@@ -6,7 +6,7 @@
 | **Instituição** | IEJB, Igreja Evangélica do Jardim Brasil |
 | **Responsável pelo projeto e desenvolvimento** | Kaique |
 | **Status** | Em planejamento. Sem aprovação institucional definitiva e sem início de desenvolvimento. |
-| **Versão deste documento** | 0.3 (substituições fora do MVP) |
+| **Versão deste documento** | 0.4 (primeiras respostas sobre o Louvor) |
 | **Última atualização** | 13/11/2026 |
 
 > Este documento registra a visão atual do IEJB Hub para que ela possa evoluir depois.
@@ -503,7 +503,7 @@ Os itens de prioridade da seção 10 (autenticação, pessoas, ministérios, cul
 
 ### 13.4. Perguntas em aberto sobre o Louvor
 
-Precisam ser respondidas, de preferência com o líder de louvor, antes de definir as regras de negócio:
+Precisam ser respondidas, de preferência com o líder de louvor, antes de definir as regras de negócio. As primeiras respostas estão na [seção 13.7](#137-respostas-do-levantamento).
 
 1. Como os grupos G1, G2 e G3 se revezam (rodízio fixo, por culto, por semana)?
 2. Cada integrante pertence a um único grupo ou pode tocar em mais de um?
@@ -527,6 +527,45 @@ Precisam ser respondidas, de preferência com o líder de louvor, antes de defin
 
 ❓ **Em aberto:** se o líder de louvor vai ajustar a escala no Hub quando souber de uma troca, ou se a escala fica como a original.
 
+### 13.7. Respostas do levantamento
+
+> **Fonte:** respostas de Kaique em 13/11/2026, como integrante do Louvor. **Ainda precisam ser confirmadas com o líder de louvor.**
+
+| # | Pergunta | Resposta |
+|---|---|---|
+| 1 | Revezamento dos grupos | Geralmente **um grupo por culto**. |
+| 2 | Integrante em mais de um grupo | **Sim.** O G2 e o G3 têm integrantes em comum. |
+| 3 | Cultos com louvor escalado | **Todos.** |
+| 4 | Poder dos líderes de grupo | Podem mudar praticamente tudo, mas **toda mudança é avisada** ao líder de louvor. |
+| 5 | Repertório | Os líderes de grupo escolhem e enviam no **grupo do WhatsApp**. Resposta sobre o tom mudar por culto ficou ambígua. |
+| 6 | Quantidade de integrantes | Não sabe. |
+| 7 | Líder de louvor usaria o Hub? | Não respondida. Só o próprio líder pode responder. |
+
+**Cultos semanais publicados no site institucional** (referência, em 13/11/2026):
+
+| Dia | Horário | Nome |
+|---|---|---|
+| Domingo | 09:00 | EBD |
+| Domingo | 18:00 | Culto da Família |
+| Terça | 19:30 | Culto de Oração |
+
+### 13.8. O que as respostas já indicam para o modelo
+
+💡 **Proposto** (a validar nas regras de negócio):
+
+- Uma pessoa pode pertencer a **vários grupos**, então a relação pessoa x grupo é de muitos para muitos.
+- A escala é montada principalmente **por grupo** ("o G2 toca neste culto"), mas a palavra "geralmente" indica exceções, então pode ser preciso ajustar pessoas individualmente.
+- Existem **dois níveis de liderança** no Louvor: o líder de louvor e os líderes de grupo, que podem editar e cujas mudanças precisam chegar ao líder de louvor.
+- O **repertório pertence ao culto e é definido pelo líder do grupo** escalado.
+
+### 13.9. Novas perguntas
+
+1. A EBD também tem louvor escalado, ou "todos" se refere aos cultos?
+2. O grupo é fixo por culto (ex.: G1 sempre no domingo à noite) ou roda entre os cultos?
+3. Em que situações sai do "um grupo por culto" (dois grupos juntos, grupo misto, eventos especiais)?
+4. Hoje, como os líderes de grupo avisam o líder de louvor das mudanças?
+5. O tom das músicas muda de um culto para outro?
+
 ---
 
 ## Histórico de alterações
@@ -536,3 +575,4 @@ Precisam ser respondidas, de preferência com o líder de louvor, antes de defin
 | 0.1 | 13/11/2026 | Registro inicial da visão do IEJB Hub. |
 | 0.2 | 13/11/2026 | Piloto Louvor como MVP, acesso inicial restrito ao Louvor, repositório privado e levantamento do processo atual. |
 | 0.3 | 13/11/2026 | Substituições fora do MVP; repositório `iejb-hub` criado. |
+| 0.4 | 13/11/2026 | Primeiras respostas do levantamento do Louvor, implicações para o modelo e novas perguntas. |
