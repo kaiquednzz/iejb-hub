@@ -6,7 +6,7 @@
 
 | Documento | Descrição | Status |
 |---|---|---|
-| [Visão geral do IEJB Hub](planejamento/VISAO-GERAL-IEJB-HUB.md) | Conceito, pilares, módulos, permissões, arquitetura considerada, modelo financeiro e pontos em aberto do IEJB Hub. | Em planejamento (v0.6) |
+| [Visão geral do IEJB Hub](planejamento/VISAO-GERAL-IEJB-HUB.md) | Conceito, pilares, módulos, permissões, arquitetura considerada, modelo financeiro e pontos em aberto do IEJB Hub. | Em planejamento (v0.7) |
 
 ## Convenções
 

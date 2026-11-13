@@ -6,7 +6,7 @@
 | **Instituição** | IEJB, Igreja Evangélica do Jardim Brasil |
 | **Responsável pelo projeto e desenvolvimento** | Kaique |
 | **Status** | Em planejamento. Sem aprovação institucional definitiva e sem início de desenvolvimento. |
-| **Versão deste documento** | 0.6 (levantamento do Louvor concluído) |
+| **Versão deste documento** | 0.7 (PWA e notificações) |
 | **Última atualização** | 13/11/2026 |
 
 > Este documento registra a visão atual do IEJB Hub para que ela possa evoluir depois.
@@ -267,7 +267,7 @@ O IEJB Hub deverá ter **aparência e experiência de um aplicativo real**.
 - Interface moderna e profissional.
 - Design responsivo.
 - Excelente experiência mobile.
-- Possibilidade de instalação como PWA.
+- Instalação como PWA (obrigatória no celular, ver seção 13.11).
 - Navegação organizada por módulos.
 - Dashboard personalizado conforme o usuário.
 - Menu lateral ou estrutura de navegação equivalente.
@@ -431,6 +431,8 @@ A mensalidade contemplaria: utilização, hospedagem, manutenção, correções,
 | D14 | Acesso inicial apenas para integrantes do Louvor; a arquitetura já deve prever a comunidade inteira, liberada por etapas. |
 | D15 | Repositório do Hub privado durante o planejamento; pode ficar público depois da aprovação. |
 | D16 | Substituições ficam fora do MVP: continuam sendo combinadas pessoalmente, sem registro no Hub. |
+| D17 | No celular, o Hub só é usado instalado como PWA; no computador, funciona no navegador sem exigir instalação. |
+| D18 | Avisos de mudança do líder de louvor: notificação push como canal principal e mensagem pronta para o WhatsApp como reserva. |
 
 ### 💡 Proposto
 
@@ -440,7 +442,6 @@ A mensalidade contemplaria: utilização, hospedagem, manutenção, correções,
 | P3 | Supabase (PostgreSQL, Supabase Auth, RLS) como backend. |
 | P4 | Hospedagem no Cloudflare Pages e versionamento no GitHub. |
 | P5 | Uso dos planos gratuitos dos serviços. |
-| P6 | Instalação como PWA. |
 | P7 | Implantação gratuita, 2 meses de teste e mensalidade a definir. |
 
 ### ❓ Em aberto
@@ -586,9 +587,19 @@ Precisam ser respondidas, de preferência com o líder de louvor, antes de defin
 | 2 | O líder de louvor usaria o Hub no lugar da planilha? | **Sim.** |
 | 3 | Quantidade de integrantes | Cerca de **13 pessoas**. |
 
-### 13.11. Ponto em aberto para as regras de negócio
+### 13.11. PWA e notificações
 
-❓ **Em aberto:** como o aviso de mudança do líder de louvor vai chegar às pessoas no MVP (por exemplo: aviso dentro do Hub, notificação no celular, ou o Hub gerar uma mensagem para o líder mandar no WhatsApp).
+✅ **Definido:**
+
+- **Celular:** o Hub precisa estar **instalado como PWA**. Se for aberto pelo navegador do celular, mostra uma tela com o passo a passo de instalação (iPhone e Android).
+- **Computador:** funciona **no navegador**, sem exigir instalação.
+- **Avisos de mudança do líder de louvor:** **notificação push** como canal principal, e o Hub gera uma **mensagem pronta para o WhatsApp** como reserva.
+
+**Motivo da instalação obrigatória no celular:** no iPhone, notificações push só funcionam em web apps adicionados à tela de início. Com cerca de 13 integrantes, a instalação pode ser feita com cada pessoa, por exemplo em um ensaio.
+
+**Motivo da reserva no WhatsApp:** a pessoa pode negar a permissão de notificação, desativá-la no sistema ou trocar de aparelho. Sem um canal de reserva, o aviso não chegaria e ninguém saberia.
+
+**Impacto no escopo do MVP:** o push adiciona uma frente própria ao MVP: tratamento de push no service worker, chaves VAPID, registro das inscrições de cada aparelho e uma função no backend para disparar as notificações.
 
 ---
 
@@ -602,3 +613,4 @@ Precisam ser respondidas, de preferência com o líder de louvor, antes de defin
 | 0.4 | 13/11/2026 | Primeiras respostas do levantamento do Louvor, implicações para o modelo e novas perguntas. |
 | 0.5 | 13/11/2026 | Segunda rodada: EBD sem louvor, escala flexível, grupos mesclados em cultos especiais, tom por culto e contradição sobre avisos. |
 | 0.6 | 13/11/2026 | Terceira rodada: avisos esclarecidos, líder de louvor usaria o Hub, cerca de 13 integrantes. Levantamento inicial do Louvor concluído. |
+| 0.7 | 13/11/2026 | PWA obrigatório no celular (não no computador), push como canal principal e WhatsApp como reserva. |
