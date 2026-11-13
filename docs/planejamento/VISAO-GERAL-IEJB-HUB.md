@@ -6,7 +6,7 @@
 | **Instituição** | IEJB, Igreja Evangélica do Jardim Brasil |
 | **Responsável pelo projeto e desenvolvimento** | Kaique |
 | **Status** | Em planejamento. Sem aprovação institucional definitiva e sem início de desenvolvimento. |
-| **Versão deste documento** | 0.5 (segunda rodada sobre o Louvor) |
+| **Versão deste documento** | 0.6 (levantamento do Louvor concluído) |
 | **Última atualização** | 13/11/2026 |
 
 > Este documento registra a visão atual do IEJB Hub para que ela possa evoluir depois.
@@ -492,7 +492,7 @@ Os itens de prioridade da seção 10 (autenticação, pessoas, ministérios, cul
 | Substituição | Quem não pode tocar **combina pessoalmente** com outra pessoa para substituí-la. |
 | Repertório | Escolhido pelo **líder de cada grupo**. |
 | Cifras | **Não há** cifra compartilhada. |
-| Tamanho | Quantidade de integrantes ainda não levantada. |
+| Tamanho | Cerca de **13 integrantes**. |
 
 ### 13.3. Dores observadas no processo atual
 
@@ -536,10 +536,10 @@ Precisam ser respondidas, de preferência com o líder de louvor, antes de defin
 | 1 | Revezamento dos grupos | Geralmente **um grupo por culto**. |
 | 2 | Integrante em mais de um grupo | **Sim.** O G2 e o G3 têm integrantes em comum. |
 | 3 | Cultos com louvor escalado | **Todos.** |
-| 4 | Poder dos líderes de grupo | Podem mudar praticamente tudo, mas **toda mudança é avisada** ao líder de louvor. |
+| 4 | Poder dos líderes de grupo | Podem mudar praticamente tudo. (A parte sobre avisos foi esclarecida na seção 13.10.) |
 | 5 | Repertório | Os líderes de grupo escolhem e enviam no **grupo do WhatsApp**. Resposta sobre o tom mudar por culto ficou ambígua. |
-| 6 | Quantidade de integrantes | Não sabe. |
-| 7 | Líder de louvor usaria o Hub? | Não respondida. Só o próprio líder pode responder. |
+| 6 | Quantidade de integrantes | Cerca de 13 (respondido depois, ver 13.10). |
+| 7 | Líder de louvor usaria o Hub? | **Sim** (ver 13.10). |
 
 **Cultos semanais publicados no site institucional** (referência, em 13/11/2026):
 
@@ -561,7 +561,7 @@ Precisam ser respondidas, de preferência com o líder de louvor, antes de defin
 | 4 | Como os líderes de grupo avisam mudanças? | **Não avisam.** |
 | 5 | O tom muda por culto? | **Pode mudar.** |
 
-⚠️ **Contradição a esclarecer:** na primeira rodada, a resposta foi que "toda mudança é avisada" ao líder de louvor; na segunda, que os líderes de grupo "não avisam". Isso define se o Hub precisa de histórico ou aviso de alterações para o líder de louvor.
+✅ **Esclarecido (ver 13.10):** não havia contradição. "Tudo é avisado" se refere às mudanças do **líder de louvor**, que são comunicadas aos líderes e integrantes. "Não avisam" se refere aos líderes de grupo, que não reportam mudanças ao líder de louvor.
 
 ### 13.9. O que as respostas indicam para o modelo
 
@@ -572,13 +572,23 @@ Precisam ser respondidas, de preferência com o líder de louvor, antes de defin
 - **Sem rodízio automático:** a escolha do grupo é manual, culto a culto, como o líder já faz hoje.
 - **Cultos com louvor:** apenas os cultos marcados como tendo louvor entram na escala (a EBD fica de fora).
 - **O tom pertence ao repertório do culto, não à música:** a mesma música pode ter tons diferentes em cultos diferentes.
-- **Dois níveis de liderança:** líder de louvor e líderes de grupo. O que cada um pode editar depende da contradição acima.
+- **Dois níveis de liderança:** líder de louvor e líderes de grupo.
+- **Mudanças do líder de louvor precisam chegar às pessoas afetadas.** Mudanças dos líderes de grupo não precisam ser reportadas para cima.
+- **Volume pequeno:** cerca de 13 integrantes, bem dentro dos limites dos planos gratuitos considerados.
 
-### 13.10. Perguntas que continuam abertas
+### 13.10. Terceira rodada de respostas
 
-1. Os líderes de grupo avisam ou não o líder de louvor quando mudam algo? O líder de louvor gostaria de ser avisado?
-2. O líder de louvor usaria o Hub no lugar da planilha? (Só ele pode responder.)
-3. Quantas pessoas fazem parte do Louvor?
+> **Fonte:** Kaique, 13/11/2026.
+
+| # | Pergunta | Resposta |
+|---|---|---|
+| 1 | Avisos de mudança | Tudo que o **líder de louvor** muda é avisado aos líderes e integrantes. Os líderes de grupo não reportam mudanças ao líder de louvor. |
+| 2 | O líder de louvor usaria o Hub no lugar da planilha? | **Sim.** |
+| 3 | Quantidade de integrantes | Cerca de **13 pessoas**. |
+
+### 13.11. Ponto em aberto para as regras de negócio
+
+❓ **Em aberto:** como o aviso de mudança do líder de louvor vai chegar às pessoas no MVP (por exemplo: aviso dentro do Hub, notificação no celular, ou o Hub gerar uma mensagem para o líder mandar no WhatsApp).
 
 ---
 
@@ -591,3 +601,4 @@ Precisam ser respondidas, de preferência com o líder de louvor, antes de defin
 | 0.3 | 13/11/2026 | Substituições fora do MVP; repositório `iejb-hub` criado. |
 | 0.4 | 13/11/2026 | Primeiras respostas do levantamento do Louvor, implicações para o modelo e novas perguntas. |
 | 0.5 | 13/11/2026 | Segunda rodada: EBD sem louvor, escala flexível, grupos mesclados em cultos especiais, tom por culto e contradição sobre avisos. |
+| 0.6 | 13/11/2026 | Terceira rodada: avisos esclarecidos, líder de louvor usaria o Hub, cerca de 13 integrantes. Levantamento inicial do Louvor concluído. |
