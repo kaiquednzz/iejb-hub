@@ -6,7 +6,7 @@
 | **Instituição** | IEJB, Igreja Evangélica do Jardim Brasil |
 | **Responsável pelo projeto e desenvolvimento** | Kaique |
 | **Status** | Em planejamento. Sem aprovação institucional definitiva e sem início de desenvolvimento. |
-| **Versão deste documento** | 0.4 (primeiras respostas sobre o Louvor) |
+| **Versão deste documento** | 0.5 (segunda rodada sobre o Louvor) |
 | **Última atualização** | 13/11/2026 |
 
 > Este documento registra a visão atual do IEJB Hub para que ela possa evoluir depois.
@@ -549,22 +549,36 @@ Precisam ser respondidas, de preferência com o líder de louvor, antes de defin
 | Domingo | 18:00 | Culto da Família |
 | Terça | 19:30 | Culto de Oração |
 
-### 13.8. O que as respostas já indicam para o modelo
+### 13.8. Segunda rodada de respostas
+
+> **Fonte:** Kaique, 13/11/2026. A confirmar com o líder de louvor.
+
+| # | Pergunta | Resposta |
+|---|---|---|
+| 1 | A EBD tem louvor? | **Não.** Os cultos com louvor são o Culto da Família e o Culto de Oração, além de cultos especiais. |
+| 2 | Grupo fixo ou rodízio? | **Flexível:** o líder de louvor decide a cada culto. Não há rodízio automático. |
+| 3 | Exceções ao "um grupo por culto" | Em **cultos especiais** os grupos podem se **mesclar**. O líder decide. |
+| 4 | Como os líderes de grupo avisam mudanças? | **Não avisam.** |
+| 5 | O tom muda por culto? | **Pode mudar.** |
+
+⚠️ **Contradição a esclarecer:** na primeira rodada, a resposta foi que "toda mudança é avisada" ao líder de louvor; na segunda, que os líderes de grupo "não avisam". Isso define se o Hub precisa de histórico ou aviso de alterações para o líder de louvor.
+
+### 13.9. O que as respostas indicam para o modelo
 
 💡 **Proposto** (a validar nas regras de negócio):
 
-- Uma pessoa pode pertencer a **vários grupos**, então a relação pessoa x grupo é de muitos para muitos.
-- A escala é montada principalmente **por grupo** ("o G2 toca neste culto"), mas a palavra "geralmente" indica exceções, então pode ser preciso ajustar pessoas individualmente.
-- Existem **dois níveis de liderança** no Louvor: o líder de louvor e os líderes de grupo, que podem editar e cujas mudanças precisam chegar ao líder de louvor.
-- O **repertório pertence ao culto e é definido pelo líder do grupo** escalado.
+- **Pessoa x grupo é muitos para muitos:** uma pessoa pode estar em vários grupos (caso do G2 e G3).
+- **A escala é de pessoas, e o grupo é um atalho:** o líder escolhe um grupo para preencher a escala de um culto rapidamente, mas o que fica registrado são as pessoas escaladas. Assim cabem os cultos normais (um grupo), os especiais (grupos mesclados) e ajustes individuais, sem regras separadas para cada caso.
+- **Sem rodízio automático:** a escolha do grupo é manual, culto a culto, como o líder já faz hoje.
+- **Cultos com louvor:** apenas os cultos marcados como tendo louvor entram na escala (a EBD fica de fora).
+- **O tom pertence ao repertório do culto, não à música:** a mesma música pode ter tons diferentes em cultos diferentes.
+- **Dois níveis de liderança:** líder de louvor e líderes de grupo. O que cada um pode editar depende da contradição acima.
 
-### 13.9. Novas perguntas
+### 13.10. Perguntas que continuam abertas
 
-1. A EBD também tem louvor escalado, ou "todos" se refere aos cultos?
-2. O grupo é fixo por culto (ex.: G1 sempre no domingo à noite) ou roda entre os cultos?
-3. Em que situações sai do "um grupo por culto" (dois grupos juntos, grupo misto, eventos especiais)?
-4. Hoje, como os líderes de grupo avisam o líder de louvor das mudanças?
-5. O tom das músicas muda de um culto para outro?
+1. Os líderes de grupo avisam ou não o líder de louvor quando mudam algo? O líder de louvor gostaria de ser avisado?
+2. O líder de louvor usaria o Hub no lugar da planilha? (Só ele pode responder.)
+3. Quantas pessoas fazem parte do Louvor?
 
 ---
 
@@ -576,3 +590,4 @@ Precisam ser respondidas, de preferência com o líder de louvor, antes de defin
 | 0.2 | 13/11/2026 | Piloto Louvor como MVP, acesso inicial restrito ao Louvor, repositório privado e levantamento do processo atual. |
 | 0.3 | 13/11/2026 | Substituições fora do MVP; repositório `iejb-hub` criado. |
 | 0.4 | 13/11/2026 | Primeiras respostas do levantamento do Louvor, implicações para o modelo e novas perguntas. |
+| 0.5 | 13/11/2026 | Segunda rodada: EBD sem louvor, escala flexível, grupos mesclados em cultos especiais, tom por culto e contradição sobre avisos. |
