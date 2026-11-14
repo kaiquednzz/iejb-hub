@@ -6,7 +6,7 @@
 | **Instituição** | IEJB, Igreja Evangélica do Jardim Brasil |
 | **Responsável pelo projeto e desenvolvimento** | Kaique |
 | **Status** | Em planejamento. Sem aprovação institucional definitiva e sem início de desenvolvimento. |
-| **Versão deste documento** | 0.9 (quinta rodada sobre o Louvor) |
+| **Versão deste documento** | 1.0 (regras do Louvor fechadas) |
 | **Última atualização** | 13/11/2026 |
 
 > Este documento registra a visão atual do IEJB Hub para que ela possa evoluir depois.
@@ -460,7 +460,7 @@ A mensalidade contemplaria: utilização, hospedagem, manutenção, correções,
 | A9 | Modelo financeiro e mensalidade. |
 | A10 | Aprovação institucional. |
 | A11 | Cronograma de desenvolvimento. |
-| A12 | Questões em aberto do piloto Louvor (documento de regras de negócio, seção 10). |
+| A12 | Confirmação das regras do piloto Louvor com o líder de louvor (documento de regras de negócio). |
 
 ---
 
@@ -626,8 +626,8 @@ Precisam ser respondidas, de preferência com o líder de louvor, antes de defin
 | Q12 | Como a pessoa recebe acesso e recupera a senha sem e-mail? | O administrador cria a conta com senha temporária, ou a pessoa solicita com nome e senha e o administrador aprova. |
 | Q13 | Quem edita o repertório de culto só com avulsos? | Líder de louvor e administrador. |
 | Q14 | Quem são os "afetados" no aviso? | Quem entrou, saiu ou continua escalado. |
-| Q15 | O líder de grupo mexe nos membros do próprio grupo? | "Os dois" (leitura a confirmar). |
-| Q16 | Uma pessoa pode ter mais de um instrumento? | Sim; na escala aparece o que o líder do grupo definir. |
+| Q15 | O líder de grupo mexe nos membros do próprio grupo? | "Os dois": líder de grupo (só o próprio grupo) e líder de louvor/admin. Leitura confirmada. |
+| Q16 | Uma pessoa pode ter mais de um instrumento? | Sim; na escala aparece o que o líder do grupo definir (por vínculo pessoa + grupo). Leitura confirmada. |
 | Q17 | Como o líder de louvor fica sabendo de uma troca? | Aviso simples e informal, sem regra. |
 
 ---
@@ -645,3 +645,4 @@ Precisam ser respondidas, de preferência com o líder de louvor, antes de defin
 | 0.7 | 13/11/2026 | PWA obrigatório no celular (não no computador), push como canal principal e WhatsApp como reserva. |
 | 0.8 | 13/11/2026 | Quarta rodada: líder de louvor atualiza a escala em trocas, aviso só aos afetados, escala visível a todos e repertório pelos líderes dos grupos. |
 | 0.9 | 13/11/2026 | Quinta rodada: acesso sem e-mail com aprovação do administrador (D19), repertório em culto só com avulsos, afetados, membros do grupo e instrumento por vínculo. |
+| 1.0 | 13/11/2026 | Q15 e Q16 confirmadas. Regras do piloto Louvor sem questões em aberto, a confirmar com o líder de louvor. |

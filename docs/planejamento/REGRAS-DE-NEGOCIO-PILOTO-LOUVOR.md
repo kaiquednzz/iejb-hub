@@ -4,7 +4,7 @@
 |---|---|
 | **Escopo** | MVP do IEJB Hub, restrito ao ministério de Louvor |
 | **Etapa** | 2. Definição de requisitos e regras de negócio |
-| **Versão** | 0.4 (rascunho para revisão) |
+| **Versão** | 0.5 (rascunho para revisão) |
 | **Última atualização** | 13/11/2026 |
 | **Documento base** | [Visão geral do IEJB Hub](VISAO-GERAL-IEJB-HUB.md), seção 13 |
 
@@ -130,9 +130,9 @@ Legenda: ✔️ pode · ✖️ não pode · ❓ a confirmar
 
 **RN-15** ✅ O Hub registra o **instrumento ou função** de cada pessoa (bateria, violão, voz etc.) e **mostra na escala** (Q5). Uma pessoa pode ter **mais de um** instrumento, e na escala aparece **o que o líder do grupo definir** (Q16).
 
-**RN-16** ✅ O líder de grupo **adiciona e tira membros do próprio grupo**, além do líder de louvor e do administrador (Q15, ver Q18).
+**RN-16** ✅ O líder de grupo **adiciona e tira membros do próprio grupo**, além do líder de louvor e do administrador (Q15 e Q18).
 
-**RN-17** 💡 O instrumento mostrado na escala é definido **por vínculo pessoa + grupo**: quem tem o instrumento "violão" no G2 aparece assim quando o G2 é usado. Pessoa avulsa, sem grupo, tem o instrumento definido pelo líder de louvor. Ver Q18.
+**RN-17** ✅ O instrumento mostrado na escala é definido **por vínculo pessoa + grupo**: quem tem o instrumento "violão" no G2 aparece assim quando o G2 é usado. Pessoa avulsa, sem grupo, tem o instrumento definido pelo líder de louvor (Q18). A mesma pessoa pode ter instrumentos diferentes em grupos diferentes.
 
 ---
 
@@ -277,9 +277,7 @@ Veja no Hub: app.iejb.com.br/...
 
 ## 10. Questões em aberto
 
-| # | Questão | Afeta |
-|---|---|---|
-| Q18 | Confirmar a leitura de duas respostas: (a) "os dois" na Q15 significa que o líder de grupo **e** o líder de louvor/administrador editam membros; (b) o instrumento mostrado na escala fica por vínculo pessoa + grupo (RN-17), podendo ser diferente em cada grupo. | RN-16, RN-17 |
+Nenhuma no momento. O piloto está com as regras fechadas, a confirmar com o líder de louvor.
 
 ### Respondidas
 
@@ -299,9 +297,10 @@ Veja no Hub: app.iejb.com.br/...
 | Q12 | Como a pessoa recebe acesso e recupera a senha sem e-mail? | O administrador cria a conta com senha temporária, ou a pessoa solicita com nome e senha e o administrador aprova. Senha esquecida: o administrador redefine. | RN-10, RN-65 |
 | Q13 | Quem edita o repertório de culto só com avulsos? | Líder de louvor e administrador. | RN-56 |
 | Q14 | "Afetados" no aviso, quem é? | Quem entrou, saiu ou continua escalado. | RN-41 |
-| Q15 | O líder de grupo mexe nos membros do próprio grupo? | "Os dois" (leitura a confirmar, Q18). | RN-16 |
+| Q15 | O líder de grupo mexe nos membros do próprio grupo? | "Os dois": líder de grupo (só o próprio grupo) e líder de louvor/admin. | RN-16 |
 | Q16 | Uma pessoa pode ter mais de um instrumento? | Sim; na escala aparece o que o líder do grupo definir. | RN-15, RN-17 |
 | Q17 | Como o líder de louvor fica sabendo de uma troca? | Aviso simples e informal, sem regra. | RN-71 |
+| Q18 | Leitura da Q15 e da Q16 está certa? | Sim: líder de grupo e líder de louvor/admin editam membros; instrumento por vínculo pessoa + grupo. | RN-16, RN-17 |
 
 ---
 
@@ -313,3 +312,4 @@ Veja no Hub: app.iejb.com.br/...
 | 0.2 | 13/11/2026 | Q1 a Q3 respondidas: Kaique como administrador, solicitação de alteração com aprovação do líder de louvor, login com e-mail e senha. |
 | 0.3 | 13/11/2026 | Q4 a Q11 respondidas. Novas questões: Q12 (acesso sem e-mail) e Q13 (repertório em culto sem grupo). |
 | 0.4 | 13/11/2026 | Q12 a Q17 respondidas: acesso sem e-mail com aprovação do administrador, líder de grupo edita membros do próprio grupo, instrumento por vínculo, aviso só aos afetados. Nova questão Q18. |
+| 0.5 | 13/11/2026 | Q18 confirmada. Sem questões em aberto no piloto. |
