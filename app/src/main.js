@@ -24,6 +24,7 @@ import { telaEquipe } from './telas/equipe/index.js';
 import { telaMontar } from './telas/montar/index.js';
 import { eLiderDeLouvor } from './sessao.js';
 import { sincronizarPush } from './util/push.js';
+import { limparRetornoDoGoogle } from './util/google.js';
 import { telaErro } from './telas/erro.js';
 import { telaInstalar } from './telas/instalar.js';
 import { precisaInstalar, registrarServiceWorker } from './pwa.js';
@@ -52,7 +53,9 @@ async function decidirTela() {
         return;
     }
 
+    // getSession espera o supabase-js trocar o ?code= do Google pela sessão
     const { data: { session } } = await supabase.auth.getSession();
+    limparRetornoDoGoogle();
     usuarioAtual = session?.user.id ?? null;
 
     let tela;

@@ -1,7 +1,8 @@
 import { h, comCarregando } from '../util/dom.js';
 import { supabase } from '../supabase.js';
 import { mensagemDeErro } from '../sessao.js';
-import { molduraEntrada, campo, caixaDeAviso } from './moldura.js';
+import { molduraEntrada, campo, caixaDeAviso, blocoGoogle } from './moldura.js';
+import { erroDoGoogle } from '../util/google.js';
 
 export function telaEntrar() {
     const aviso = caixaDeAviso();
@@ -37,10 +38,13 @@ export function telaEntrar() {
         ajuda,
     );
 
+    const erroGoogle = erroDoGoogle();
+    if (erroGoogle) aviso.mostrar(erroGoogle);
+
     return molduraEntrada({
         titulo: 'Entrar',
         subtitulo: 'Escalas e repertório do Louvor.',
-        conteudo: form,
+        conteudo: h('div', null, blocoGoogle('Entrar com Google', aviso), form),
         rodape: h('span', null, 'Ainda não tem acesso? ', h('a', { href: '#/pedir-acesso' }, 'Pedir acesso')),
     });
 }

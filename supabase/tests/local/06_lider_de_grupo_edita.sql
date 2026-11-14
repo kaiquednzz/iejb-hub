@@ -88,4 +88,9 @@ select teste.ok(:'resumo2' like 'Escala atualizada: %', 'mudança do líder de l
 select teste.ok((select count(*) = 0 from public.aviso_destinatario where aviso_id = :'aviso2' and pessoa_id = :'p_lider'),
   'e o líder de louvor não é avisado da própria mudança');
 
+
+-- Migração 16: nome de quem entra com Google
+insert into auth.users (email, raw_user_meta_data) values ('google@teste', '{"full_name": "Maria do Google", "avatar_url": "https://x"}');
+select teste.ok((select nome_informado = 'Maria do Google' from public.conta where login = 'google@teste'),
+  'quem entra com Google chega com o nome no pedido de acesso');
 \warn 'TESTES DO LÍDER DE GRUPO PASSARAM'

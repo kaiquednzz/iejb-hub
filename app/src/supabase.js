@@ -14,7 +14,10 @@ export const supabase = createClient(url, chave, {
         // Mantém a pessoa logada entre aberturas do app (fica no localStorage)
         persistSession: true,
         autoRefreshToken: true,
-        // Não usamos login por link mágico nem OAuth (D19, D23)
-        detectSessionInUrl: false,
+        // Login com Google (D33): ao voltar do Google o endereço traz ?code=...,
+        // que o supabase-js troca pela sessão sozinho. PKCE: o segredo dessa
+        // troca fica no aparelho, então um ?code= roubado não serve para nada.
+        detectSessionInUrl: true,
+        flowType: 'pkce',
     },
 });

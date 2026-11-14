@@ -3,6 +3,7 @@ import { h, icone } from '../util/dom.js';
 import { supabase } from '../supabase.js';
 import { eLiderDeLouvor } from '../sessao.js';
 import { removerAparelho } from '../util/push.js';
+import { googleAtivo, entrarComGoogle } from '../util/google.js';
 
 // Telas de quem ainda não entrou (ou está esperando aprovação):
 // fundo vinho com brilho e um cartão de vidro no meio.
@@ -72,6 +73,27 @@ export function barraAbas(conta, atual) {
 }
 
 export { iniciais, avatar } from '../util/foto.js';
+
+// "Entrar com Google" + divisória "ou". Some se o Google não estiver ligado.
+export function blocoGoogle(texto, aviso) {
+    const botao = h('button', { type: 'button', class: 'botao-google botao-largo' },
+        h('span', { class: 'google-g', 'aria-hidden': 'true' }, 'G'), texto);
+    const bloco = h('div', { class: 'bloco-google', hidden: true }, botao, h('p', { class: 'divisoria' }, h('span', null, 'ou com e-mail')));
+    botao.addEventListener('click', async () => {
+        botao.disabled = true;
+        botao.classList.add('carregando');
+        try {
+            await entrarComGoogle(); // sai do app; volta logado
+        } catch (erro) {
+            console.error(erro);
+            aviso?.mostrar('Não deu para abrir o Google. Tente de novo.');
+            botao.disabled = false;
+            botao.classList.remove('carregando');
+        }
+    });
+    googleAtivo().then((ativo) => { bloco.hidden = !ativo; });
+    return bloco;
+}
 
 // Campo de formulário com rótulo de verdade (acessível e com área de toque boa)
 export function campo({ rotulo, nome, tipo = 'text', autocomplete, dica, ...resto }) {

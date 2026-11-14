@@ -4,7 +4,7 @@
 |---|---|
 | **Escopo** | MVP do IEJB Hub, restrito ao ministério de Louvor |
 | **Etapa** | 2. Definição de requisitos e regras de negócio |
-| **Versão** | 0.7 (rascunho para revisão) |
+| **Versão** | 0.8 (rascunho para revisão) |
 | **Última atualização** | 14/11/2026 |
 | **Documento base** | [Visão geral do IEJB Hub](VISAO-GERAL-IEJB-HUB.md), seção 13 |
 
@@ -259,7 +259,7 @@ Veja no Hub: app.iejb.com.br/...
 
 **RN-63** 💡 Uma pessoa pode receber notificações em **mais de um aparelho** (ex.: celular e computador).
 
-**RN-64** ✅ Login com **e-mail e senha** (Q3, escolhido a partir da recomendação abaixo).
+**RN-64** ✅ Login com **e-mail e senha** (Q3, escolhido a partir da recomendação abaixo). 💡 *(14/11/2026, D33)* **Google** em teste como opção a mais, para quem é leigo: só vira oficial se o retorno funcionar no iPhone com o app instalado (o problema descrito na tabela abaixo).
 
 **RN-65** ✅ A **senha esquecida é redefinida pelo administrador** (Q12), que passa uma nova senha temporária. Não há redefinição por e-mail.
 
@@ -317,4 +317,5 @@ Nenhuma no momento. O piloto está com as regras fechadas, a confirmar com o lí
 | 0.4 | 13/11/2026 | Q12 a Q17 respondidas: acesso sem e-mail com aprovação do administrador, líder de grupo edita membros do próprio grupo, instrumento por vínculo, aviso só aos afetados. Nova questão Q18. |
 | 0.5 | 13/11/2026 | Q18 confirmada. Sem questões em aberto no piloto. |
 | 0.6 | 13/11/2026 | Q19 a Q22 (da etapa 3) incorporadas: instrumento ajustável por culto, solicitação só nos cultos do próprio grupo, repertório após a escala, contato visível. |
+| 0.8 | 14/11/2026 | RN-64: login com Google em teste (D33). |
 | 0.7 | 14/11/2026 | Q23: o líder de grupo ajusta pessoas e instrumentos sozinho e o líder de louvor é avisado (RN-02, RN-37 a 39, RN-44 mudaram; RN-46 e 47 sem efeito). Mesa de som e ceia como parte da escala (ver visão geral, D29). |

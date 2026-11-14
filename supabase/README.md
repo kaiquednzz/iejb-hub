@@ -5,8 +5,8 @@ Banco do piloto Louvor, construído a partir do [modelo de dados e permissões](
 | | |
 |---|---|
 | Projeto Supabase | `iejb-hub` (organização IEJB Hub), região São Paulo (`sa-east-1`), Postgres 17 |
-| Estado | 15 migrações (10 a 15 em 14/11/2026), a função de servidor `admin-acesso` e o bucket `fotos`. |
-| Testes | 143 verificações, todas passando (`tests/local/rodar.sh`) |
+| Estado | 16 migrações (10 a 16 em 14/11/2026), a função de servidor `admin-acesso` e o bucket `fotos`. |
+| Testes | 144 verificações, todas passando (`tests/local/rodar.sh`) |
 
 ## Estrutura
 
@@ -27,7 +27,8 @@ supabase/
 │   ├── ..._fechar_funcoes_novas.sql     # REVOKE de anon que faltou nas 10 e 11 (ver lição abaixo)
 │   ├── ..._push.sql                     # chaves VAPID, aparelhos, fila de envio, agendamento
 │   ├── ..._pg_net_fora_do_public.sql    # extensão pg_net no esquema extensions
-│   └── ..._lider_de_grupo_edita.sql     # D32: líder de grupo ajusta pessoas e instrumentos; líder de louvor é avisado
+│   ├── ..._lider_de_grupo_edita.sql     # D32: líder de grupo ajusta pessoas e instrumentos; líder de louvor é avisado
+│   └── ..._nome_vindo_do_google.sql     # D33: nome do pedido de acesso também vem do Google
 ├── functions/enviar-push/   # entrega os avisos no celular (chamada pelo pg_cron)
 ├── functions/admin-acesso/  # criar acesso e redefinir senha (precisa da chave de serviço)
 └── tests/local/

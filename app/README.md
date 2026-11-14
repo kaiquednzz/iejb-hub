@@ -32,6 +32,7 @@ src/telas/equipe/     tela Equipe: pedidos de acesso, pessoas e grupos (uma seç
 src/telas/montar/     tela Montar escala (líder de louvor): mês, semanas, culto, mesa, WhatsApp
 src/util/foto.js      fotos de perfil: comprime no aparelho, sobe, mostra (avatar)
 src/util/escala.js    regra da "Mesa" (função de som) usada em mais de uma tela
+src/util/google.js    entrar com Google (D33): só aparece se estiver ligado no Supabase
 src/util/push.js      ativar avisos, inscrever o aparelho, remover ao sair
 src/util/musica.js    links de busca nas plataformas, ID do YouTube, fila "Tocar no YouTube" (D26)
 src/telas/repertorio.js  bloco do repertório na escala, "Ouvir" e o editor

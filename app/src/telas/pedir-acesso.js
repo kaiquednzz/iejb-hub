@@ -3,7 +3,7 @@
 import { h, comCarregando } from '../util/dom.js';
 import { supabase } from '../supabase.js';
 import { mensagemDeErro } from '../sessao.js';
-import { molduraEntrada, campo, caixaDeAviso } from './moldura.js';
+import { molduraEntrada, campo, caixaDeAviso, blocoGoogle } from './moldura.js';
 
 const SENHA_MINIMA = 8;
 
@@ -54,7 +54,8 @@ export function telaPedirAcesso() {
     return molduraEntrada({
         titulo: 'Pedir acesso',
         subtitulo: 'Um administrador confere e libera sua conta.',
-        conteudo: form,
+        // Com Google o pedido nasce do mesmo jeito (conta pendente, com o nome do Google)
+        conteudo: h('div', null, blocoGoogle('Pedir acesso com Google', aviso), form),
         rodape: h('span', null, 'Já tem conta? ', h('a', { href: '#/entrar' }, 'Entrar')),
     });
 }
