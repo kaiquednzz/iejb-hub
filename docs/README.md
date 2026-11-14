@@ -19,4 +19,4 @@
 
 ### Próximos documentos previstos
 
-Nenhum por enquanto. A etapa 4 começou pelo banco: veja [`supabase/README.md`](../supabase/README.md).
+Nenhum por enquanto. A etapa 4 começou pelo banco ([`supabase/README.md`](../supabase/README.md)) e seguiu para o front-end ([`app/README.md`](../app/README.md)).

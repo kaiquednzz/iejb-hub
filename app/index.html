@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>IEJB Hub</title>
+    <meta name="description" content="Escalas e repertório dos ministérios da IEJB.">
+    <!-- App privado: não queremos ele no Google -->
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="theme-color" content="#8F0D0B">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="IEJB Hub">
+    <link rel="manifest" href="/manifest.webmanifest">
+    <link rel="icon" href="/favicon.ico" sizes="any">
+    <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96">
+    <link rel="apple-touch-icon" href="/icone-192.png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&display=swap">
+</head>
+<body>
+    <a class="pular" href="#conteudo">Pular para o conteúdo</a>
+    <div id="app">
+        <!-- Enquanto o JS carrega, mostra só o logo (evita tela branca) -->
+        <div class="carregando-inicial" role="status">
+            <img src="/logo-iejb-pequeno.png" alt="" width="56" height="56">
+            <span class="sr-only">Carregando o IEJB Hub…</span>
+        </div>
+    </div>
+    <noscript>
+        <p class="sem-js">O IEJB Hub precisa de JavaScript ligado para funcionar.</p>
+    </noscript>
+    <script type="module" src="/src/main.js"></script>
+</body>
+</html>
