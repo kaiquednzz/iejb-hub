@@ -5,8 +5,8 @@
 | **Nome** | IEJB Hub |
 | **Instituição** | IEJB, Igreja Evangélica do Jardim Brasil |
 | **Responsável pelo projeto e desenvolvimento** | Kaique |
-| **Status** | Em planejamento. Sem aprovação institucional definitiva e sem início de desenvolvimento. |
-| **Versão deste documento** | 1.3 (decisões técnicas fechadas) |
+| **Status** | Em desenvolvimento (etapa 4): banco, login, escala e PWA prontos. Sem aprovação institucional definitiva. |
+| **Versão deste documento** | 1.4 (música nas plataformas e PWA antes do login) |
 | **Última atualização** | 13/11/2026 |
 
 > Este documento registra a visão atual do IEJB Hub para que ela possa evoluir depois.
@@ -440,6 +440,8 @@ A mensalidade contemplaria: utilização, hospedagem, manutenção, correções,
 | D23 | Login com Supabase Auth, sem e-mail: conta criada pelo administrador ou solicitada pela pessoa (cadastro aberto com confirmação de e-mail desligada) e aprovada por ele. A conta pendente não acessa nada. |
 | D24 | Hospedagem no Cloudflare Pages, código no GitHub, endereço `app.iejb.com.br`. Kaique tem acesso ao DNS. |
 | D25 | Push com service worker próprio, chaves VAPID e função de servidor, com a mensagem de WhatsApp como reserva. |
+| D26 | Músicas nas plataformas de streaming sem integração de conta: cada música do repertório tem botões "Ouvir no Spotify / YouTube Music / Apple Music" que abrem a busca da plataforma com título e artista, e o culto tem "Tocar o repertório no YouTube", que monta a fila na ordem do repertório com os links do YouTube das músicas (endereço `youtube.com/watch_videos?video_ids=`). Sem criar playlist nas contas das pessoas e sem campo de playlist do culto. Motivos: a API do Spotify em modo de desenvolvimento aceita só 5 usuários e exige Premium do dono; a da Apple exige conta paga de desenvolvedor. Risco aceito: o endereço do YouTube não é oficial; se parar, os botões por música continuam. Entra na tela de montar repertório. |
+| D27 | No celular, a instalação como PWA vem antes do login, porque no iPhone o app da tela de início não enxerga a sessão do Safari. O app guarda no aparelho a última escala vista, para abrir sem internet, e apaga essa cópia ao sair da conta. |
 
 ### 💡 Proposto
 
@@ -661,3 +663,4 @@ Precisam ser respondidas, de preferência com o líder de louvor, antes de defin
 | 1.1 | 13/11/2026 | Sexta rodada (Q19 a Q22), vinda do modelo de dados da etapa 3. |
 | 1.2 | 13/11/2026 | Decisões técnicas: Supabase, planos gratuitos e front-end com Vite e JavaScript puro (D20 a D22). Registro de decisões técnicas criado. |
 | 1.3 | 13/11/2026 | Aprovadas as recomendações de login, hospedagem e push (D23 a D25). Stack do piloto fechada. |
+| 1.4 | 13/11/2026 | Desenvolvimento começou. Músicas nas plataformas de streaming por botões e fila do YouTube, sem playlist (D26). PWA antes do login e escala offline (D27). |
