@@ -5,8 +5,8 @@ Banco do piloto Louvor, construído a partir do [modelo de dados e permissões](
 | | |
 |---|---|
 | Projeto Supabase | `iejb-hub` (organização IEJB Hub), região São Paulo (`sa-east-1`), Postgres 17 |
-| Estado | 14 migrações aplicadas (10 a 14 em 14/11/2026), a função de servidor `admin-acesso` e o bucket `fotos`. |
-| Testes | 127 verificações, todas passando (`tests/local/rodar.sh`) |
+| Estado | 15 migrações (10 a 15 em 14/11/2026), a função de servidor `admin-acesso` e o bucket `fotos`. |
+| Testes | 143 verificações, todas passando (`tests/local/rodar.sh`) |
 
 ## Estrutura
 
@@ -26,7 +26,8 @@ supabase/
 │   ├── ..._montar_escala_e_fotos.sql    # grupos por culto, mesa de som, rótulo (Ceia), fotos
 │   ├── ..._fechar_funcoes_novas.sql     # REVOKE de anon que faltou nas 10 e 11 (ver lição abaixo)
 │   ├── ..._push.sql                     # chaves VAPID, aparelhos, fila de envio, agendamento
-│   └── ..._pg_net_fora_do_public.sql    # extensão pg_net no esquema extensions
+│   ├── ..._pg_net_fora_do_public.sql    # extensão pg_net no esquema extensions
+│   └── ..._lider_de_grupo_edita.sql     # D32: líder de grupo ajusta pessoas e instrumentos; líder de louvor é avisado
 ├── functions/enviar-push/   # entrega os avisos no celular (chamada pelo pg_cron)
 ├── functions/admin-acesso/  # criar acesso e redefinir senha (precisa da chave de serviço)
 └── tests/local/
@@ -36,6 +37,7 @@ supabase/
     ├── 03_gestao_de_pessoas.sql  # as funções da migração 10
     ├── 04_montar_escala_e_fotos.sql # as funções da migração 11
     ├── 05_push.sql               # aparelhos e fila de envio
+    ├── 06_lider_de_grupo_edita.sql # D32 (roda depois da migração 15; os anteriores, antes)
     └── rodar.sh
 ```
 
@@ -123,3 +125,7 @@ Para conferir se está entregando: `select push_enviado_em, push_erro from aviso
 ## Manter acordado
 
 O plano gratuito pausa depois de 7 dias sem uso. `.github/workflows/manter-acordado.yml` faz uma leitura por dia (GitHub Actions). Dá para rodar na hora em Actions → "Manter o Supabase acordado" → Run workflow.
+
+## Lição aprendida 3: gatilho que pergunta "quem está agindo?" não pode ser security definer
+
+Dentro de uma função `security definer` o `current_user` vira o dono da função, então `privado.e_sistema()` responde "sim" para todo mundo. O gatilho `mesa_so_lider_de_louvor` nasceu assim e deixava qualquer líder de grupo mexer na mesa; o teste do cenário 06 pegou antes de ir para o banco. Gatilhos que conferem o papel de quem chamou rodam como invoker (igual ao `so_admin_muda_lider` da migração 01).

@@ -151,7 +151,7 @@ export function abrirCulto(cultoId, ctx) {
 }
 
 // Instrumento da pessoa NESTE culto (RN-17: pode ser diferente do padrão do grupo)
-function folhaItem(item, culto, fazer) {
+export function folhaItem(item, culto, fazer) {
     const temMesa = item.instrumento_exibido.includes(FUNCAO_MESA);
     const seletor = seletorInstrumentos({
         sugestoes: SUGESTOES.filter((s) => s !== FUNCAO_MESA),
@@ -178,7 +178,7 @@ function folhaItem(item, culto, fazer) {
 }
 
 // Pessoa avulsa (substituição combinada, D16; ou culto especial)
-function folhaAdicionarPessoa(culto, dados, fazer) {
+export function folhaAdicionarPessoa(culto, dados, fazer) {
     const jaEstao = new Set(culto.itens.map((i) => i.pessoa_id));
     const candidatas = dados.doLouvor.filter((p) => !jaEstao.has(p.id));
     if (candidatas.length === 0) {

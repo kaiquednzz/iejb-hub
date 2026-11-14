@@ -5,8 +5,8 @@
 | **Nome** | IEJB Hub |
 | **Instituição** | IEJB, Igreja Evangélica do Jardim Brasil |
 | **Responsável pelo projeto e desenvolvimento** | Kaique |
-| **Status** | Em desenvolvimento (etapa 4): banco, login, escala, PWA gestão de pessoas e acessos, montagem da escala, repertório com botões de streaming, fotos de perfil, avisos por push e pedido de alteração prontos (todas as regras do piloto têm tela); app publicado em `app.iejb.com.br`. Sem aprovação institucional definitiva. |
-| **Versão deste documento** | 1.9 (pedido de alteração) |
+| **Status** | Em desenvolvimento (etapa 4): banco, login, escala, PWA gestão de pessoas e acessos, montagem da escala, repertório com botões de streaming, fotos de perfil, avisos por push e ajuste da escala pelo líder de grupo prontos (todas as regras do piloto têm tela); app publicado em `app.iejb.com.br`. Sem aprovação institucional definitiva. |
+| **Versão deste documento** | 2.0 (líder de grupo com autonomia) |
 | **Última atualização** | 13/11/2026 |
 
 > Este documento registra a visão atual do IEJB Hub para que ela possa evoluir depois.
@@ -444,6 +444,7 @@ A mensalidade contemplaria: utilização, hospedagem, manutenção, correções,
 | D27 | No celular, a instalação como PWA vem antes do login, porque no iPhone o app da tela de início não enxerga a sessão do Safari. O app guarda no aparelho a última escala vista, para abrir sem internet, e apaga essa cópia ao sair da conta. |
 | D28 | Toda a gestão de pessoas e acessos é feita pelo próprio Hub, na tela Equipe: aprovar ou recusar pedidos, cadastrar e desativar pessoas, criar acesso com senha temporária, redefinir senha, desligar acesso, tornar administrador, marcar líder de louvor e montar os grupos. Criar acesso e redefinir senha usam uma função de servidor do Supabase (`admin-acesso`), a única parte que tem a chave de serviço. |
 | D29 | Montagem da escala espelha a planilha atual do líder: o mês é formado pelas semanas que começam nele; o grupo é escolhido por semana (vale para domingo e terça) e pode ser trocado culto a culto; cada culto tem a **Mesa** (quem opera o som), registrada como uma pessoa da escala com a função "Mesa"; culto pode ter o rótulo **Ceia**; e o resumo do mês sai em texto para o WhatsApp, no lugar do PDF. Veio da planilha de novembro/2026 (a confirmar com o líder de louvor, A12). |
+| D32 | (Q23) O líder de grupo ajusta sozinho pessoas e instrumentos nos cultos publicados do grupo dele; o líder de louvor é avisado de cada ajuste, com o nome de quem mudou. Mesa, grupo do culto, cancelar e publicar seguem com o líder de louvor. O pedido de alteração (RN-37 a 39 antigas) saiu do app. **Inverte a Q2 e a RN-44; precisa ser confirmado com o líder de louvor (A12).** |
 | D31 | Push implementado sem ninguém manusear a chave privada: a função de servidor gera as chaves VAPID na primeira vez e as guarda numa tabela que só o servidor lê. Envio a cada minuto pelo agendador do banco, só quando há aviso pendente. Um agendamento diário no GitHub mantém o Supabase acordado (D21). |
 | D30 | Fotos de perfil comprimidas no próprio aparelho (~25 KB) e guardadas no Storage do Supabase com limite de 200 KB por arquivo, cache de um ano e nome novo a cada troca. Com cerca de 13 pessoas o uso fica muito abaixo do plano gratuito. |
 
@@ -667,6 +668,7 @@ Precisam ser respondidas, de preferência com o líder de louvor, antes de defin
 | 1.1 | 13/11/2026 | Sexta rodada (Q19 a Q22), vinda do modelo de dados da etapa 3. |
 | 1.2 | 13/11/2026 | Decisões técnicas: Supabase, planos gratuitos e front-end com Vite e JavaScript puro (D20 a D22). Registro de decisões técnicas criado. |
 | 1.3 | 13/11/2026 | Aprovadas as recomendações de login, hospedagem e push (D23 a D25). Stack do piloto fechada. |
+| 2.0 | 14/11/2026 | D32: o líder de grupo ajusta a escala com autonomia e o líder de louvor é avisado; o pedido de alteração saiu. |
 | 1.9 | 14/11/2026 | Pedido de alteração do líder de grupo e decisão do líder de louvor (RN-37 a 39); mensagem de WhatsApp de uma mudança (RN-43). Todas as regras do piloto Louvor têm tela. |
 | 1.8 | 14/11/2026 | Avisos por push (D31) e o "mantenha acordado" diário. |
 | 1.7 | 14/11/2026 | Repertório implementado como na D26: ouvir nas plataformas, tocar no YouTube em sequência, editor para líderes de grupo. |

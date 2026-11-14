@@ -35,7 +35,7 @@ src/util/escala.js    regra da "Mesa" (função de som) usada em mais de uma tel
 src/util/push.js      ativar avisos, inscrever o aparelho, remover ao sair
 src/util/musica.js    links de busca nas plataformas, ID do YouTube, fila "Tocar no YouTube" (D26)
 src/telas/repertorio.js  bloco do repertório na escala, "Ouvir" e o editor
-src/telas/pedido-alteracao.js  pedir (líder de grupo) e decidir (líder de louvor)
+src/telas/ajustar-escala.js  "Mudar quem toca" do líder de grupo (D32)
 src/util/folha.js     folha que sobe de baixo (<dialog>), confirmação e aviso rápido (toast)
 src/util/erros.js     traduz erros do banco e da função admin-acesso
 src/util/dom.js       h() monta HTML sem innerHTML (proteção contra XSS) + ícones
@@ -151,12 +151,13 @@ Dentro de cada culto da aba Escala:
 - **Tocar no YouTube:** monta uma fila com os vídeos na ordem do repertório (`youtube.com/watch_videos?video_ids=`) e mostra "N de M" com link. Endereço não oficial (risco aceito na D26).
 - **Montar/Editar repertório:** aparece para o líder de um grupo escalado (depois da escala publicada), o líder de louvor e o admin, a mesma regra que o banco confere em `pode_editar_repertorio`. Busca no catálogo enquanto digita, cadastra música nova (com atalho "Procurar no YouTube" para pegar o link), tom por culto com um toque, sobe/desce na ordem. Mudança depois de publicada gera aviso de "repertório alterado".
 
-## Pedido de alteração (RN-37 a 39)
+## Líder de grupo ajusta a escala (D32)
 
-- **Líder de grupo** (não líder de louvor), num culto publicado em que o grupo dele foi escalado: "Pedir alteração na escala" no cartão do culto, texto livre. Os pedidos dele aparecem ali com o estado (esperando, aprovado, reprovado + motivo).
-- **Líder de louvor:** os pendentes ficam no topo da tela Montar (e com contador na aba). Aprovar avisa o autor e já abre o culto para fazer a mudança (aprovar não muda a escala sozinho, RN-39). Reprovar pede um motivo opcional.
-- Os avisos do pedido (RN-46, 47) são criados por gatilho no banco e vão por push; o de pedido novo abre direto a aba Montar.
-- **Reserva do push (RN-43):** na folha de um culto publicado, "Mandar esta escala no WhatsApp" gera a mensagem pronta da mudança.
+- Num culto **publicado** em que o grupo dele está escalado, o líder de grupo (que não é líder de louvor) vê "Mudar quem toca" no cartão do culto: tira e inclui pessoas e muda o instrumento delas **naquele culto**.
+- Mesa de som, grupo do culto, cancelar e publicar continuam com o líder de louvor. Quem garante é o banco (políticas de `escala_item` + gatilho `mesa_so_lider_de_louvor`).
+- Os afetados e o **líder de louvor** recebem o aviso ("Escala atualizada por Mari: ...").
+- **Reserva do push (RN-43):** na folha de um culto publicado (aba Montar), "Mandar esta escala no WhatsApp" gera a mensagem pronta da mudança.
+- O pedido de alteração (versão anterior da regra) saiu do app; o histórico fica no banco.
 
 ## Avisos no celular (push)
 

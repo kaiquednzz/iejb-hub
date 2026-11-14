@@ -4,8 +4,8 @@
 |---|---|
 | **Escopo** | MVP do IEJB Hub, restrito ao ministério de Louvor |
 | **Etapa** | 2. Definição de requisitos e regras de negócio |
-| **Versão** | 0.6 (rascunho para revisão) |
-| **Última atualização** | 13/11/2026 |
+| **Versão** | 0.7 (rascunho para revisão) |
+| **Última atualização** | 14/11/2026 |
 | **Documento base** | [Visão geral do IEJB Hub](VISAO-GERAL-IEJB-HUB.md), seção 13 |
 
 > Este documento descreve **o que** o piloto deve fazer e **quais regras** valem. Ele não define banco de dados, telas nem tecnologia; isso fica para a etapa 3.
@@ -105,7 +105,7 @@ Legenda: ✔️ pode · ✖️ não pode · ❓ a confirmar
 
 **RN-01** ✅ Toda permissão é verificada **no banco de dados e no backend**, não só na interface (decisão D4). Esconder um botão não é considerado controle de acesso.
 
-**RN-02** ✅ Só o **líder de louvor** edita a escala. O líder de grupo **solicita alterações**, que o líder de louvor aprova ou reprova (Q2, ver RN-37 a RN-39).
+**RN-02** ✅ O **líder de louvor** monta e publica a escala. ✅ *(mudou em 14/11/2026, Q23)* O **líder de grupo** ajusta sozinho as pessoas e os instrumentos nos cultos publicados do próprio grupo, e o líder de louvor é avisado (ver RN-37 a RN-39).
 
 **RN-03** ✅ O primeiro administrador é **Kaique**, que pode designar outros administradores (Q1). Para quem também for líder de louvor, basta acumular os dois papéis.
 
@@ -173,13 +173,13 @@ Isso permite ao líder montar o mês inteiro com calma e só avisar quando estiv
 
 **RN-36** ✅ Todo integrante vê a **escala completa de todos os cultos** (Q6). 💡 Além disso, o Hub destaca **"minhas escalas"**, só com os cultos em que a pessoa está escalada. Essa é a principal diferença em relação ao PDF atual (visão geral, seção 13.3).
 
-**RN-37** ✅ O **líder de grupo não edita a escala**. Ele envia uma **solicitação de alteração** para um culto específico **em que o grupo dele foi escalado** (Q2, Q20).
+**RN-37** ✅ *(mudou em 14/11/2026, Q23)* O **líder de grupo ajusta a escala com autonomia**, sem pedir aprovação, nos cultos **publicados** em que o grupo dele foi escalado (Q20): **tira e inclui pessoas** e **muda o instrumento** de alguém naquele culto.
 
-**RN-38** ✅ O **líder de louvor aprova ou reprova** cada solicitação (Q2).
+**RN-38** ✅ *(Q23)* Continuam só com o **líder de louvor**: a **mesa de som**, o **grupo** escalado no culto, **cancelar** o culto, mexer em **rascunho** e **publicar**. Ou seja: a montagem do mês é dele; o ajuste fino do culto, do líder de grupo.
 
-**RN-39** 💡 Formato da solicitação no piloto: **texto livre** ligado ao culto (ex.: "trocar Fulano por Ciclano no domingo"). Ao aprovar, o próprio líder de louvor faz a alteração na escala, e o aviso normal é disparado (RN-40). A solicitação guarda o estado (**pendente**, **aprovada** ou **reprovada**) e, se reprovada, um motivo opcional.
+**RN-39** ✅ *(Q23)* O **líder de louvor é avisado** de cada ajuste feito por um líder de grupo, com o nome de quem mudou (ex.: "Escala atualizada por Mari: Culto da Família, 22/11. Entrou: Bia. Saiu: Lucas."). As pessoas afetadas recebem o aviso normal (RN-40).
 
-**Motivo da proposta:** uma solicitação "estruturada", em que o líder de grupo monta a escala nova e a aprovação aplica sozinha, é bem mais complexa de construir. Com cerca de 13 pessoas e poucas solicitações por mês, o texto livre resolve no piloto e pode evoluir depois.
+> **Histórico:** até a versão 0.6 o líder de grupo **solicitava** a alteração em texto livre e o líder de louvor aprovava ou reprovava (Q2). Essa versão chegou a ser construída e foi trocada pela autonomia na Q23, porque o pedido deixaria a troca parada esperando aprovação. As solicitações antigas ficam guardadas no banco.
 
 ### 6.2. Fluxo: montar e publicar a escala
 
@@ -189,13 +189,11 @@ Isso permite ao líder montar o mês inteiro com calma e só avisar quando estiv
 4. Salva como **rascunho** ou **publica**.
 5. Ao publicar, o Hub dispara o aviso (seção 7).
 
-### 6.3. Fluxo: solicitação de alteração
+### 6.3. Fluxo: ajuste pelo líder de grupo
 
-1. O líder de grupo abre um culto com escala publicada e envia uma solicitação.
-2. O líder de louvor recebe um aviso (RN-46).
-3. O líder de louvor aprova ou reprova.
-4. Se aprovar, ele altera a escala e o aviso normal vai para as pessoas afetadas.
-5. O líder de grupo recebe a resposta (RN-47).
+1. O líder de grupo abre um culto publicado do grupo dele e toca em "Mudar quem toca".
+2. Troca pessoas ou instrumentos.
+3. Depois de alguns minutos sem novas mudanças (RN-45), os afetados e o líder de louvor recebem o aviso (RN-39, RN-40).
 
 ### 6.4. Troca combinada entre integrantes
 
@@ -223,13 +221,13 @@ Tocam: G2 + Fulano
 Veja no Hub: app.iejb.com.br/...
 ```
 
-**RN-44** 🗣️ Mudanças feitas pelos **líderes de grupo não geram aviso** para o líder de louvor.
+**RN-44** ✅ *(mudou em 14/11/2026, Q23)* Mudanças feitas pelos **líderes de grupo avisam o líder de louvor** (antes: não avisavam). Mudanças no **repertório** continuam avisando só quem está escalado.
 
 **RN-45** 💡 Várias alterações seguidas na mesma escala, feitas em poucos minutos, geram **um único aviso**, para não lotar o celular das pessoas.
 
-**RN-46** 💡 O líder de louvor recebe uma notificação quando chega uma **nova solicitação de alteração**.
+**RN-46** ~~O líder de louvor recebe uma notificação quando chega uma nova solicitação de alteração.~~ Sem efeito desde a Q23 (não existe mais solicitação).
 
-**RN-47** 💡 O líder de grupo recebe uma notificação quando sua solicitação é **aprovada ou reprovada**.
+**RN-47** ~~O líder de grupo recebe uma notificação quando sua solicitação é aprovada ou reprovada.~~ Sem efeito desde a Q23.
 
 ---
 
@@ -284,7 +282,7 @@ Nenhuma no momento. O piloto está com as regras fechadas, a confirmar com o lí
 | # | Questão | Resposta | Regras |
 |---|---|---|---|
 | Q1 | Quem é o administrador? | Kaique, que pode designar outros. | RN-03, RN-10 |
-| Q2 | Líder de grupo pode editar a escala? | Não. Ele solicita a alteração e o líder de louvor aprova ou reprova. | RN-02, RN-37 a RN-39 |
+| Q2 | Líder de grupo pode editar a escala? | Não. Ele solicita a alteração e o líder de louvor aprova ou reprova. **Substituída pela Q23.** | RN-02, RN-37 a RN-39 |
 | Q3 | Como as pessoas fazem login? | E-mail e senha. O Hub não envia e-mail (Q12). | RN-64, RN-65 |
 | Q4 | Algum grupo tem mais de um líder? | Não. | RN-12 |
 | Q5 | A escala mostra o instrumento de cada pessoa? | Sim. | RN-15 |
@@ -305,6 +303,7 @@ Nenhuma no momento. O piloto está com as regras fechadas, a confirmar com o lí
 | Q20 | O líder de grupo pede alteração em qual culto? | Só nos cultos do próprio grupo. | RN-37 |
 | Q21 | Quando o líder de grupo edita o repertório? | Depois da escala, quando ele quiser. | RN-56 |
 | Q22 | Integrantes veem o contato uns dos outros? | Sim. | RN-14 |
+| Q23 | (14/11/2026) O líder de grupo deve pedir ao líder de louvor? | Não: ele muda com autonomia **pessoas e instrumentos** nos cultos publicados do grupo dele, e o líder de louvor é apenas avisado. Mesa, grupo do culto, cancelar e publicar continuam com o líder de louvor. | RN-02, RN-37 a RN-39, RN-44 |
 
 ---
 
@@ -318,3 +317,4 @@ Nenhuma no momento. O piloto está com as regras fechadas, a confirmar com o lí
 | 0.4 | 13/11/2026 | Q12 a Q17 respondidas: acesso sem e-mail com aprovação do administrador, líder de grupo edita membros do próprio grupo, instrumento por vínculo, aviso só aos afetados. Nova questão Q18. |
 | 0.5 | 13/11/2026 | Q18 confirmada. Sem questões em aberto no piloto. |
 | 0.6 | 13/11/2026 | Q19 a Q22 (da etapa 3) incorporadas: instrumento ajustável por culto, solicitação só nos cultos do próprio grupo, repertório após a escala, contato visível. |
+| 0.7 | 14/11/2026 | Q23: o líder de grupo ajusta pessoas e instrumentos sozinho e o líder de louvor é avisado (RN-02, RN-37 a 39, RN-44 mudaram; RN-46 e 47 sem efeito). Mesa de som e ceia como parte da escala (ver visão geral, D29). |
