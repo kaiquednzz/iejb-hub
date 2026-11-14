@@ -6,7 +6,7 @@
 | **Instituição** | IEJB, Igreja Evangélica do Jardim Brasil |
 | **Responsável pelo projeto e desenvolvimento** | Kaique |
 | **Status** | Em planejamento. Sem aprovação institucional definitiva e sem início de desenvolvimento. |
-| **Versão deste documento** | 0.7 (PWA e notificações) |
+| **Versão deste documento** | 0.8 (quarta rodada sobre o Louvor) |
 | **Última atualização** | 13/11/2026 |
 
 > Este documento registra a visão atual do IEJB Hub para que ela possa evoluir depois.
@@ -430,7 +430,7 @@ A mensalidade contemplaria: utilização, hospedagem, manutenção, correções,
 | D13 | O MVP é um piloto restrito ao ministério de Louvor. |
 | D14 | Acesso inicial apenas para integrantes do Louvor; a arquitetura já deve prever a comunidade inteira, liberada por etapas. |
 | D15 | Repositório do Hub privado durante o planejamento; pode ficar público depois da aprovação. |
-| D16 | Substituições ficam fora do MVP: continuam sendo combinadas pessoalmente, sem registro no Hub. |
+| D16 | Substituições não têm fluxo próprio no MVP: são combinadas pessoalmente e o líder de louvor atualiza a escala no Hub. |
 | D17 | No celular, o Hub só é usado instalado como PWA; no computador, funciona no navegador sem exigir instalação. |
 | D18 | Avisos de mudança do líder de louvor: notificação push como canal principal e mensagem pronta para o WhatsApp como reserva. |
 
@@ -459,7 +459,7 @@ A mensalidade contemplaria: utilização, hospedagem, manutenção, correções,
 | A9 | Modelo financeiro e mensalidade. |
 | A10 | Aprovação institucional. |
 | A11 | Cronograma de desenvolvimento. |
-| A12 | Regras do Louvor listadas na seção 13.4. |
+| A12 | Questões em aberto do piloto Louvor (documento de regras de negócio, seção 10). |
 
 ---
 
@@ -520,13 +520,13 @@ Precisam ser respondidas, de preferência com o líder de louvor, antes de defin
 
 ### 13.6. Fora do escopo do MVP
 
-✅ **Definido:** **substituições** não serão tratadas no MVP. Elas continuam sendo combinadas pessoalmente entre os integrantes, como hoje.
+✅ **Definido:** **substituições** não terão fluxo próprio no MVP (sem pedido nem aceite do substituto no Hub). Elas continuam sendo combinadas pessoalmente entre os integrantes, como hoje.
 
 **Motivo:** manter o piloto simples.
 
-**Consequência conhecida:** quando houver uma troca, a escala no Hub vai mostrar quem foi escalado originalmente, não quem vai tocar de fato.
+✅ **Definido:** quando o líder de louvor souber de uma troca, ele **atualiza a escala no Hub** (ver 13.12).
 
-❓ **Em aberto:** se o líder de louvor vai ajustar a escala no Hub quando souber de uma troca, ou se a escala fica como a original.
+**Risco conhecido:** se a troca não chegar ao líder de louvor, a escala mostra quem não vai tocar.
 
 ### 13.7. Respostas do levantamento
 
@@ -601,6 +601,21 @@ Precisam ser respondidas, de preferência com o líder de louvor, antes de defin
 
 **Impacto no escopo do MVP:** o push adiciona uma frente própria ao MVP: tratamento de push no service worker, chaves VAPID, registro das inscrições de cada aparelho e uma função no backend para disparar as notificações.
 
+### 13.12. Quarta rodada de respostas
+
+> **Fonte:** Kaique, 13/11/2026. As regras derivadas estão no [documento de regras de negócio](REGRAS-DE-NEGOCIO-PILOTO-LOUVOR.md).
+
+| # | Pergunta | Resposta |
+|---|---|---|
+| Q4 | Algum grupo tem mais de um líder? | Não. |
+| Q5 | A escala mostra o instrumento de cada pessoa? | Sim. |
+| Q6 | O integrante vê só a própria escala ou todas? | Todas. |
+| Q7 | O aviso de mudança vai para quem? | Para os afetados. |
+| Q8 | Em culto com grupos mesclados, quem escolhe o repertório? | Os líderes dos grupos, em conjunto. |
+| Q9 | A ordem das músicas importa? | Sim. |
+| Q10 | Mudança no repertório avisa? | Sim. |
+| Q11 | Em troca combinada, o líder atualiza a escala no Hub? | Sim. |
+
 ---
 
 ## Histórico de alterações
@@ -614,3 +629,4 @@ Precisam ser respondidas, de preferência com o líder de louvor, antes de defin
 | 0.5 | 13/11/2026 | Segunda rodada: EBD sem louvor, escala flexível, grupos mesclados em cultos especiais, tom por culto e contradição sobre avisos. |
 | 0.6 | 13/11/2026 | Terceira rodada: avisos esclarecidos, líder de louvor usaria o Hub, cerca de 13 integrantes. Levantamento inicial do Louvor concluído. |
 | 0.7 | 13/11/2026 | PWA obrigatório no celular (não no computador), push como canal principal e WhatsApp como reserva. |
+| 0.8 | 13/11/2026 | Quarta rodada: líder de louvor atualiza a escala em trocas, aviso só aos afetados, escala visível a todos e repertório pelos líderes dos grupos. |

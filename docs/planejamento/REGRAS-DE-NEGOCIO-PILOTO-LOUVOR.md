@@ -4,7 +4,7 @@
 |---|---|
 | **Escopo** | MVP do IEJB Hub, restrito ao ministério de Louvor |
 | **Etapa** | 2. Definição de requisitos e regras de negócio |
-| **Versão** | 0.2 (rascunho para revisão) |
+| **Versão** | 0.3 (rascunho para revisão) |
 | **Última atualização** | 13/11/2026 |
 | **Documento base** | [Visão geral do IEJB Hub](VISAO-GERAL-IEJB-HUB.md), seção 13 |
 
@@ -18,7 +18,7 @@ Cada regra indica de onde veio:
 
 | Origem | Significado |
 |---|---|
-| 🗣️ **Levantamento** | Vem das respostas sobre como o Louvor funciona hoje (visão geral, seções 13.7 a 13.11). |
+| 🗣️ **Levantamento** | Vem das respostas sobre como o Louvor funciona hoje (visão geral, seções 13.7 a 13.12). |
 | ✅ **Decisão** | Decisão já registrada por Kaique na visão geral. |
 | 💡 **Proposta** | Sugestão para fechar uma lacuna. Precisa ser aceita ou ajustada por Kaique. |
 | ❓ **Em aberto** | Ainda não há resposta. Listado na [seção 10](#10-questões-em-aberto). |
@@ -42,7 +42,7 @@ As regras são numeradas (`RN-xx`) para poderem ser citadas no código, nos test
 
 | Item | Motivo |
 |---|---|
-| Substituições registradas no Hub | ✅ Decisão D16: continuam combinadas pessoalmente. |
+| Fluxo próprio de substituição (pedido, aceite do substituto) | ✅ Decisão D16: a troca continua combinada pessoalmente; o líder de louvor só atualiza a escala (RN-70). |
 | Outros ministérios e a comunidade | ✅ Decisões D13 e D14: entram depois do piloto. |
 | Cifras hospedadas no Hub | 💡 Proposta: no piloto, só um link externo opcional (ver RN-52). |
 | Disponibilidade dos músicos e confirmação de presença | 💡 Proposta: ficam para depois. Não apareceram como dor no levantamento. |
@@ -114,13 +114,13 @@ Legenda: ✔️ pode · ✖️ não pode · ❓ a confirmar
 
 **RN-11** 🗣️ Uma pessoa pode ser membro de **mais de um grupo** (caso do G2 e G3).
 
-**RN-12** 💡 Um grupo tem **um líder**, que precisa ser membro desse grupo. ❓ Confirmar se algum grupo tem mais de um líder (Q4).
+**RN-12** ✅ Cada grupo tem **um único líder**, que precisa ser membro desse grupo (Q4).
 
 **RN-13** 💡 Pessoas que saem do Louvor são **desativadas**, não apagadas. Assim as escalas e os repertórios antigos continuam mostrando quem tocou.
 
 **RN-14** 💡 Dados mínimos da pessoa: nome, como é chamada no Louvor (apelido) e meio de contato da conta. Nenhum dado além do necessário para o piloto funcionar.
 
-**RN-15** ❓ Se o piloto vai registrar o **instrumento ou função** de cada pessoa (bateria, violão, voz etc.). Não apareceu no levantamento, mas a visão geral prevê (Q5).
+**RN-15** ✅ O Hub registra o **instrumento ou função** de cada pessoa (bateria, violão, voz etc.) e **mostra na escala** (Q5). 💡 Se uma pessoa pode ter mais de um instrumento fica para a etapa 3.
 
 ---
 
@@ -159,7 +159,7 @@ Isso permite ao líder montar o mês inteiro com calma e só avisar quando estiv
 
 **RN-35** 💡 Toda escala publicada guarda **quem fez a última alteração e quando**. É o mínimo para alguém conferir se está vendo a versão atual.
 
-**RN-36** 💡 Cada integrante tem uma visão **"minhas escalas"**, mostrando só os cultos em que está escalado. Essa é a principal diferença em relação ao PDF atual (visão geral, seção 13.3). ❓ Confirmar se o integrante também pode ver a escala completa de todos os cultos (Q6).
+**RN-36** ✅ Todo integrante vê a **escala completa de todos os cultos** (Q6). 💡 Além disso, o Hub destaca **"minhas escalas"**, só com os cultos em que a pessoa está escalada. Essa é a principal diferença em relação ao PDF atual (visão geral, seção 13.3).
 
 **RN-37** ✅ O **líder de grupo não edita a escala**. Ele envia uma **solicitação de alteração** para um culto específico (Q2).
 
@@ -185,13 +185,19 @@ Isso permite ao líder montar o mês inteiro com calma e só avisar quando estiv
 4. Se aprovar, ele altera a escala e o aviso normal vai para as pessoas afetadas.
 5. O líder de grupo recebe a resposta (RN-47).
 
+### 6.4. Troca combinada entre integrantes
+
+**RN-70** ✅ Quando duas pessoas combinam uma troca pessoalmente, o **líder de louvor atualiza a escala no Hub** (Q11). Não existe fluxo próprio de substituição no piloto (decisão D16). A atualização gera o aviso normal (RN-40), então quem entrou e quem saiu são avisados pelo próprio Hub.
+
+**RN-71** 💡 Risco conhecido: se a troca não chegar ao líder de louvor, a escala mostra quem não vai tocar. Hoje só o líder de grupo consegue pedir alteração pelo Hub (RN-37). Permitir que qualquer integrante avise o líder pelo Hub fica como melhoria depois do piloto.
+
 ---
 
 ## 7. Avisos de mudança
 
 **RN-40** ✅ Quando o **líder de louvor** publica ou altera uma escala publicada, as pessoas são avisadas (levantamento, seção 13.10).
 
-**RN-41** 💡 Recebem o aviso as **pessoas afetadas**: quem entrou, quem saiu e quem continua escalado naquele culto. ❓ Confirmar se deve ir para todo o Louvor (Q7).
+**RN-41** ✅ O aviso vai **só para as pessoas afetadas**, não para o Louvor inteiro (Q7). 💡 Definição proposta de "afetado": quem entrou, quem saiu e quem continua escalado naquele culto, já que a equipe que toca mudou.
 
 **RN-42** ✅ Canal principal: **notificação push** (decisão D18).
 
@@ -217,15 +223,19 @@ Veja no Hub: app.iejb.com.br/...
 
 ## 8. Repertório
 
-**RN-50** 🗣️ O repertório de um culto é escolhido pelo **líder do grupo escalado**. ❓ Em cultos com grupos mesclados, quem escolhe (Q8).
+**RN-50** ✅ O repertório de um culto é escolhido pelos **líderes dos grupos daquele culto, em conjunto** (Q8). Com um grupo só, é o líder desse grupo; com grupos mesclados, os líderes dos grupos juntos.
 
 **RN-51** 🗣️ O **tom pertence ao repertório do culto**, não à música. A mesma música pode ter tons diferentes em cultos diferentes.
 
 **RN-52** 💡 A música é cadastrada **uma vez** (nome, artista ou versão de referência, link opcional para cifra ou vídeo) e reaproveitada nos repertórios.
 
-**RN-53** 💡 O repertório tem **ordem** (qual música vem primeiro). ❓ Confirmar se a ordem importa (Q9).
+**RN-53** ✅ O repertório tem **ordem**, e ela importa (Q9).
 
-**RN-54** 💡 O repertório fica visível para as pessoas escaladas naquele culto assim que o líder do grupo salvar. ❓ Se alterar o repertório também deve gerar aviso (Q10). Pelo levantamento, hoje ele é enviado no WhatsApp e não há regra de aviso.
+**RN-54** 💡 O repertório fica visível para os integrantes assim que um líder salvar.
+
+**RN-55** ✅ Mudança no repertório **gera aviso** (Q10). 💡 O aviso vai para as pessoas escaladas naquele culto, e a regra de agrupar avisos seguidos (RN-45) também vale aqui.
+
+**RN-56** 💡 Como a escala é de pessoas (RN-31), o Hub precisa guardar **quais grupos foram usados** para montar cada culto, só para saber quais líderes podem editar o repertório. Todos esses líderes editam o mesmo repertório; vale a última alteração salva. Líder de louvor e administrador editam o repertório de qualquer culto. ❓ Pessoas avulsas, sem grupo, não têm líder de grupo (Q13).
 
 ---
 
@@ -257,14 +267,8 @@ Veja no Hub: app.iejb.com.br/...
 
 | # | Questão | Afeta |
 |---|---|---|
-| Q4 | Algum grupo tem mais de um líder? | RN-12 |
-| Q5 | O piloto registra o instrumento ou função de cada pessoa? | RN-15 |
-| Q6 | O integrante vê a escala completa de todos os cultos ou só a dele? | RN-36 |
-| Q7 | O aviso de mudança vai só para as pessoas afetadas ou para todo o Louvor? | RN-41 |
-| Q8 | Em culto com grupos mesclados, quem escolhe o repertório? | RN-50 |
-| Q9 | A ordem das músicas no repertório importa? | RN-53 |
-| Q10 | Mudança no repertório deve gerar aviso? | RN-54 |
-| Q11 | Quando a pessoa sabe de uma troca (substituição), o líder ajusta a escala no Hub? | Visão geral, seção 13.6 |
+| Q12 | Sem enviar e-mail, como a pessoa recebe o acesso e recupera a senha? Proposta: o administrador cria a conta com senha temporária (troca obrigatória no primeiro acesso) e redefine senhas esquecidas. | RN-10, RN-65 |
+| Q13 | Pessoas avulsas na escala (sem grupo) não têm líder de grupo. Quem edita o repertório quando o culto não tem grupo? Proposta: só líder de louvor e administrador. | RN-56 |
 
 ### Respondidas
 
@@ -272,7 +276,15 @@ Veja no Hub: app.iejb.com.br/...
 |---|---|---|---|
 | Q1 | Quem é o administrador? | Kaique, que pode designar outros. | RN-03, RN-10 |
 | Q2 | Líder de grupo pode editar a escala? | Não. Ele solicita a alteração e o líder de louvor aprova ou reprova. | RN-02, RN-37 a RN-39 |
-| Q3 | Como as pessoas fazem login? | E-mail e senha. | RN-64, RN-65 |
+| Q3 | Como as pessoas fazem login? | E-mail e senha. O envio de e-mail pelo Hub ficou em aberto (Q12). | RN-64, RN-65 |
+| Q4 | Algum grupo tem mais de um líder? | Não. | RN-12 |
+| Q5 | A escala mostra o instrumento de cada pessoa? | Sim. | RN-15 |
+| Q6 | O integrante vê só a própria escala ou todas? | Todas. | RN-36 |
+| Q7 | O aviso vai para quem? | Para os afetados. | RN-41 |
+| Q8 | Em culto com grupos mesclados, quem escolhe o repertório? | Os líderes dos grupos, em conjunto. | RN-50, RN-56 |
+| Q9 | A ordem das músicas importa? | Sim. | RN-53 |
+| Q10 | Mudança no repertório avisa? | Sim. | RN-55 |
+| Q11 | Em troca combinada, o líder atualiza a escala no Hub? | Sim. | RN-70, RN-71 |
 
 ---
 
@@ -282,3 +294,4 @@ Veja no Hub: app.iejb.com.br/...
 |---|---|---|
 | 0.1 | 13/11/2026 | Rascunho inicial das regras de negócio do piloto Louvor. |
 | 0.2 | 13/11/2026 | Q1 a Q3 respondidas: Kaique como administrador, solicitação de alteração com aprovação do líder de louvor, login com e-mail e senha. |
+| 0.3 | 13/11/2026 | Q4 a Q11 respondidas. Novas questões: Q12 (acesso sem e-mail) e Q13 (repertório em culto sem grupo). |
