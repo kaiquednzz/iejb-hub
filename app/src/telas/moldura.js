@@ -77,7 +77,10 @@ export { iniciais, avatar } from '../util/foto.js';
 // "Entrar com Google" + divisória "ou". Some se o Google não estiver ligado.
 export function blocoGoogle(texto, aviso) {
     const botao = h('button', { type: 'button', class: 'botao-google botao-largo' },
-        h('span', { class: 'google-g', 'aria-hidden': 'true' }, 'G'), texto);
+        // Logo oficial do Google (arquivo do pacote de marca do "Sign in with
+        // Google", em public/). Se o arquivo faltar, o botão fica só com o texto.
+        h('img', { class: 'google-g', src: '/google-g.svg', alt: '', width: 20, height: 20,
+            onerror: (e) => e.target.remove() }), texto);
     const bloco = h('div', { class: 'bloco-google', hidden: true }, botao, h('p', { class: 'divisoria' }, h('span', null, 'ou com e-mail')));
     botao.addEventListener('click', async () => {
         botao.disabled = true;

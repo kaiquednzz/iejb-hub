@@ -589,18 +589,6 @@
 }
 .botao-google:active:not(:disabled) { transform: scale(0.96); transition-duration: 0.12s; }
 .botao-google.carregando::after { border-color: rgba(0, 0, 0, 0.12); border-top-color: #4285f4; }
-/* "G" desenhado com as cores do Google, sem carregar imagem de fora */
-.google-g {
-    width: 24px;
-    height: 24px;
-    display: grid;
-    place-items: center;
-    border-radius: 50%;
-    font-family: Arial, sans-serif;
-    font-weight: 700;
-    font-size: 16px;
-    color: #fff;
-    background: conic-gradient(#ea4335 0 25%, #fbbc05 0 50%, #34a853 0 75%, #4285f4 0);
-}
+.google-g { width: 20px; height: 20px; flex: none; }
 .divisoria { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--texto-2); }
 .divisoria::before, .divisoria::after { content: '' / ''; flex: 1; height: 1px; background: rgba(58, 10, 9, 0.12); }
