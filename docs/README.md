@@ -19,5 +19,4 @@
 
 ### Próximos documentos previstos
 
-Ainda não criados. Devem surgir conforme as etapas do projeto avançarem:
-
+Nenhum por enquanto. O próximo passo é a etapa 4 (desenvolvimento do MVP), que começa depois das decisões técnicas.
