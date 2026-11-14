@@ -5,13 +5,29 @@
 // o banco (RLS) devolve vazio para conta pendente. A tela é conveniência;
 // a trava de verdade está no Postgres.
 import { supabase } from './supabase.js';
+import { guardarConta, contaGuardada, eErroDeRede } from './offline.js';
 
+// Sem internet, usa a última conta conhecida deste aparelho (se houver)
 export async function carregarConta(idUsuario) {
+    const resultado = await buscarConta(idUsuario);
+    if (resultado.conta) {
+        guardarConta(resultado.conta);
+        return resultado;
+    }
+    const copia = eErroDeRede(resultado.erro) ? contaGuardada(idUsuario) : null;
+    return copia ? { conta: copia, offline: true } : resultado;
+}
+
+async function buscarConta(idUsuario) {
     const { data, error } = await supabase
         .from('conta')
         .select('id, login, estado, e_administrador, senha_temporaria, nome_informado, pessoa:pessoa_id (id, nome, apelido)')
         .eq('id', idUsuario)
-        .maybeSingle();
+        .maybeSingle()
+        // O supabase-js tenta de novo sozinho em erro de rede (espera 1s, 2s, 4s).
+        // Ótimo no 4G instável; inútil quando o aparelho já sabe que está sem
+        // internet: aí só atrasaria a cópia offline em 7 segundos.
+        .retry(navigator.onLine);
 
     if (error) return { erro: error };
     // Não deveria acontecer: o gatilho criar_conta cria a linha junto com o usuário

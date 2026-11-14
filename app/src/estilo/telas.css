@@ -424,3 +424,145 @@
     animation: brilhar 1.3s var(--ease-ios) infinite;
 }
 @keyframes brilhar { to { translate: 100% 0; } }
+
+/* ---------------------------------------------------------------------------
+   Instalar (trava do PWA no celular)
+   --------------------------------------------------------------------------- */
+
+.instalar-icone-app {
+    position: relative;
+    animation: surgir 0.8s var(--mola) both;
+}
+.instalar-icone-app img {
+    width: 88px;
+    height: 88px;
+    border-radius: 22px; /* mesmo arredondado dos ícones do iOS */
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.12);
+    /* Flutua devagar: só translate, roda na GPU e não pesa na bateria */
+    animation: flutuar 3.2s 0.8s ease-in-out infinite alternate;
+}
+/* Brilho atrás do ícone: círculo separado que pulsa só em opacity/scale */
+.instalar-icone-app::before {
+    content: '' / '';
+    position: absolute;
+    inset: -18px;
+    z-index: -1;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(242, 184, 181, 0.45), transparent 65%);
+    animation: pulsar 3.2s 0.8s ease-in-out infinite alternate;
+}
+@keyframes flutuar { to { translate: 0 -6px; } }
+@keyframes pulsar { from { opacity: 0.5; scale: 0.9; } to { opacity: 1; scale: 1.05; } }
+
+.instalar-corpo { display: flex; flex-direction: column; gap: 14px; }
+
+.instalar-passos {
+    list-style: none;
+    display: grid;
+    gap: 10px;
+}
+.instalar-passos li {
+    display: grid;
+    grid-template-columns: 44px 1fr;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    border-radius: var(--raio-m);
+    background: var(--fundo-rosado);
+    font-size: 15px;
+    line-height: 1.4;
+    animation: subir 0.6s calc(0.25s + var(--i, 0) * 0.09s) var(--ease-out) both;
+}
+.instalar-passo-icone {
+    position: relative;
+    width: 44px;
+    height: 44px;
+    display: grid;
+    place-items: center;
+    border-radius: 13px;
+    background: #fff;
+    color: var(--principal);
+    box-shadow: var(--sombra-1);
+}
+/* Número do passo no cantinho do ícone */
+.instalar-passos { counter-reset: passo; }
+.instalar-passos li { counter-increment: passo; }
+.instalar-passo-icone::after {
+    content: counter(passo);
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    width: 20px;
+    height: 20px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: var(--principal);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+}
+.icone-pontos { stroke-width: 3.6; }
+
+.instalar-nota { font-size: 14px; color: var(--texto-2); text-align: center; }
+
+.instalar-pronto {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    text-align: center;
+    font-size: 16px;
+}
+.instalar-pronto-icone {
+    width: 56px;
+    height: 56px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: var(--verde);
+    color: #fff;
+    animation: surgir 0.7s var(--mola) both;
+}
+.instalar-pronto-icone .icone { width: 28px; height: 28px; stroke-width: 2.6; }
+
+/* ---------------------------------------------------------------------------
+   Faixa "sem conexão" na escala
+   --------------------------------------------------------------------------- */
+
+.faixa-offline-area:empty { display: none; }
+.faixa-offline-area { margin-top: 18px; }
+.faixa-offline {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 10px 10px 14px;
+    border-radius: var(--raio-m);
+    background: rgba(154, 91, 0, 0.1);
+    color: #6b3f00;
+    font-size: 14px;
+    animation: subir 0.5s var(--ease-out) both;
+}
+.faixa-offline > span:nth-child(2) { flex: 1; }
+.faixa-offline-ponto {
+    flex: none;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--ambar);
+}
+.faixa-offline-botao {
+    flex: none;
+    min-height: 36px;
+    padding: 6px 14px;
+    border: none;
+    border-radius: var(--raio-capsula);
+    background: rgba(154, 91, 0, 0.14);
+    color: #6b3f00;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.5s var(--mola);
+}
+.faixa-offline-botao:active { transform: scale(0.95); transition-duration: 0.12s; }
+.faixa-offline-botao.carregando::after { border-color: rgba(154, 91, 0, 0.25); border-top-color: var(--ambar); }

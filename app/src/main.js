@@ -19,6 +19,9 @@ import { telaAguardando } from './telas/aguardando.js';
 import { telaTrocarSenha } from './telas/trocar-senha.js';
 import { telaEscala } from './telas/escala.js';
 import { telaErro } from './telas/erro.js';
+import { telaInstalar } from './telas/instalar.js';
+import { precisaInstalar, registrarServiceWorker } from './pwa.js';
+import { apagarCopiasLocais } from './offline.js';
 
 const raiz = document.getElementById('app');
 let rodada = 0;          // descarta resultados de decisões antigas que chegarem atrasadas
@@ -26,6 +29,15 @@ let usuarioAtual;        // undefined = ainda não decidiu nenhuma vez
 
 async function decidirTela() {
     const minhaRodada = ++rodada;
+
+    // No celular o Hub só roda instalado (D-PWA). A instalação vem ANTES do
+    // login: no iPhone o app da tela de início não enxerga a sessão do Safari,
+    // então quem entrasse pelo Safari cairia deslogado ao abrir o ícone.
+    if (precisaInstalar()) {
+        mostrar(telaInstalar());
+        return;
+    }
+
     const { data: { session } } = await supabase.auth.getSession();
     usuarioAtual = session?.user.id ?? null;
 
@@ -69,6 +81,7 @@ function mostrar(tela) {
 // supabase-js segura um "cadeado" da sessão enquanto ele roda e a chamada
 // ficaria esperando para sempre. Por isso o setTimeout joga para depois.
 supabase.auth.onAuthStateChange((evento, sessao) => {
+    if (evento === 'SIGNED_OUT') apagarCopiasLocais();
     if (usuarioAtual === undefined) return; // a primeira decisão ainda está rodando
     const mudouQuem = (sessao?.user.id ?? null) !== usuarioAtual;
     if (evento === 'USER_UPDATED' || evento === 'SIGNED_OUT' || mudouQuem) {
@@ -80,4 +93,5 @@ window.addEventListener('hashchange', () => {
     if (!usuarioAtual) decidirTela();
 });
 
+registrarServiceWorker();
 decidirTela();

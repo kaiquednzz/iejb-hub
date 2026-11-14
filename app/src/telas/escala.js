@@ -9,6 +9,7 @@ import { supabase } from '../supabase.js';
 import { nomeCurto } from '../sessao.js';
 import { hojeEmBrasilia, somarDias, rotuloDoDia, partesDaData, formatarHorario } from '../util/datas.js';
 import { cabecalhoApp } from './moldura.js';
+import { guardarEscala, escalaGuardada, eErroDeRede } from '../offline.js';
 
 const SEMANAS_A_MOSTRAR = 6;
 const SEMANAS_PARA_GERAR = 8;
@@ -26,6 +27,7 @@ const CONSULTA = `
 export function telaEscala(conta) {
     const lista = h('div', { class: 'lista-cultos', 'aria-busy': 'true' }, esqueleto());
     const destaque = h('div', { class: 'destaque-area' });
+    const faixaOffline = h('div', { class: 'faixa-offline-area', role: 'status' });
     const titulo = h('h1', { tabindex: -1, class: 'titulo-tela' }, `Oi, ${nomeCurto(conta.pessoa, 'tudo bem')}!`);
 
     const tela = h('div', { class: 'tela tela-app' },
@@ -33,6 +35,7 @@ export function telaEscala(conta) {
         h('main', { id: 'conteudo', class: 'app-conteudo' },
             titulo,
             h('p', { class: 'subtitulo-tela' }, 'Aqui estão os próximos cultos do Louvor.'),
+            faixaOffline,
             destaque,
             h('h2', { class: 'titulo-secao' }, 'Próximos cultos'),
             lista,
@@ -53,21 +56,34 @@ export function telaEscala(conta) {
             .lte('data', somarDias(hoje, SEMANAS_A_MOSTRAR * 7))
             .order('data')
             .order('horario')
-            .order('posicao', { referencedTable: 'repertorio_item' });
+            .order('posicao', { referencedTable: 'repertorio_item' })
+            .retry(navigator.onLine); // ver o comentário em sessao.js
 
         lista.removeAttribute('aria-busy');
         if (error) {
             console.error(error);
+            const copia = eErroDeRede(error) ? escalaGuardada(conta.id) : null;
+            if (copia) {
+                desenhar(copia.cultos.filter((culto) => culto.data >= hoje), copia.salvaEm);
+                return;
+            }
+            faixaOffline.replaceChildren();
             lista.replaceChildren(estadoVazio('Não deu para carregar a escala.', 'Confira sua internet e tente de novo.',
                 botaoAcao('Tentar de novo', carregar)));
             return;
         }
+        guardarEscala(conta.id, cultos);
+        desenhar(cultos);
+    }
 
+    // offlineDesde: quando veio da cópia local, a data dessa cópia
+    function desenhar(cultos, offlineDesde) {
+        faixaOffline.replaceChildren(...(offlineDesde ? [faixaSemConexao(offlineDesde, carregar)] : []));
         const meuId = conta.pessoa?.id;
         destaque.replaceChildren(...cartaoDestaque(cultos, meuId));
 
         if (cultos.length === 0) {
-            const acao = conta.e_administrador && botaoAcao(`Gerar ${SEMANAS_PARA_GERAR} semanas de cultos`, gerarCultos);
+            const acao = conta.e_administrador && !offlineDesde && botaoAcao(`Gerar ${SEMANAS_PARA_GERAR} semanas de cultos`, gerarCultos);
             lista.replaceChildren(estadoVazio('Nenhum culto no calendário ainda.',
                 conta.e_administrador
                     ? 'Os cultos fixos (domingo e terça) são gerados a partir dos tipos de culto cadastrados.'
@@ -203,6 +219,19 @@ function linkSeguro(link) {
 function iniciais(pessoa) {
     const partes = (pessoa?.apelido || pessoa?.nome || '?').trim().split(/\s+/);
     return (partes[0][0] + (partes.length > 1 ? partes.at(-1)[0] : '')).toUpperCase();
+}
+
+function faixaSemConexao(salvaEm, tentarDeNovo) {
+    const quando = new Intl.DateTimeFormat('pt-BR', {
+        day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo',
+    }).format(new Date(salvaEm));
+    const botao = h('button', { type: 'button', class: 'faixa-offline-botao' }, 'Atualizar');
+    botao.addEventListener('click', () => comCarregando(botao, tentarDeNovo));
+    return h('div', { class: 'faixa-offline' },
+        h('span', { class: 'faixa-offline-ponto', 'aria-hidden': 'true' }),
+        h('span', null, h('strong', null, 'Sem conexão. '), `Mostrando a escala de ${quando}.`),
+        botao,
+    );
 }
 
 function estadoVazio(titulo, texto, acao) {
