@@ -93,7 +93,7 @@ Legenda: ✔️ pode · ✖️ não pode · ❓ a confirmar
 | Editar os próprios dados de contato | ✔️ | ✔️ | ✔️ | ✔️ |
 | Criar e editar grupos e seus membros | ✔️ | ✔️ | ❓ | ✖️ |
 | Criar cultos especiais | ✔️ | ✔️ | ✖️ | ✖️ |
-| Montar, editar e publicar escalas | ✔️ | ✔️ | ✖️ | ✖️ |
+| Montar, editar e publicar escalas | ✖️ (RN-02) | ✔️ | ✖️ | ✖️ |
 | Solicitar alteração em uma escala | ✖️ | ✖️ | ✔️ (ver RN-37) | ✖️ |
 | Aprovar ou reprovar solicitações | ✖️ | ✔️ | ✖️ | ✖️ |
 | Cadastrar músicas | ✔️ | ✔️ | ✔️ | ✖️ |
