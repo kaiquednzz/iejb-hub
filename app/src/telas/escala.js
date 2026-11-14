@@ -10,6 +10,7 @@ import { nomeCurto } from '../sessao.js';
 import { hojeEmBrasilia, somarDias, rotuloDoDia, partesDaData, formatarHorario } from '../util/datas.js';
 import { cabecalhoApp, barraAbas, avatar } from './moldura.js';
 import { FUNCAO_MESA, separarMesa } from '../util/escala.js';
+import { blocoRepertorio } from './repertorio.js';
 import { guardarEscala, escalaGuardada, eErroDeRede } from '../offline.js';
 
 const SEMANAS_A_MOSTRAR = 6;
@@ -20,9 +21,9 @@ const CONSULTA = `
     escala (
         id, estado,
         escala_item ( id, pessoa_id, instrumento_exibido, pessoa:pessoa_id ( nome, apelido, foto ) ),
-        escala_grupo ( grupo:grupo_id ( nome ) )
+        escala_grupo ( grupo:grupo_id ( nome, lider_pessoa_id ) )
     ),
-    repertorio_item ( id, posicao, tom, musica:musica_id ( titulo, artista, link ) )
+    repertorio_item ( id, posicao, tom, musica:musica_id ( id, titulo, artista, link ) )
 `;
 
 export function telaEscala(conta) {
@@ -93,7 +94,9 @@ export function telaEscala(conta) {
                 acao));
             return;
         }
-        lista.replaceChildren(...cultos.map((culto, i) => cartaoCulto(culto, meuId, i)));
+        // Repertório: quem pode monta ali mesmo; ao fechar o editor, recarrega
+        const extras = { conta, recarregar: carregar, offline: !!offlineDesde };
+        lista.replaceChildren(...cultos.map((culto, i) => cartaoCulto(culto, meuId, i, extras)));
     }
 
     async function gerarCultos() {
@@ -135,7 +138,7 @@ function cartaoDestaque(cultos, meuId) {
     return [];
 }
 
-function cartaoCulto(culto, meuId, indice) {
+function cartaoCulto(culto, meuId, indice, extras) {
     const escala = escalaDo(culto);
     const cancelado = culto.estado === 'cancelado';
     const datas = partesDaData(culto.data);
@@ -168,7 +171,7 @@ function cartaoCulto(culto, meuId, indice) {
             ),
         ),
         !cancelado && corpoDaEscala(escala, meuId),
-        !cancelado && blocoRepertorio(culto.repertorio_item),
+        !cancelado && blocoRepertorio(culto, extras.conta, extras.recarregar, extras.offline),
     );
 }
 
@@ -198,31 +201,6 @@ function corpoDaEscala(escala, meuId) {
             h('span', null, 'Mesa de som'),
             h('strong', null, mesa.map((item) => nomeCurto(item.pessoa, 'Pessoa')).join(', '))),
     );
-}
-
-function blocoRepertorio(itens) {
-    if (!itens || itens.length === 0) return null;
-    return h('details', { class: 'repertorio' },
-        h('summary', null,
-            icone('musica', 'icone icone-p'),
-            `Repertório · ${itens.length} ${itens.length === 1 ? 'música' : 'músicas'}`),
-        h('ol', { class: 'lista-musicas' },
-            itens.map((item) => h('li', null,
-                h('span', { class: 'musica-titulo' }, item.musica.titulo),
-                item.musica.artista && h('span', { class: 'musica-artista' }, item.musica.artista),
-                item.tom && h('span', { class: 'musica-tom', title: 'Tom' }, item.tom),
-                linkSeguro(item.musica.link),
-            )),
-        ),
-    );
-}
-
-// O banco já só aceita http(s) (check na tabela musica), mas conferir de novo
-// aqui custa uma linha e impede um "javascript:" se a regra um dia mudar.
-function linkSeguro(link) {
-    if (!link || !/^https?:\/\//i.test(link)) return null;
-    return h('a', { class: 'musica-link', href: link, target: '_blank', rel: 'noopener noreferrer', 'aria-label': 'Ouvir (abre em outra aba)' },
-        icone('externo', 'icone icone-p'));
 }
 
 function faixaSemConexao(salvaEm, tentarDeNovo) {

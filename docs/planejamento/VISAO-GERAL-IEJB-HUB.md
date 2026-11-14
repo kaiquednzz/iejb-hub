@@ -5,8 +5,8 @@
 | **Nome** | IEJB Hub |
 | **Instituição** | IEJB, Igreja Evangélica do Jardim Brasil |
 | **Responsável pelo projeto e desenvolvimento** | Kaique |
-| **Status** | Em desenvolvimento (etapa 4): banco, login, escala, PWA gestão de pessoas e acessos, montagem da escala e fotos de perfil prontos; app publicado em `app.iejb.com.br`. Sem aprovação institucional definitiva. |
-| **Versão deste documento** | 1.6 (montar escala e fotos de perfil) |
+| **Status** | Em desenvolvimento (etapa 4): banco, login, escala, PWA gestão de pessoas e acessos, montagem da escala, repertório com botões de streaming e fotos de perfil prontos; app publicado em `app.iejb.com.br`. Sem aprovação institucional definitiva. |
+| **Versão deste documento** | 1.7 (repertório com streaming) |
 | **Última atualização** | 13/11/2026 |
 
 > Este documento registra a visão atual do IEJB Hub para que ela possa evoluir depois.
@@ -666,6 +666,7 @@ Precisam ser respondidas, de preferência com o líder de louvor, antes de defin
 | 1.1 | 13/11/2026 | Sexta rodada (Q19 a Q22), vinda do modelo de dados da etapa 3. |
 | 1.2 | 13/11/2026 | Decisões técnicas: Supabase, planos gratuitos e front-end com Vite e JavaScript puro (D20 a D22). Registro de decisões técnicas criado. |
 | 1.3 | 13/11/2026 | Aprovadas as recomendações de login, hospedagem e push (D23 a D25). Stack do piloto fechada. |
+| 1.7 | 14/11/2026 | Repertório implementado como na D26: ouvir nas plataformas, tocar no YouTube em sequência, editor para líderes de grupo. |
 | 1.6 | 14/11/2026 | Tela de montar escala (D29), com mesa de som e ceia vindas da planilha do líder, e fotos de perfil (D30). |
 | 1.5 | 14/11/2026 | App publicado em `app.iejb.com.br` (Cloudflare Workers, D24 atualizada). Tela Equipe com gestão completa de pessoas e acessos (D28). |
 | 1.4 | 13/11/2026 | Desenvolvimento começou. Músicas nas plataformas de streaming por botões e fila do YouTube, sem playlist (D26). PWA antes do login e escala offline (D27). |
