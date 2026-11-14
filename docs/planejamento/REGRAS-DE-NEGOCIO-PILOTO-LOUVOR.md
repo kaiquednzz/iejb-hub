@@ -4,7 +4,7 @@
 |---|---|
 | **Escopo** | MVP do IEJB Hub, restrito ao ministério de Louvor |
 | **Etapa** | 2. Definição de requisitos e regras de negócio |
-| **Versão** | 0.1 (rascunho para revisão) |
+| **Versão** | 0.2 (rascunho para revisão) |
 | **Última atualização** | 13/11/2026 |
 | **Documento base** | [Visão geral do IEJB Hub](VISAO-GERAL-IEJB-HUB.md), seção 13 |
 
@@ -74,7 +74,7 @@ As regras são numeradas (`RN-xx`) para poderem ser citadas no código, nos test
 
 | Papel | Quem é | Origem |
 |---|---|---|
-| **Administrador** | Quem cuida do sistema (cadastro de contas e configurações). | 💡 Proposta. ❓ Quem ocupa esse papel está em aberto (Q1). |
+| **Administrador** | Quem cuida do sistema (cadastro de contas e configurações). Inicialmente **Kaique**, que pode designar outros administradores. | ✅ Decisão (Q1) |
 | **Líder de louvor** | Líder geral do ministério. Monta a escala. | 🗣️ Levantamento |
 | **Líder de grupo** | Líder de G1, G2 ou G3. Escolhe o repertório. | 🗣️ Levantamento |
 | **Integrante** | Pessoa do Louvor com conta. | 🗣️ Levantamento |
@@ -87,25 +87,30 @@ Legenda: ✔️ pode · ✖️ não pode · ❓ a confirmar
 
 | Ação | Admin | Líder de louvor | Líder de grupo | Integrante |
 |---|---|---|---|---|
-| Criar contas e convidar pessoas | ✔️ | ❓ | ✖️ | ✖️ |
+| Criar contas e convidar pessoas | ✔️ | ✖️ | ✖️ | ✖️ |
+| Designar outros administradores | ✔️ | ✖️ | ✖️ | ✖️ |
 | Cadastrar e editar pessoas do Louvor | ✔️ | ✔️ | ✖️ | ✖️ |
 | Editar os próprios dados de contato | ✔️ | ✔️ | ✔️ | ✔️ |
 | Criar e editar grupos e seus membros | ✔️ | ✔️ | ❓ | ✖️ |
 | Criar cultos especiais | ✔️ | ✔️ | ✖️ | ✖️ |
-| Montar, editar e publicar escalas | ✔️ | ✔️ | ❓ | ✖️ |
+| Montar, editar e publicar escalas | ✔️ | ✔️ | ✖️ | ✖️ |
+| Solicitar alteração em uma escala | ✖️ | ✖️ | ✔️ (ver RN-37) | ✖️ |
+| Aprovar ou reprovar solicitações | ✖️ | ✔️ | ✖️ | ✖️ |
 | Cadastrar músicas | ✔️ | ✔️ | ✔️ | ✖️ |
 | Montar o repertório de um culto | ✔️ | ✔️ | ✔️ (ver RN-50) | ✖️ |
 | Ver escalas e repertórios | ✔️ | ✔️ | ✔️ | ✔️ (ver RN-36) |
 
 **RN-01** ✅ Toda permissão é verificada **no banco de dados e no backend**, não só na interface (decisão D4). Esconder um botão não é considerado controle de acesso.
 
-**RN-02** ❓ O levantamento diz que os líderes de grupo "podem mudar meio que tudo". Ainda não está claro se isso inclui **editar a escala** ou só o repertório (Q2). Até a confirmação, a proposta é: só o líder de louvor edita a escala.
+**RN-02** ✅ Só o **líder de louvor** edita a escala. O líder de grupo **solicita alterações**, que o líder de louvor aprova ou reprova (Q2, ver RN-37 a RN-39).
+
+**RN-03** ✅ O primeiro administrador é **Kaique**, que pode designar outros administradores (Q1). Para quem também for líder de louvor, basta acumular os dois papéis.
 
 ---
 
 ## 4. Pessoas, contas e grupos
 
-**RN-10** 💡 Uma pessoa pode estar cadastrada sem ter conta. A conta é criada por convite (Q1, Q3).
+**RN-10** 💡 Uma pessoa pode estar cadastrada sem ter conta. A conta é criada por **convite de um administrador**, enviado por e-mail; a pessoa define a própria senha ao aceitar (ver RN-64).
 
 **RN-11** 🗣️ Uma pessoa pode ser membro de **mais de um grupo** (caso do G2 e G3).
 
@@ -156,6 +161,14 @@ Isso permite ao líder montar o mês inteiro com calma e só avisar quando estiv
 
 **RN-36** 💡 Cada integrante tem uma visão **"minhas escalas"**, mostrando só os cultos em que está escalado. Essa é a principal diferença em relação ao PDF atual (visão geral, seção 13.3). ❓ Confirmar se o integrante também pode ver a escala completa de todos os cultos (Q6).
 
+**RN-37** ✅ O **líder de grupo não edita a escala**. Ele envia uma **solicitação de alteração** para um culto específico (Q2).
+
+**RN-38** ✅ O **líder de louvor aprova ou reprova** cada solicitação (Q2).
+
+**RN-39** 💡 Formato da solicitação no piloto: **texto livre** ligado ao culto (ex.: "trocar Fulano por Ciclano no domingo"). Ao aprovar, o próprio líder de louvor faz a alteração na escala, e o aviso normal é disparado (RN-40). A solicitação guarda o estado (**pendente**, **aprovada** ou **reprovada**) e, se reprovada, um motivo opcional.
+
+**Motivo da proposta:** uma solicitação "estruturada", em que o líder de grupo monta a escala nova e a aprovação aplica sozinha, é bem mais complexa de construir. Com cerca de 13 pessoas e poucas solicitações por mês, o texto livre resolve no piloto e pode evoluir depois.
+
 ### 6.2. Fluxo: montar e publicar a escala
 
 1. O líder de louvor abre um culto com louvor.
@@ -163,6 +176,14 @@ Isso permite ao líder montar o mês inteiro com calma e só avisar quando estiv
 3. Ajusta a lista, tirando ou adicionando pessoas, se precisar.
 4. Salva como **rascunho** ou **publica**.
 5. Ao publicar, o Hub dispara o aviso (seção 7).
+
+### 6.3. Fluxo: solicitação de alteração
+
+1. O líder de grupo abre um culto com escala publicada e envia uma solicitação.
+2. O líder de louvor recebe um aviso (RN-46).
+3. O líder de louvor aprova ou reprova.
+4. Se aprovar, ele altera a escala e o aviso normal vai para as pessoas afetadas.
+5. O líder de grupo recebe a resposta (RN-47).
 
 ---
 
@@ -187,6 +208,10 @@ Veja no Hub: app.iejb.com.br/...
 **RN-44** 🗣️ Mudanças feitas pelos **líderes de grupo não geram aviso** para o líder de louvor.
 
 **RN-45** 💡 Várias alterações seguidas na mesma escala, feitas em poucos minutos, geram **um único aviso**, para não lotar o celular das pessoas.
+
+**RN-46** 💡 O líder de louvor recebe uma notificação quando chega uma **nova solicitação de alteração**.
+
+**RN-47** 💡 O líder de grupo recebe uma notificação quando sua solicitação é **aprovada ou reprovada**.
 
 ---
 
@@ -214,7 +239,17 @@ Veja no Hub: app.iejb.com.br/...
 
 **RN-63** 💡 Uma pessoa pode receber notificações em **mais de um aparelho** (ex.: celular e computador).
 
-**RN-64** ❓ Forma de login: e-mail e senha, link mágico por e-mail, conta Google ou outra (Q3).
+**RN-64** ✅ Login com **e-mail e senha** (Q3, escolhido a partir da recomendação abaixo).
+
+**RN-65** 💡 A pessoa pode **redefinir a senha** por e-mail.
+
+**Por que e-mail e senha, e não as alternativas:**
+
+| Opção | Problema no Hub |
+|---|---|
+| Nome de usuário + senha | Sem e-mail, não há como recuperar a senha esquecida, e o Supabase Auth (backend proposto) trabalha com e-mail ou telefone. |
+| Link mágico por e-mail | No iPhone, o link abre no Safari, que **não compartilha a sessão** com o app instalado na tela de início. A pessoa faria login no lugar errado. |
+| Conta Google | Nem todo integrante usa Google, e o redirecionamento de login dentro de um PWA instalado é menos previsível. Pode ser adicionado depois. |
 
 ---
 
@@ -222,9 +257,6 @@ Veja no Hub: app.iejb.com.br/...
 
 | # | Questão | Afeta |
 |---|---|---|
-| Q1 | Quem é o administrador do sistema no piloto? O líder de louvor também pode convidar pessoas? | RN-10, matriz |
-| Q2 | Líder de grupo pode editar a escala, ou só o repertório? | RN-02, matriz |
-| Q3 | Como as pessoas vão fazer login e como recebem o convite? | RN-10, RN-64 |
 | Q4 | Algum grupo tem mais de um líder? | RN-12 |
 | Q5 | O piloto registra o instrumento ou função de cada pessoa? | RN-15 |
 | Q6 | O integrante vê a escala completa de todos os cultos ou só a dele? | RN-36 |
@@ -234,6 +266,14 @@ Veja no Hub: app.iejb.com.br/...
 | Q10 | Mudança no repertório deve gerar aviso? | RN-54 |
 | Q11 | Quando a pessoa sabe de uma troca (substituição), o líder ajusta a escala no Hub? | Visão geral, seção 13.6 |
 
+### Respondidas
+
+| # | Questão | Resposta | Regras |
+|---|---|---|---|
+| Q1 | Quem é o administrador? | Kaique, que pode designar outros. | RN-03, RN-10 |
+| Q2 | Líder de grupo pode editar a escala? | Não. Ele solicita a alteração e o líder de louvor aprova ou reprova. | RN-02, RN-37 a RN-39 |
+| Q3 | Como as pessoas fazem login? | E-mail e senha. | RN-64, RN-65 |
+
 ---
 
 ## Histórico de alterações
@@ -241,3 +281,4 @@ Veja no Hub: app.iejb.com.br/...
 | Versão | Data | Descrição |
 |---|---|---|
 | 0.1 | 13/11/2026 | Rascunho inicial das regras de negócio do piloto Louvor. |
+| 0.2 | 13/11/2026 | Q1 a Q3 respondidas: Kaique como administrador, solicitação de alteração com aprovação do líder de louvor, login com e-mail e senha. |
