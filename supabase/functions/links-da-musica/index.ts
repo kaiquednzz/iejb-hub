@@ -1,12 +1,13 @@
 // Função de servidor "links-da-musica": o link de cada streaming que abre
 // A FAIXA no app (não a busca, que o Spotify e o Apple Music ignoram no iPhone).
 //
-//   POST { musica_id }  ->  { apple, spotify, ytmusic, youtube, faixa } | { nada: true }
+//   POST { musica_id }  ->  { apple, faixa } | { nada: true }
 //
-// Como acha:
-//   1. Catálogo público do iTunes (sem chave): "título artista", Brasil, 1º resultado.
-//   2. song.link (sem chave, 10 consultas/min) traduz a faixa da Apple para
-//      Spotify, YouTube Music e YouTube.
+// Como acha: catálogo público do iTunes (sem chave), "título artista", Brasil,
+// 5 resultados; fica o de título mais parecido (ver escolher()).
+// O Spotify não sai daqui: o song.link, que traduzia a faixa, fechou a API
+// pública (401 PUBLIC_API_ACCESS_DEPRECATED, 14/11/2026). No celular o app
+// abre o Spotify direto na busca (spotify:search:), ver util/musica.js.
 // O resultado fica guardado em musica.links_streaming: cada música é
 // procurada uma vez (de novo só se não achou, depois de 1 dia, ou se o
 // título/artista mudar, que zera a coluna no banco).
@@ -37,31 +38,39 @@ function seguro(url: unknown, hosts: string[]): string | null {
     }
 }
 
+// Tira acento, caixa e o que estiver entre parênteses: "Bondade de Deus (Ao Vivo)" -> "bondade de deus"
+const limpo = (t: string) => t.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
+    .replace(/\(.*?\)|\[.*?\]/g, ' ').replace(/[^a-z0-9]+/g, ' ').trim();
+const AO_VIVO = /\b(ao vivo|en vivo|live|acustic|acoustic|playback|instrumental|karaoke)\b/i;
+
+// Melhor resultado: título igual vale mais; a versão (ao vivo, playback...)
+// tem que bater com o que o título cadastrado pede; artista igual ajuda.
+function escolher(resultados: any[], titulo: string, artista: string | null) {
+    const alvo = limpo(titulo);
+    const pedeVersao = AO_VIVO.test(titulo);
+    let melhor = null, nota = -Infinity;
+    resultados.forEach((r, i) => {
+        let n = -i * 0.1;   // empate: fica a ordem da Apple
+        if (limpo(r.trackName ?? '') === alvo) n += 3;
+        else if (limpo(r.trackName ?? '').includes(alvo)) n += 1;
+        if (artista && limpo(r.artistName ?? '').includes(limpo(artista))) n += 1;
+        const eVersao = AO_VIVO.test(`${r.trackName} ${r.collectionName}`);
+        if (eVersao !== pedeVersao) n -= 1.5;   // quer estúdio e veio ao vivo, ou o contrário
+        if (n > nota) { nota = n; melhor = r; }
+    });
+    return nota >= 1 ? melhor : null;   // nada parecido: melhor cair na busca
+}
+
 async function procurar(titulo: string, artista: string | null) {
     const termo = [titulo, artista].filter(Boolean).join(' ');
     const itunes = await fetch(`https://itunes.apple.com/search?${new URLSearchParams({
-        term: termo, country: 'BR', media: 'music', entity: 'song', limit: '1',
+        term: termo, country: 'BR', media: 'music', entity: 'song', limit: '5',
     })}`, { signal: AbortSignal.timeout(8000) });
     if (!itunes.ok) throw new Error(`itunes ${itunes.status}`);
-    const faixa = (await itunes.json()).results?.[0];
+    const faixa = escolher((await itunes.json()).results ?? [], titulo, artista);
     const apple = seguro(faixa?.trackViewUrl, ['music.apple.com', 'itunes.apple.com']);
     if (!apple) return { nada: true };
-
-    const links: Record<string, string | null> = { apple, spotify: null, ytmusic: null, youtube: null };
-    try {
-        const songlink = await fetch(`https://api.song.link/v1-alpha.1/links?${new URLSearchParams({
-            url: apple, userCountry: 'BR',
-        })}`, { signal: AbortSignal.timeout(8000) });
-        if (songlink.ok) {
-            const p = (await songlink.json()).linksByPlatform ?? {};
-            links.spotify = seguro(p.spotify?.url, ['open.spotify.com']);
-            links.ytmusic = seguro(p.youtubeMusic?.url, ['music.youtube.com']);
-            links.youtube = seguro(p.youtube?.url, ['www.youtube.com', 'youtube.com', 'youtu.be']);
-        }
-    } catch (e) {
-        console.error('song.link', e);   // fica só com a Apple; o app usa a busca nos outros
-    }
-    return { ...links, faixa: `${faixa.trackName} – ${faixa.artistName}` };
+    return { apple, faixa: `${faixa.trackName} – ${faixa.artistName}` };
 }
 
 Deno.serve(async (req) => {

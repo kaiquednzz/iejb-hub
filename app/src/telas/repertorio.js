@@ -9,7 +9,7 @@ import { supabase } from '../supabase.js';
 import { abrirFolha, avisar } from '../util/folha.js';
 import { mensagemDoBanco } from '../util/erros.js';
 import { rotuloDoDia, formatarHorario } from '../util/datas.js';
-import { linksDeBusca, buscarLinksDiretos, filaDoYoutube, idDoYoutube, linkSeguro, termoDeBusca, TONS } from '../util/musica.js';
+import { linksDeBusca, buscarLinksDiretos, abrirComReserva, filaDoYoutube, idDoYoutube, linkSeguro, termoDeBusca, TONS } from '../util/musica.js';
 import { eLiderDeLouvor } from '../sessao.js';
 import { campo, caixaDeAviso } from './moldura.js';
 
@@ -62,6 +62,10 @@ export function blocoRepertorio(culto, conta, aoMudar, offline = false) {
 }
 
 // Ouvir uma música: abre a busca de cada plataforma (ou o vídeo cadastrado)
+// Ícones oficiais de cada serviço (public/marcas). Spotify e YouTube só vieram
+// em PNG no kit da marca; reduzidos para 88 px (nítido no ícone de 22 px).
+const LOGOS = { spotify: 'spotify.png', ytmusic: 'ytmusic.svg', apple: 'apple.svg', youtube: 'youtube.png' };
+
 export function folhaOuvir(musica) {
     const video = linkSeguro(musica.link);
     const grade = h('div', { class: 'grade-streaming' });
@@ -70,12 +74,14 @@ export function folhaOuvir(musica) {
     function desenhar(achados) {
         grade.replaceChildren(...linksDeBusca(musica, achados).map((l) => {
             const marca = h('span', { class: 'streaming-marca', 'aria-hidden': 'true' });
-            const logo = h('img', { src: `/marcas/${l.classe}.svg`, alt: '', width: 22, height: 22, class: 'streaming-logo' });
+            const logo = h('img', { src: `/marcas/${LOGOS[l.classe]}`, alt: '', width: 22, height: 22, class: 'streaming-logo' });
             logo.addEventListener('error', () => logo.remove(), { once: true });   // sem o arquivo, fica a bolinha
             logo.addEventListener('load', () => marca.classList.add('com-logo'), { once: true });
             marca.append(logo);
-            return h('a', { class: `botao-streaming streaming-${l.classe}${l.direto ? ' direto' : ''}`, href: l.url, target: '_blank', rel: 'noopener noreferrer' },
-                marca, l.nome);
+            const link = h('a', { class: `botao-streaming streaming-${l.classe}${l.direto ? ' direto' : ''}`, href: l.url,
+                target: l.reserva ? null : '_blank', rel: 'noopener noreferrer' }, marca, l.nome);
+            if (l.reserva) link.addEventListener('click', (e) => abrirComReserva(e, l.reserva));
+            return link;
         }));
     }
     desenhar(musica.links_streaming?.apple ? musica.links_streaming : null);
@@ -94,9 +100,9 @@ export function folhaOuvir(musica) {
     buscarLinksDiretos(musica.id).then((achados) => {
         if (achados?.apple) {
             desenhar(achados);
-            nota.textContent = `Abre direto em “${achados.faixa}”.`;
+            nota.textContent = `Apple Music abre direto em “${achados.faixa}”. Os outros abrem a busca.`;
         } else {
-            nota.textContent = `Não achei essa faixa certinha. Os botões abrem a busca por “${termoDeBusca(musica)}”.`;
+            nota.textContent = `Os botões abrem a busca por “${termoDeBusca(musica)}”.`;
         }
     });
 }

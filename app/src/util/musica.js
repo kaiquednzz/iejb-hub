@@ -14,17 +14,35 @@ export function termoDeBusca(musica) {
     return [musica.titulo, musica.artista].filter(Boolean).join(' ');
 }
 
-// "achados": os links diretos da faixa (função links-da-musica). Onde não
-// tiver, cai na busca, que funciona no navegador e no YouTube, mas o app do
-// Spotify e o do Apple Music no iPhone abrem sem a busca.
+// "achados": os links diretos da faixa (função links-da-musica; hoje só a
+// Apple). Onde não tiver, cai na busca. O app do Spotify ignora a busca que
+// chega por open.spotify.com, então no celular usa o endereço do próprio app
+// (spotify:search:termo), que abre já buscando; "reserva" é a busca no
+// navegador, para quem não tem o app (ver abrirComReserva).
+const CELULAR = /iphone|ipad|ipod|android/i.test(navigator.userAgent);
+
 export function linksDeBusca(musica, achados = null) {
     const termo = encodeURIComponent(termoDeBusca(musica));
+    const spotifyWeb = `https://open.spotify.com/search/${termo}`;
     return [
-        { nome: 'Spotify', classe: 'spotify', url: achados?.spotify ?? `https://open.spotify.com/search/${termo}` },
+        achados?.spotify
+            ? { nome: 'Spotify', classe: 'spotify', url: achados.spotify }
+            : CELULAR
+                ? { nome: 'Spotify', classe: 'spotify', url: `spotify:search:${termo}`, reserva: spotifyWeb }
+                : { nome: 'Spotify', classe: 'spotify', url: spotifyWeb },
         { nome: 'YouTube Music', classe: 'ytmusic', url: achados?.ytmusic ?? `https://music.youtube.com/search?q=${termo}` },
         { nome: 'Apple Music', classe: 'apple', url: achados?.apple ?? `https://music.apple.com/br/search?term=${termo}` },
         { nome: 'YouTube', classe: 'youtube', url: achados?.youtube ?? `https://www.youtube.com/results?search_query=${termo}` },
     ].map((l) => ({ ...l, direto: Boolean(achados?.[l.classe]) }));
+}
+
+// Endereço de app (spotify:): se em 1,5 s a página continua na frente, o app
+// não abriu (não instalado) e vai para a busca no navegador.
+export function abrirComReserva(evento, reserva) {
+    const timer = setTimeout(() => {
+        if (document.visibilityState === 'visible') window.open(reserva, '_blank', 'noopener');
+    }, 1500);
+    document.addEventListener('visibilitychange', () => clearTimeout(timer), { once: true });
 }
 
 // Pede ao servidor os links diretos (uma vez por música e por sessão; o
