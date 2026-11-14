@@ -9,7 +9,7 @@ import { supabase } from '../supabase.js';
 import { abrirFolha, avisar } from '../util/folha.js';
 import { mensagemDoBanco } from '../util/erros.js';
 import { rotuloDoDia, formatarHorario } from '../util/datas.js';
-import { linksDeBusca, filaDoYoutube, idDoYoutube, linkSeguro, termoDeBusca, TONS } from '../util/musica.js';
+import { linksDeBusca, buscarLinksDiretos, filaDoYoutube, idDoYoutube, linkSeguro, termoDeBusca, TONS } from '../util/musica.js';
 import { eLiderDeLouvor } from '../sessao.js';
 import { campo, caixaDeAviso } from './moldura.js';
 
@@ -64,17 +64,40 @@ export function blocoRepertorio(culto, conta, aoMudar, offline = false) {
 // Ouvir uma música: abre a busca de cada plataforma (ou o vídeo cadastrado)
 export function folhaOuvir(musica) {
     const video = linkSeguro(musica.link);
+    const grade = h('div', { class: 'grade-streaming' });
+    const nota = h('p', { class: 'folha-texto folha-texto-pequeno', role: 'status' }, 'Procurando a música nos apps…');
+
+    function desenhar(achados) {
+        grade.replaceChildren(...linksDeBusca(musica, achados).map((l) => {
+            const marca = h('span', { class: 'streaming-marca', 'aria-hidden': 'true' });
+            const logo = h('img', { src: `/marcas/${l.classe}.svg`, alt: '', width: 22, height: 22, class: 'streaming-logo' });
+            logo.addEventListener('error', () => logo.remove(), { once: true });   // sem o arquivo, fica a bolinha
+            logo.addEventListener('load', () => marca.classList.add('com-logo'), { once: true });
+            marca.append(logo);
+            return h('a', { class: `botao-streaming streaming-${l.classe}${l.direto ? ' direto' : ''}`, href: l.url, target: '_blank', rel: 'noopener noreferrer' },
+                marca, l.nome);
+        }));
+    }
+    desenhar(musica.links_streaming?.apple ? musica.links_streaming : null);
+
     abrirFolha({
         titulo: musica.titulo,
         conteudo: h('div', { class: 'form' },
             musica.artista && h('p', { class: 'folha-texto' }, musica.artista),
             video && h('a', { class: 'botao-principal botao-largo', href: video, target: '_blank', rel: 'noopener noreferrer' },
                 icone('play'), idDoYoutube(video) ? 'Abrir o vídeo cadastrado' : 'Abrir o link cadastrado'),
-            h('div', { class: 'grade-streaming' }, linksDeBusca(musica).map((l) =>
-                h('a', { class: `botao-streaming streaming-${l.classe}`, href: l.url, target: '_blank', rel: 'noopener noreferrer' },
-                    h('span', { class: 'streaming-ponto', 'aria-hidden': 'true' }), l.nome))),
-            h('p', { class: 'folha-texto folha-texto-pequeno' }, `Abre a busca por “${termoDeBusca(musica)}” no app escolhido.`),
+            grade,
+            nota,
         ),
+    });
+
+    buscarLinksDiretos(musica.id).then((achados) => {
+        if (achados?.apple) {
+            desenhar(achados);
+            nota.textContent = `Abre direto em “${achados.faixa}”.`;
+        } else {
+            nota.textContent = `Não achei essa faixa certinha. Os botões abrem a busca por “${termoDeBusca(musica)}”.`;
+        }
     });
 }
 

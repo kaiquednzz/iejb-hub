@@ -626,3 +626,42 @@ fieldset.campo { border: none; padding: 0; margin: 0; min-width: 0; }
 }
 .toast.visivel { translate: -50% 0; opacity: 1; }
 .toast:empty { display: none; }
+
+/* --- Ajustar foto (util/recorte.js) ------------------------------------ */
+.recorte { display: grid; gap: 14px; justify-items: center; }
+.recorte-janela {
+    position: relative;
+    width: var(--lado);
+    height: var(--lado);
+    overflow: hidden;
+    border-radius: 28px;
+    background: #1c1213;
+    touch-action: none;           /* os gestos são nossos, não da rolagem da página */
+    cursor: grab;
+    user-select: none;
+    -webkit-user-select: none;
+    animation: surgir 0.45s var(--mola);
+}
+.recorte-janela.arrastando { cursor: grabbing; }
+.recorte-janela:focus-visible { outline: 3px solid var(--foco, var(--principal)); outline-offset: 3px; }
+.recorte-foto {
+    position: absolute;
+    top: 0;
+    left: 0;
+    max-width: none;
+    transform-origin: 0 0;
+    will-change: transform;
+    pointer-events: none;
+}
+/* Escurece o que fica fora do círculo: é o que vai virar a foto */
+.recorte-mascara {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    box-shadow: 0 0 0 999px rgba(20, 8, 9, 0.55), inset 0 0 0 2px rgba(255, 255, 255, 0.85);
+    pointer-events: none;
+}
+.recorte-controle { display: flex; align-items: center; gap: 12px; width: min(100%, var(--lado, 320px)); }
+.recorte-zoom { flex: 1; accent-color: var(--principal); }
+.recorte-icone-menor { opacity: 0.6; }
+.recorte-dica { text-align: center; }

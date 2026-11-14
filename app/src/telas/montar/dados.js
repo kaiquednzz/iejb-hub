@@ -48,7 +48,7 @@ export async function carregarMontagem(mes) {
     const [cultos, grupos, pessoas, ministerio] = await Promise.all([
         supabase.from('culto')
             .select(`id, nome, rotulo, data, horario, estado, tipo_culto_id,
-                     escala ( id, estado, escala_item ( id, pessoa_id, instrumento_exibido, origem_grupo_id ),
+                     escala ( id, estado, escala_item ( id, pessoa_id, instrumento_exibido, origem_grupo_id, saiu_em ),
                               escala_grupo ( grupo_id ) )`)
             .eq('tem_louvor', true)
             .gte('data', inicio).lte('data', fim)

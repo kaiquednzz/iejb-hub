@@ -8,18 +8,38 @@
 // Risco aceito (D26): o endereço watch_videos do YouTube não é oficial.
 // Se um dia parar, os botões por música continuam funcionando.
 
+import { supabase } from '../supabase.js';
+
 export function termoDeBusca(musica) {
     return [musica.titulo, musica.artista].filter(Boolean).join(' ');
 }
 
-export function linksDeBusca(musica) {
+// "achados": os links diretos da faixa (função links-da-musica). Onde não
+// tiver, cai na busca, que funciona no navegador e no YouTube, mas o app do
+// Spotify e o do Apple Music no iPhone abrem sem a busca.
+export function linksDeBusca(musica, achados = null) {
     const termo = encodeURIComponent(termoDeBusca(musica));
     return [
-        { nome: 'Spotify', classe: 'spotify', url: `https://open.spotify.com/search/${termo}` },
-        { nome: 'YouTube Music', classe: 'ytmusic', url: `https://music.youtube.com/search?q=${termo}` },
-        { nome: 'Apple Music', classe: 'apple', url: `https://music.apple.com/br/search?term=${termo}` },
-        { nome: 'YouTube', classe: 'youtube', url: `https://www.youtube.com/results?search_query=${termo}` },
-    ];
+        { nome: 'Spotify', classe: 'spotify', url: achados?.spotify ?? `https://open.spotify.com/search/${termo}` },
+        { nome: 'YouTube Music', classe: 'ytmusic', url: achados?.ytmusic ?? `https://music.youtube.com/search?q=${termo}` },
+        { nome: 'Apple Music', classe: 'apple', url: achados?.apple ?? `https://music.apple.com/br/search?term=${termo}` },
+        { nome: 'YouTube', classe: 'youtube', url: achados?.youtube ?? `https://www.youtube.com/results?search_query=${termo}` },
+    ].map((l) => ({ ...l, direto: Boolean(achados?.[l.classe]) }));
+}
+
+// Pede ao servidor os links diretos (uma vez por música e por sessão; o
+// servidor ainda guarda no banco para os próximos)
+const linksAchados = new Map();
+export function buscarLinksDiretos(musicaId) {
+    if (!linksAchados.has(musicaId)) {
+        linksAchados.set(musicaId, supabase.functions
+            .invoke('links-da-musica', { body: { musica_id: musicaId } })
+            .then(({ data, error }) => {
+                if (error || !data) { linksAchados.delete(musicaId); return null; }
+                return data;
+            }));
+    }
+    return linksAchados.get(musicaId);
 }
 
 // Pega o ID de 11 caracteres de qualquer formato de link do YouTube:

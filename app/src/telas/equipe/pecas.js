@@ -1,6 +1,7 @@
 // Peças reaproveitadas entre Pedidos, Pessoas e Grupos.
 import { h, icone, comCarregando } from '../../util/dom.js';
-import { avatar, trocarFoto } from '../../util/foto.js';
+import { avatar, trocarFoto, carregar } from '../../util/foto.js';
+import { recortarFoto } from '../../util/recorte.js';
 import { avisar } from '../../util/folha.js';
 import { chave } from './dados.js';
 
@@ -144,18 +145,32 @@ export function blocoFoto(pessoa, aoMudar) {
     const tirar = h('button', { type: 'button', class: 'link-discreto', hidden: !pessoa.foto }, 'Tirar foto');
 
     escolher.addEventListener('click', () => entrada.click());
-    entrada.addEventListener('change', () => {
+    entrada.addEventListener('change', async () => {
         const arquivo = entrada.files?.[0];
         entrada.value = '';
-        if (arquivo) mudar(arquivo);
+        if (!arquivo) return;
+        // Antes de subir, a pessoa ajusta o enquadramento (arrastar e zoom)
+        let imagem;
+        try {
+            imagem = await carregar(arquivo);
+        } catch {
+            avisar('Não deu para abrir essa imagem. Tente outra.');
+            return;
+        }
+        const recorte = await recortarFoto(arquivo, imagem);
+        if (!recorte) {
+            imagem.close?.();
+            return;
+        }
+        mudar(arquivo, recorte, imagem);
     });
     tirar.addEventListener('click', () => mudar(null));
 
-    async function mudar(arquivo) {
+    async function mudar(arquivo, recorte, imagem) {
         const botao = arquivo ? escolher : tirar;
         await comCarregando(botao, async () => {
             try {
-                const caminho = await trocarFoto(atual, arquivo);
+                const caminho = await trocarFoto(atual, arquivo, recorte, imagem);
                 atual = { ...atual, foto: caminho };
                 lugar.replaceChildren(avatar(atual, 'pessoa-avatar avatar-grande'));
                 lugar.firstChild.classList.add('foto-nova');

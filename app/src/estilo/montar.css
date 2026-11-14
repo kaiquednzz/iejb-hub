@@ -350,11 +350,16 @@
     transition: transform 0.5s var(--mola);
 }
 .botao-streaming:active { transform: scale(0.95); transition-duration: 0.12s; }
-.streaming-ponto { width: 12px; height: 12px; border-radius: 50%; flex: none; }
-.streaming-spotify .streaming-ponto { background: #1db954; }
-.streaming-ytmusic .streaming-ponto { background: #ff0033; }
-.streaming-apple .streaming-ponto { background: #fa2d48; }
-.streaming-youtube .streaming-ponto { background: #282828; }
+.streaming-marca { width: 12px; height: 12px; border-radius: 50%; flex: none; display: grid; place-items: center; transition: width 0.4s var(--mola), height 0.4s var(--mola); }
+.streaming-marca.com-logo { width: 22px; height: 22px; border-radius: 0; background: none !important; }
+.streaming-logo { width: 22px; height: 22px; display: block; }
+.streaming-marca:not(.com-logo) .streaming-logo { display: none; }
+.streaming-spotify .streaming-marca { background: #1db954; }
+.streaming-ytmusic .streaming-marca { background: #ff0033; }
+.streaming-apple .streaming-marca { background: #fa2d48; }
+.streaming-youtube .streaming-marca { background: #282828; }
+/* Achou a faixa: o botão "acende" de leve quando troca da busca para o link direto */
+.botao-streaming.direto { animation: surgir 0.4s var(--mola); }
 .folha-texto-pequeno { font-size: 13px; }
 
 /* Editor */
@@ -542,3 +547,4 @@
 .pedido-cabeca { display: flex; align-items: center; gap: 10px; }
 .pedido-botoes { display: grid; grid-template-columns: 1fr 1fr 1.2fr; gap: 6px; }
 .pedido-botoes > * { padding-inline: 8px; }
+.linha-nao-vai { color: var(--principal); font-weight: 600; }

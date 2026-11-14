@@ -13,3 +13,15 @@ export function separarMesa(itens) {
         mesa: itens.filter(fazMesa),
     };
 }
+
+// "Não vou poder ir" (D35): a pessoa continua na escala, riscada
+export const naoVai = (item) => Boolean(item.saiu_em);
+
+// O culto já começou? Comparado no relógio de Brasília (o banco faz igual)
+export function cultoJaComecou(culto) {
+    const agora = new Intl.DateTimeFormat('sv-SE', {
+        timeZone: 'America/Sao_Paulo', year: 'numeric', month: '2-digit', day: '2-digit',
+        hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23',
+    }).format(new Date()).replace(' ', 'T');
+    return `${culto.data}T${culto.horario}` <= agora;
+}

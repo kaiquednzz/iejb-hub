@@ -11,7 +11,7 @@ import { supabase } from '../supabase.js';
 import { abrirFolha, avisar } from '../util/folha.js';
 import { mensagemDoBanco } from '../util/erros.js';
 import { rotuloDoDia, formatarHorario } from '../util/datas.js';
-import { FUNCAO_MESA } from '../util/escala.js';
+import { FUNCAO_MESA, naoVai } from '../util/escala.js';
 import { avatar } from '../util/foto.js';
 import { eLiderDeLouvor, nomeCurto } from '../sessao.js';
 import { folhaItem, folhaAdicionarPessoa } from './montar/culto.js';
@@ -45,7 +45,7 @@ async function abrirAjuste(culto, aoMudar) {
     // As folhas da tela Montar esperam este formato de "culto" e "dados"
     async function recarregar() {
         const [itens, pessoas] = await Promise.all([
-            supabase.from('escala_item').select('id, pessoa_id, instrumento_exibido, origem_grupo_id').eq('escala_id', escalaId),
+            supabase.from('escala_item').select('id, pessoa_id, instrumento_exibido, origem_grupo_id, saiu_em').eq('escala_id', escalaId),
             supabase.from('pessoa').select('id, nome, apelido, instrumentos, foto, ativa').eq('ativa', true).order('nome'),
         ]);
         const erro = itens.error || pessoas.error;
@@ -84,8 +84,10 @@ async function abrirAjuste(culto, aoMudar) {
                     avatar(item.pessoa),
                     h('span', { class: 'linha-textos' },
                         h('span', { class: 'linha-nome' }, nomeCurto(item.pessoa)),
-                        h('span', { class: 'linha-detalhe' },
-                            item.instrumento_exibido.filter((x) => x !== FUNCAO_MESA).join(', ') || 'sem instrumento')),
+                        naoVai(item)
+                            ? h('span', { class: 'linha-detalhe linha-nao-vai' }, 'Avisou que não vai · toque para trocar')
+                            : h('span', { class: 'linha-detalhe' },
+                                item.instrumento_exibido.filter((x) => x !== FUNCAO_MESA).join(', ') || 'sem instrumento')),
                     icone('seta', 'icone icone-p linha-seta'));
                 linha.addEventListener('click', () => folhaItem(item, cultoLocal, fazer));
                 return h('li', { class: 'linha' }, linha);

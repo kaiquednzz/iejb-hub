@@ -4,7 +4,7 @@ import { supabase } from '../../supabase.js';
 import { abrirFolha, confirmar, avisar } from '../../util/folha.js';
 import { mensagemDoBanco } from '../../util/erros.js';
 import { rotuloDoDia, formatarHorario, hojeEmBrasilia } from '../../util/datas.js';
-import { FUNCAO_MESA } from '../../util/escala.js';
+import { FUNCAO_MESA, naoVai } from '../../util/escala.js';
 import { avatar } from '../../util/foto.js';
 import { nomeCurto } from '../../sessao.js';
 import { campo, caixaDeAviso } from '../moldura.js';
@@ -86,7 +86,7 @@ export function abrirCulto(cultoId, ctx) {
         const adicionar = h('button', { type: 'button', class: 'botao-secundario botao-pequeno' }, icone('mais', 'icone icone-p'), 'Pessoa');
         adicionar.addEventListener('click', () => folhaAdicionarPessoa(culto, dados, fazer));
         partes.push(h('section', { class: 'bloco' },
-            h('div', { class: 'bloco-topo' }, h('h3', { class: 'bloco-titulo' }, `Quem toca (${pessoas.length})`), adicionar),
+            h('div', { class: 'bloco-topo' }, h('h3', { class: 'bloco-titulo' }, `Quem toca (${pessoas.filter((i) => !naoVai(i)).length})`), adicionar),
             pessoas.length === 0
                 ? h('p', { class: 'bloco-texto' }, 'Escolha um grupo acima ou adicione pessoas.')
                 : h('ul', { class: 'lista-linhas lista-linhas-compacta' }, pessoas.map((item) => {
@@ -94,9 +94,11 @@ export function abrirCulto(cultoId, ctx) {
                         avatar(item.pessoa),
                         h('span', { class: 'linha-textos' },
                             h('span', { class: 'linha-nome' }, nomeCurto(item.pessoa)),
-                            h('span', { class: 'linha-detalhe' },
-                                item.instrumento_exibido.filter((x) => x !== FUNCAO_MESA).join(', ') || 'sem instrumento',
-                                !item.origem_grupo_id && ' · avulso')),
+                            naoVai(item)
+                                ? h('span', { class: 'linha-detalhe linha-nao-vai' }, 'Avisou que não vai · toque para trocar')
+                                : h('span', { class: 'linha-detalhe' },
+                                    item.instrumento_exibido.filter((x) => x !== FUNCAO_MESA).join(', ') || 'sem instrumento',
+                                    !item.origem_grupo_id && ' · avulso')),
                         icone('seta', 'icone icone-p linha-seta'));
                     linha.addEventListener('click', () => folhaItem(item, culto, fazer));
                     return h('li', { class: 'linha' }, linha);

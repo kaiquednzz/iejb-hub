@@ -9,7 +9,9 @@ import { supabase } from '../supabase.js';
 import { nomeCurto } from '../sessao.js';
 import { hojeEmBrasilia, somarDias, rotuloDoDia, partesDaData, formatarHorario } from '../util/datas.js';
 import { cabecalhoApp, barraAbas, avatar } from './moldura.js';
-import { FUNCAO_MESA, separarMesa } from '../util/escala.js';
+import { FUNCAO_MESA, separarMesa, naoVai, cultoJaComecou } from '../util/escala.js';
+import { confirmar, avisar } from '../util/folha.js';
+import { mensagemDoBanco } from '../util/erros.js';
 import { blocoRepertorio } from './repertorio.js';
 import { blocoAjustar } from './ajustar-escala.js';
 import { estadoDoPush, ativarPush } from '../util/push.js';
@@ -22,10 +24,10 @@ const CONSULTA = `
     id, nome, rotulo, data, horario, estado,
     escala (
         id, estado,
-        escala_item ( id, pessoa_id, instrumento_exibido, pessoa:pessoa_id ( nome, apelido, foto ) ),
+        escala_item ( id, pessoa_id, instrumento_exibido, saiu_em, pessoa:pessoa_id ( nome, apelido, foto ) ),
         escala_grupo ( grupo:grupo_id ( nome, lider_pessoa_id ) )
     ),
-    repertorio_item ( id, posicao, tom, musica:musica_id ( id, titulo, artista, link ) )
+    repertorio_item ( id, posicao, tom, musica:musica_id ( id, titulo, artista, link, links_streaming ) )
 `;
 
 export function telaEscala(conta) {
@@ -129,7 +131,7 @@ function cartaoDestaque(cultos, meuId) {
         const escala = escalaDo(culto);
         if (culto.estado !== 'ativo' || escala?.estado !== 'publicada') continue;
         const eu = escala.escala_item.find((item) => item.pessoa_id === meuId);
-        if (!eu) continue;
+        if (!eu || naoVai(eu)) continue;
         return [h('a', { class: 'destaque', href: `#culto-${culto.id}` },
             h('span', { class: 'destaque-rotulo' }, icone('estrela'), 'Sua próxima escala'),
             h('strong', { class: 'destaque-quando' }, `${rotuloDoDia(culto.data)} · ${formatarHorario(culto.horario)}`),
@@ -145,12 +147,14 @@ function cartaoCulto(culto, meuId, indice, extras) {
     const escala = escalaDo(culto);
     const cancelado = culto.estado === 'cancelado';
     const datas = partesDaData(culto.data);
-    const estouNela = escala?.escala_item.some((item) => item.pessoa_id === meuId);
+    const meuItem = escala?.escala_item.find((item) => item.pessoa_id === meuId);
+    const estouNela = Boolean(meuItem) && !naoVai(meuItem);
 
     let selo = null;
     if (cancelado) selo = h('span', { class: 'selo selo-cancelado' }, 'Cancelado');
     else if (escala?.estado === 'rascunho') selo = h('span', { class: 'selo selo-rascunho' }, icone('olho'), 'Rascunho · só você vê');
     else if (estouNela) selo = h('span', { class: 'selo selo-voce' }, 'Você toca');
+    else if (meuItem) selo = h('span', { class: 'selo selo-cancelado' }, 'Você não vai');
 
     return h('article', {
         class: `cartao-culto${cancelado ? ' cancelado' : ''}${estouNela && !cancelado ? ' comigo' : ''}`,
@@ -174,6 +178,7 @@ function cartaoCulto(culto, meuId, indice, extras) {
             ),
         ),
         !cancelado && corpoDaEscala(escala, meuId),
+        !cancelado && !extras.offline && blocoPresenca(culto, escala, meuItem, extras.recarregar),
         !cancelado && blocoRepertorio(culto, extras.conta, extras.recarregar, extras.offline),
         !cancelado && !extras.offline && blocoAjustar(culto, extras.conta, extras.recarregar),
     );
@@ -192,19 +197,50 @@ function corpoDaEscala(escala, meuId) {
     return h('div', { class: 'cartao-escala' },
         grupos.length > 0 && h('p', { class: 'cartao-grupos' }, grupos.length > 1 ? 'Grupos ' : 'Grupo ', grupos.join(' + ')),
         h('ul', { class: 'lista-pessoas' },
-            pessoas.map((item) => h('li', { class: item.pessoa_id === meuId ? 'sou-eu' : null },
+            pessoas.map((item) => h('li', { class: [item.pessoa_id === meuId && 'sou-eu', naoVai(item) && 'nao-vai'].filter(Boolean).join(' ') || null },
                 avatar(item.pessoa),
                 h('span', { class: 'pessoa-nome' },
                     nomeCurto(item.pessoa, 'Pessoa'),
                     item.pessoa_id === meuId && h('span', { class: 'sr-only' }, ' (você)')),
-                h('span', { class: 'pessoa-instrumento' },
-                    item.instrumento_exibido.filter((i) => i !== FUNCAO_MESA).join(' · ') || '—'),
+                naoVai(item)
+                    ? h('span', { class: 'pessoa-instrumento pessoa-nao-vai' }, 'Não vai')
+                    : h('span', { class: 'pessoa-instrumento' },
+                        item.instrumento_exibido.filter((i) => i !== FUNCAO_MESA).join(' · ') || '—'),
             )),
         ),
         mesa.length > 0 && h('p', { class: 'cartao-mesa' },
             h('span', null, 'Mesa de som'),
             h('strong', null, mesa.map((item) => nomeCurto(item.pessoa, 'Pessoa')).join(', '))),
     );
+}
+
+// "Não vou poder ir" / "Vou sim" (D35): só para quem está na escala publicada,
+// até o culto começar. Avisa o líder do grupo e o líder de louvor na hora.
+function blocoPresenca(culto, escala, meuItem, recarregar) {
+    if (!meuItem || escala?.estado !== 'publicada' || cultoJaComecou(culto)) return null;
+    const saiu = naoVai(meuItem);
+    const botao = h('button', { type: 'button', class: saiu ? 'botao-principal botao-pequeno' : 'botao-secundario botao-pequeno' },
+        saiu ? 'Vou poder ir sim' : 'Não vou poder ir');
+    botao.addEventListener('click', async () => {
+        if (!saiu) {
+            const ok = await confirmar({
+                titulo: 'Não vai poder ir?',
+                texto: 'O líder do grupo e o líder de louvor recebem um aviso agora. Você continua na escala, riscado, e pode voltar atrás até o culto começar.',
+                botao: 'Avisar que não vou',
+                perigo: true,
+            });
+            if (!ok) return;
+        }
+        await comCarregando(botao, async () => {
+            const { error } = await supabase.rpc('marcar_presenca', { p_escala: escala.id, p_vai: saiu });
+            if (error) return avisar(mensagemDoBanco(error));
+            avisar(saiu ? 'Que bom! Os líderes foram avisados.' : 'Os líderes foram avisados.');
+            await recarregar();
+        });
+    });
+    return h('div', { class: `presenca${saiu ? ' presenca-saiu' : ''}` },
+        saiu && h('p', { class: 'presenca-texto' }, 'Você avisou que não vai.'),
+        botao);
 }
 
 function faixaSemConexao(salvaEm, tentarDeNovo) {

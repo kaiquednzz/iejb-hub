@@ -37,17 +37,20 @@ export function iniciais(pessoa) {
     return (partes[0][0] + (partes.length > 1 ? partes.at(-1)[0] : '')).toUpperCase();
 }
 
-// Recorta no centro, reduz e comprime. WebP quando o navegador sabe gerar
+// Recorta o quadrado que a pessoa escolheu (util/recorte.js) ou, sem
+// recorte, o centro; reduz e comprime. WebP quando o navegador sabe gerar
 // (Chrome, Android); o Safari do iPhone devolve PNG nesse caso, aí vai JPEG.
-export async function comprimirFoto(arquivo) {
-    const imagem = await carregar(arquivo);
-    const lado = Math.min(imagem.width, imagem.height);
+export async function comprimirFoto(arquivo, recorte = null, imagemPronta = null) {
+    const imagem = imagemPronta ?? await carregar(arquivo);
+    const lado = recorte?.lado ?? Math.min(imagem.width, imagem.height);
+    const sx = recorte?.sx ?? (imagem.width - lado) / 2;
+    const sy = recorte?.sy ?? (imagem.height - lado) / 2;
     const tela = document.createElement('canvas');
     tela.width = LADO;
     tela.height = LADO;
     const ctx = tela.getContext('2d');
     ctx.imageSmoothingQuality = 'high';
-    ctx.drawImage(imagem, (imagem.width - lado) / 2, (imagem.height - lado) / 2, lado, lado, 0, 0, LADO, LADO);
+    ctx.drawImage(imagem, sx, sy, lado, lado, 0, 0, LADO, LADO);
     imagem.close?.();
 
     let blob = await paraBlob(tela, 'image/webp', 0.82);
@@ -57,7 +60,7 @@ export async function comprimirFoto(arquivo) {
 }
 
 // createImageBitmap já respeita a rotação da foto (EXIF) nos navegadores atuais
-async function carregar(arquivo) {
+export async function carregar(arquivo) {
     if (!arquivo.type.startsWith('image/')) throw new Error('Escolha uma imagem.');
     try {
         return await createImageBitmap(arquivo, { imageOrientation: 'from-image' });
@@ -79,11 +82,11 @@ const paraBlob = (tela, tipo, qualidade) => new Promise((ok) => tela.toBlob(ok, 
 
 // Sobe a foto nova, aponta a pessoa para ela e apaga a antiga.
 // Devolve o caminho novo (ou null quando removeu).
-export async function trocarFoto(pessoa, arquivo) {
+export async function trocarFoto(pessoa, arquivo, recorte = null, imagem = null) {
     const anterior = pessoa.foto;
     let caminho = null;
     if (arquivo) {
-        const blob = await comprimirFoto(arquivo);
+        const blob = await comprimirFoto(arquivo, recorte, imagem);
         const extensao = blob.type === 'image/webp' ? 'webp' : 'jpg';
         caminho = `${pessoa.id}/${crypto.randomUUID()}.${extensao}`;
         const { error } = await supabase.storage.from('fotos')
