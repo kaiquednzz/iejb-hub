@@ -9,7 +9,7 @@ Supabase pelo `@supabase/supabase-js`; quem protege os dados é a RLS do banco.
 cd app
 npm install
 npm run dev       # http://localhost:5173
-npm run build     # gera dist/ (é isso que vai pro Cloudflare Pages)
+npm run build     # gera dist/ (é isso que vai pro Cloudflare)
 npm run preview   # serve o dist/ para conferir o build
 ```
 
@@ -28,6 +28,9 @@ src/offline.js        cópia local da conta e da última escala (apagada ao sair
 src/supabase.js       o cliente único do Supabase
 src/sessao.js         lê a conta logada, nome curto, tradução de erros
 src/telas/            uma função por tela; cada uma devolve um elemento pronto
+src/telas/equipe/     tela Equipe: pedidos de acesso, pessoas e grupos (uma seção por arquivo)
+src/util/folha.js     folha que sobe de baixo (<dialog>), confirmação e aviso rápido (toast)
+src/util/erros.js     traduz erros do banco e da função admin-acesso
 src/util/dom.js       h() monta HTML sem innerHTML (proteção contra XSS) + ícones
 src/util/datas.js     datas sempre no fuso de Brasília
 src/estilo/           tokens (do site) → base → componentes → telas
@@ -42,7 +45,7 @@ com sessão
   conta pendente ───► Aguardando ("Conferir de novo")
   recusada/desativ. ► Aguardando (explica e oferece Sair)
   senha temporária ─► Trocar senha (obrigatório)
-  ativa ────────────► Escala
+  ativa ────────────► Escala (#/escala) ⇄ Equipe (#/equipe), pela barra de abas
 ```
 
 A tela é só conveniência. Se alguém forçar a tela da escala mexendo no JS, o
@@ -107,18 +110,35 @@ PWA: iPhone no Safari (passos), Android sem e com `beforeinstallprompt`
 login), e desktop logado que perde a internet: o app abre pelo service worker e
 mostra a escala guardada com a faixa de sem conexão.
 
-## Antes de pôr no ar
+## Publicação (feita em 14/11/2026)
 
-1. **Cloudflare Pages**: conectar o repo, *Root directory* `app`, *Build
-   command* `npm run build`, *Output* `dist`. Domínio `app.iejb.com.br`.
+1. **Cloudflare Workers** (conta IEJB), conectado ao repo: *Path* `app`, *Build
+   command* `npm run build`, *Deploy command*
+   `npx wrangler deploy --assets=./dist --name iejb-hub --compatibility-date=2026-11-01`,
+   variável `NODE_VERSION=22`. Domínio `app.iejb.com.br` em
+   Settings → Domains & Routes. Cada push na `main` publica sozinho.
 2. **Supabase → Authentication → URL Configuration**: Site URL
    `https://app.iejb.com.br`.
 3. **Desligar "Confirm email"** (Authentication → Sign In / Providers → Email)
    antes de alguém usar o *Pedir acesso*. Ligado, o Supabase manda e-mail de
    confirmação (contra a D19) e a pessoa não consegue entrar até clicar nele.
 
+## Tela Equipe
+
+Todo integrante entra: vê as pessoas (com o contato, Q22) e os grupos. O que cada um pode mexer:
+
+| | Admin | Líder de louvor | Líder de grupo | Integrante |
+|---|---|---|---|---|
+| Pedidos de acesso (aprovar, recusar) | ✓ | | | |
+| Cadastrar, editar, desativar pessoa | ✓ | ✓ | | |
+| Acesso ao Hub (criar, redefinir senha, desligar, tornar admin) | ✓ | | | |
+| Marcar líder de louvor | ✓ | | | |
+| Membros e instrumentos dos grupos | ✓ | ✓ | só o próprio grupo | |
+| Escolher o líder do grupo | ✓ | ✓ | | |
+
+Os botões aparecem conforme o papel, mas quem garante a tabela é o banco (RLS e as funções). Criar acesso e redefinir senha passam pela função de servidor `admin-acesso` (ver `supabase/functions/`), porque precisam da chave de serviço, que nunca vai para o app.
+
 ## Ainda não tem
 
 - Push (as notificações): precisa de chaves VAPID e da função de servidor que envia.
-- Telas do líder (montar escala, repertório) e do admin (aprovar contas).
-- Edge Function para o admin criar conta com senha temporária e redefinir senha.
+- Telas do líder: montar e publicar escala, repertório (com os botões da D26).

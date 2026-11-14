@@ -5,8 +5,8 @@
 | **Nome** | IEJB Hub |
 | **Instituição** | IEJB, Igreja Evangélica do Jardim Brasil |
 | **Responsável pelo projeto e desenvolvimento** | Kaique |
-| **Status** | Em desenvolvimento (etapa 4): banco, login, escala e PWA prontos. Sem aprovação institucional definitiva. |
-| **Versão deste documento** | 1.4 (música nas plataformas e PWA antes do login) |
+| **Status** | Em desenvolvimento (etapa 4): banco, login, escala, PWA e gestão de pessoas e acessos prontos; app publicado em `app.iejb.com.br`. Sem aprovação institucional definitiva. |
+| **Versão deste documento** | 1.5 (app publicado e tela Equipe) |
 | **Última atualização** | 13/11/2026 |
 
 > Este documento registra a visão atual do IEJB Hub para que ela possa evoluir depois.
@@ -312,7 +312,7 @@ O WhatsApp continuará sendo útil como canal de comunicação. O Hub deverá fu
 | Banco de dados | PostgreSQL | ✅ **Definido** |
 | Autenticação | Supabase Auth | ✅ **Definido** |
 | Segurança | Políticas RLS (Row Level Security) | ✅ **Definido** |
-| Hospedagem | Cloudflare Pages | ✅ **Definido** |
+| Hospedagem | Cloudflare (Workers com arquivos estáticos) | ✅ **Definido** |
 | Versionamento | GitHub | ✅ **Definido** |
 | Domínio | Subdomínio `app.iejb.com.br` | ✅ **Definido** |
 
@@ -438,10 +438,11 @@ A mensalidade contemplaria: utilização, hospedagem, manutenção, correções,
 | D21 | Planos gratuitos dos serviços no piloto, com atividade programada e backup próprio para reduzir os riscos do plano gratuito. |
 | D22 | Front-end: Vite com JavaScript puro em módulos, sem framework na v1 (escolha delegada por Kaique). |
 | D23 | Login com Supabase Auth, sem e-mail: conta criada pelo administrador ou solicitada pela pessoa (cadastro aberto com confirmação de e-mail desligada) e aprovada por ele. A conta pendente não acessa nada. |
-| D24 | Hospedagem no Cloudflare Pages, código no GitHub, endereço `app.iejb.com.br`. Kaique tem acesso ao DNS. |
+| D24 | Hospedagem no Cloudflare (Workers com arquivos estáticos, na conta da IEJB, deploy automático a cada push), código no GitHub, endereço `app.iejb.com.br`. O domínio está na mesma conta do Cloudflare. |
 | D25 | Push com service worker próprio, chaves VAPID e função de servidor, com a mensagem de WhatsApp como reserva. |
 | D26 | Músicas nas plataformas de streaming sem integração de conta: cada música do repertório tem botões "Ouvir no Spotify / YouTube Music / Apple Music" que abrem a busca da plataforma com título e artista, e o culto tem "Tocar o repertório no YouTube", que monta a fila na ordem do repertório com os links do YouTube das músicas (endereço `youtube.com/watch_videos?video_ids=`). Sem criar playlist nas contas das pessoas e sem campo de playlist do culto. Motivos: a API do Spotify em modo de desenvolvimento aceita só 5 usuários e exige Premium do dono; a da Apple exige conta paga de desenvolvedor. Risco aceito: o endereço do YouTube não é oficial; se parar, os botões por música continuam. Entra na tela de montar repertório. |
 | D27 | No celular, a instalação como PWA vem antes do login, porque no iPhone o app da tela de início não enxerga a sessão do Safari. O app guarda no aparelho a última escala vista, para abrir sem internet, e apaga essa cópia ao sair da conta. |
+| D28 | Toda a gestão de pessoas e acessos é feita pelo próprio Hub, na tela Equipe: aprovar ou recusar pedidos, cadastrar e desativar pessoas, criar acesso com senha temporária, redefinir senha, desligar acesso, tornar administrador, marcar líder de louvor e montar os grupos. Criar acesso e redefinir senha usam uma função de servidor do Supabase (`admin-acesso`), a única parte que tem a chave de serviço. |
 
 ### 💡 Proposto
 
@@ -663,4 +664,5 @@ Precisam ser respondidas, de preferência com o líder de louvor, antes de defin
 | 1.1 | 13/11/2026 | Sexta rodada (Q19 a Q22), vinda do modelo de dados da etapa 3. |
 | 1.2 | 13/11/2026 | Decisões técnicas: Supabase, planos gratuitos e front-end com Vite e JavaScript puro (D20 a D22). Registro de decisões técnicas criado. |
 | 1.3 | 13/11/2026 | Aprovadas as recomendações de login, hospedagem e push (D23 a D25). Stack do piloto fechada. |
+| 1.5 | 14/11/2026 | App publicado em `app.iejb.com.br` (Cloudflare Workers, D24 atualizada). Tela Equipe com gestão completa de pessoas e acessos (D28). |
 | 1.4 | 13/11/2026 | Desenvolvimento começou. Músicas nas plataformas de streaming por botões e fila do YouTube, sem playlist (D26). PWA antes do login e escala offline (D27). |

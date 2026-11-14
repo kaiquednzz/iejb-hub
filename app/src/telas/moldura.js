@@ -40,6 +40,37 @@ export function cabecalhoApp(conta) {
     );
 }
 
+// Barra de abas fixa embaixo (Escala | Equipe), como num app do iPhone.
+// O número vermelho em "Equipe" mostra pedidos de acesso esperando o admin.
+export function barraAbas(conta, atual) {
+    const aba = (rota, nome, nomeIcone) => h('a', {
+        class: 'aba', href: rota,
+        'aria-current': atual === rota ? 'page' : null,
+    }, icone(nomeIcone), h('span', null, nome));
+
+    const equipe = aba('#/equipe', 'Equipe', 'pessoas');
+    const barra = h('nav', { class: 'barra-abas', 'aria-label': 'Seções' },
+        aba('#/escala', 'Escala', 'calendario'),
+        equipe,
+    );
+
+    if (conta.e_administrador) {
+        supabase.from('conta').select('id', { count: 'exact', head: true }).eq('estado', 'pendente')
+            .then(({ count }) => {
+                if (!count) return;
+                equipe.append(h('span', { class: 'aba-contador' },
+                    String(count), h('span', { class: 'sr-only' }, count === 1 ? ' pedido de acesso' : ' pedidos de acesso')));
+            });
+    }
+    return barra;
+}
+
+// Iniciais para o círculo da pessoa: "Gabi" → G, "Ana Souza" → AS
+export function iniciais(pessoa) {
+    const partes = (pessoa?.apelido || pessoa?.nome || '?').trim().split(/\s+/);
+    return (partes[0][0] + (partes.length > 1 ? partes.at(-1)[0] : '')).toUpperCase();
+}
+
 // Campo de formulário com rótulo de verdade (acessível e com área de toque boa)
 export function campo({ rotulo, nome, tipo = 'text', autocomplete, dica, ...resto }) {
     const id = `campo-${nome}`;
@@ -48,7 +79,7 @@ export function campo({ rotulo, nome, tipo = 'text', autocomplete, dica, ...rest
         h('label', { for: id }, rotulo),
         h('input', {
             id, name: nome, type: tipo, autocomplete, required: true,
-            'aria-describedby': idDica, ...resto,
+            'aria-describedby': idDica, ...resto, // resto pode trocar o required
         }),
         dica && h('p', { class: 'campo-dica', id: idDica }, dica),
     );

@@ -2,7 +2,7 @@
    Mesma lógica do site: uma base com :where() (especificidade zero, qualquer
    regra de componente ajusta) e cada botão em exatamente UM grupo de cor. */
 
-:where(.botao-principal, .botao-secundario, .botao-icone) {
+:where(.botao-principal, .botao-secundario, .botao-perigo, .botao-icone) {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -22,7 +22,7 @@
 }
 
 /* "Afunda" ao tocar e volta com mola ao soltar, como no iOS */
-:where(.botao-principal, .botao-secundario, .botao-icone):active:not(:disabled) {
+:where(.botao-principal, .botao-secundario, .botao-perigo, .botao-icone):active:not(:disabled) {
     transform: scale(0.95);
     transition-duration: 0.12s;
 }
@@ -44,6 +44,30 @@
     .botao-secundario:hover:not(:disabled) { background: rgba(143, 13, 11, 0.14); }
 }
 
+.botao-perigo {
+    background: var(--principal-brighter);
+    color: #fff;
+    box-shadow: 0 6px 18px rgba(191, 38, 43, 0.26), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+}
+
+/* Ação destrutiva discreta (fim das folhas): texto vermelho, sem fundo */
+.botao-texto-perigo {
+    min-height: 44px;
+    padding: 10px 14px;
+    border: none;
+    border-radius: var(--raio-capsula);
+    background: none;
+    color: var(--principal-brighter);
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.5s var(--mola);
+}
+.botao-texto-perigo:active:not(:disabled) { transform: scale(0.95); transition-duration: 0.12s; background: rgba(191, 38, 43, 0.08); }
+.botao-texto-perigo.carregando::after { border-color: rgba(191, 38, 43, 0.2); border-top-color: var(--principal-brighter); }
+
+.botao-pequeno { min-height: 38px; padding: 8px 14px; font-size: 15px; }
+
 .botao-icone {
     width: 44px;
     min-height: 44px;
@@ -54,7 +78,7 @@
 
 .botao-largo { width: 100%; }
 
-:is(.botao-principal, .botao-secundario):disabled { opacity: 0.6; cursor: progress; }
+:is(.botao-principal, .botao-secundario, .botao-perigo):disabled { opacity: 0.6; cursor: progress; }
 
 /* Bolinha girando no lugar do texto enquanto espera o servidor */
 .carregando {

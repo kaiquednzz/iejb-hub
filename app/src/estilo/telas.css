@@ -90,7 +90,8 @@
     position: relative;
     isolation: isolate;
     background: var(--background);
-    padding-bottom: max(32px, env(safe-area-inset-bottom));
+    /* Espaço para a barra de abas fixa não cobrir o fim da lista */
+    padding-bottom: calc(110px + env(safe-area-inset-bottom));
 }
 
 /* O brilho fica numa camada fixa atrás de tudo. (background-attachment: fixed

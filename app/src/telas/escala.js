@@ -8,7 +8,7 @@ import { h, icone, comCarregando } from '../util/dom.js';
 import { supabase } from '../supabase.js';
 import { nomeCurto } from '../sessao.js';
 import { hojeEmBrasilia, somarDias, rotuloDoDia, partesDaData, formatarHorario } from '../util/datas.js';
-import { cabecalhoApp } from './moldura.js';
+import { cabecalhoApp, barraAbas, iniciais } from './moldura.js';
 import { guardarEscala, escalaGuardada, eErroDeRede } from '../offline.js';
 
 const SEMANAS_A_MOSTRAR = 6;
@@ -40,6 +40,7 @@ export function telaEscala(conta) {
             h('h2', { class: 'titulo-secao' }, 'Próximos cultos'),
             lista,
         ),
+        barraAbas(conta, '#/escala'),
     );
 
     carregar();
@@ -214,11 +215,6 @@ function linkSeguro(link) {
     if (!link || !/^https?:\/\//i.test(link)) return null;
     return h('a', { class: 'musica-link', href: link, target: '_blank', rel: 'noopener noreferrer', 'aria-label': 'Ouvir (abre em outra aba)' },
         icone('externo', 'icone icone-p'));
-}
-
-function iniciais(pessoa) {
-    const partes = (pessoa?.apelido || pessoa?.nome || '?').trim().split(/\s+/);
-    return (partes[0][0] + (partes.length > 1 ? partes.at(-1)[0] : '')).toUpperCase();
 }
 
 function faixaSemConexao(salvaEm, tentarDeNovo) {

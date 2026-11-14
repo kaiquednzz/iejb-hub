@@ -3,13 +3,14 @@
 //   2. Em que estado está a conta?  (tabela conta: pendente, ativa...)
 //
 // Não há "roteador" de verdade: o app tem poucas telas e o estado da conta
-// manda mais do que a URL. O hash (#/pedir-acesso) só escolhe entre as telas
-// de quem ainda não entrou. Quando o app crescer (escala do líder, admin),
-// aí sim vale um roteador pequeno.
+// manda mais do que a URL. O hash só escolhe entre telas do mesmo "andar":
+//   deslogado: #/pedir-acesso ou a tela de entrar
+//   conta pronta: #/equipe ou a escala (barra de abas embaixo)
 import './estilo/tokens.css';
 import './estilo/base.css';
 import './estilo/componentes.css';
 import './estilo/telas.css';
+import './estilo/equipe.css';
 
 import { supabase } from './supabase.js';
 import { carregarConta } from './sessao.js';
@@ -18,6 +19,7 @@ import { telaPedirAcesso } from './telas/pedir-acesso.js';
 import { telaAguardando } from './telas/aguardando.js';
 import { telaTrocarSenha } from './telas/trocar-senha.js';
 import { telaEscala } from './telas/escala.js';
+import { telaEquipe } from './telas/equipe/index.js';
 import { telaErro } from './telas/erro.js';
 import { telaInstalar } from './telas/instalar.js';
 import { precisaInstalar, registrarServiceWorker } from './pwa.js';
@@ -26,6 +28,10 @@ import { apagarCopiasLocais } from './offline.js';
 const raiz = document.getElementById('app');
 let rodada = 0;          // descarta resultados de decisões antigas que chegarem atrasadas
 let usuarioAtual;        // undefined = ainda não decidiu nenhuma vez
+let contaPronta = null;  // conta ativa e sem senha temporária: pode navegar pelas abas
+
+const ROTAS_DA_CONTA = { '#/equipe': telaEquipe };
+const telaDaConta = (conta) => (ROTAS_DA_CONTA[location.hash] ?? telaEscala)(conta);
 
 async function decidirTela() {
     const minhaRodada = ++rodada;
@@ -42,17 +48,21 @@ async function decidirTela() {
     usuarioAtual = session?.user.id ?? null;
 
     let tela;
+    contaPronta = null;
     if (!session) {
         tela = location.hash === '#/pedir-acesso' ? telaPedirAcesso() : telaEntrar();
     } else {
         // Logado: o #/pedir-acesso não faz mais sentido (e voltaria ao sair)
-        if (location.hash) history.replaceState(null, '', location.pathname);
+        if (location.hash && !ROTAS_DA_CONTA[location.hash]) history.replaceState(null, '', location.pathname);
         const { conta, erro } = await carregarConta(session.user.id);
         if (erro) tela = telaErro(erro, decidirTela);
         // pendente, recusada ou desativada: a tela explica cada caso
         else if (conta.estado !== 'ativa') tela = telaAguardando(conta, decidirTela);
         else if (conta.senha_temporaria) tela = telaTrocarSenha(conta);
-        else tela = telaEscala(conta);
+        else {
+            contaPronta = conta;
+            tela = telaDaConta(conta);
+        }
     }
 
     if (minhaRodada !== rodada) return; // outra decisão mais nova já começou
@@ -90,7 +100,11 @@ supabase.auth.onAuthStateChange((evento, sessao) => {
 });
 
 window.addEventListener('hashchange', () => {
-    if (!usuarioAtual) decidirTela();
+    // Trocar de aba não precisa buscar a conta de novo. Âncoras dentro da
+    // tela (#culto-...) não são rotas: deixa o navegador só rolar até elas.
+    const eRota = location.hash === '' || location.hash.startsWith('#/');
+    if (contaPronta) { if (eRota) mostrar(telaDaConta(contaPronta)); }
+    else if (!usuarioAtual) decidirTela();
 });
 
 registrarServiceWorker();

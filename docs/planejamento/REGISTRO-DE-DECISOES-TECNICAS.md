@@ -113,6 +113,8 @@
 
 **✅ Decisão (aprovada por Kaique em 13/11/2026):** Cloudflare Pages com deploy automático a cada push na `main`. O limite de 500 builds por mês é folgado para um projeto desse tamanho.
 
+**Atualização (14/11/2026):** na hora de publicar, o painel do Cloudflare levou para o fluxo novo de **Workers com arquivos estáticos**, que substitui o Pages para sites novos. Mesmo efeito: deploy a cada push, plano gratuito, sem código de servidor. O projeto ficou na conta do Cloudflare da IEJB, a mesma do domínio, então o DNS de `app.iejb.com.br` foi criado sozinho, sem mexer no Registro.br.
+
 ---
 
 ## 6. DT-05: Notificações push
