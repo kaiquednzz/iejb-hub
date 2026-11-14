@@ -122,6 +122,10 @@ O `alter default privileges` da migração 09 só vale para funções criadas pe
 
 Para conferir se está entregando: `select push_enviado_em, push_erro from aviso_destinatario order by criado_em desc limit 10;`
 
+## Backup
+
+Semanal, criptografado, 90 dias no GitHub. Configuração e restauração (testada): [BACKUP-E-RESTAURACAO.md](BACKUP-E-RESTAURACAO.md).
+
 ## Manter acordado
 
 O plano gratuito pausa depois de 7 dias sem uso. `.github/workflows/manter-acordado.yml` faz uma leitura por dia (GitHub Actions). Dá para rodar na hora em Actions → "Manter o Supabase acordado" → Run workflow.

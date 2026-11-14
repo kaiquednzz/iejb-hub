@@ -1,0 +1,69 @@
+# Backup semanal dos dados do IEJB Hub (D21 / DT-06).
+#
+# O plano gratuito do Supabase não tem backup. Este agendamento exporta os
+# DADOS toda semana (a estrutura está nas migrações do repositório), criptografa
+# com uma senha que só o responsável tem e guarda o arquivo por 90 dias nos
+# "artifacts" do GitHub (cerca de 12 backups disponíveis a qualquer momento).
+#
+# Precisa de dois segredos (Settings → Secrets and variables → Actions):
+#   SUPABASE_DB_URL  endereço "Session pooler" do banco, com a senha do banco
+#   BACKUP_SENHA     senha para criptografar (sem ela o backup não abre!)
+#
+# Restaurar: supabase/BACKUP-E-RESTAURACAO.md
+name: Backup semanal do banco
+
+on:
+  schedule:
+    - cron: '23 6 * * 0'   # domingo, 3h23 de Brasília
+  workflow_dispatch: {}     # botão "Run workflow" para fazer um agora
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Conferir os segredos
+        env:
+          DB: ${{ secrets.SUPABASE_DB_URL }}
+          SENHA: ${{ secrets.BACKUP_SENHA }}
+        run: |
+          if [ -z "$DB" ] || [ -z "$SENHA" ]; then
+            echo "::error::Cadastre SUPABASE_DB_URL e BACKUP_SENHA em Settings → Secrets and variables → Actions"
+            exit 1
+          fi
+
+      # pg_dump da mesma versão do banco (Postgres 17), pela imagem oficial
+      - name: Exportar os dados
+        env:
+          DB: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          set -euo pipefail
+          docker run --rm -e DB postgres:17 sh -c \
+            'pg_dump "$DB" --data-only --table=auth.users --table=auth.identities --no-owner --no-privileges' > contas.sql
+          docker run --rm -e DB postgres:17 sh -c \
+            'pg_dump "$DB" --data-only --schema=public --no-owner --no-privileges' > publico.sql
+          # Confere que veio alguma coisa de verdade (não um arquivo vazio)
+          grep -q 'COPY public.pessoa' publico.sql
+          grep -q 'COPY auth.users' contas.sql
+          cat contas.sql publico.sql | gzip -9 > dados.sql.gz
+          echo "Tabelas exportadas: $(grep -c '^COPY' publico.sql) + contas"
+
+      - name: Criptografar
+        env:
+          SENHA: ${{ secrets.BACKUP_SENHA }}
+        run: |
+          set -euo pipefail
+          nome="iejb-hub-$(date -u +%Y-%m-%d).sql.gz.gpg"
+          printf '%s' "$SENHA" > "$RUNNER_TEMP/senha"
+          gpg --batch --yes --pinentry-mode loopback --passphrase-file "$RUNNER_TEMP/senha" \
+              --symmetric --cipher-algo AES256 -o "$nome" dados.sql.gz
+          rm -f "$RUNNER_TEMP/senha" dados.sql.gz contas.sql publico.sql
+          echo "ARQUIVO=$nome" >> "$GITHUB_ENV"
+
+      - name: Guardar por 90 dias
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.ARQUIVO }}
+          path: ${{ env.ARQUIVO }}
+          retention-days: 90
+          if-no-files-found: error
