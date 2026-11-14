@@ -5,8 +5,8 @@ Banco do piloto Louvor, construído a partir do [modelo de dados e permissões](
 | | |
 |---|---|
 | Projeto Supabase | `iejb-hub` (organização IEJB Hub), região São Paulo (`sa-east-1`), Postgres 17 |
-| Estado | 12 migrações aplicadas (10 a 12 em 14/11/2026), a função de servidor `admin-acesso` e o bucket `fotos`. |
-| Testes | 116 verificações, todas passando (`tests/local/rodar.sh`) |
+| Estado | 13 migrações aplicadas (10 a 13 em 14/11/2026), a função de servidor `admin-acesso` e o bucket `fotos`. |
+| Testes | 127 verificações, todas passando (`tests/local/rodar.sh`) |
 
 ## Estrutura
 
@@ -24,7 +24,9 @@ supabase/
 │   ├── ..._ajustes_do_verificador.sql   # correções apontadas pelo Supabase (ver abaixo)
 │   ├── ..._gestao_de_pessoas.sql        # cadastrar_pessoa, aprovar_pedido, definir_pessoa_ativa
 │   ├── ..._montar_escala_e_fotos.sql    # grupos por culto, mesa de som, rótulo (Ceia), fotos
-│   └── ..._fechar_funcoes_novas.sql     # REVOKE de anon que faltou nas 10 e 11 (ver lição abaixo)
+│   ├── ..._fechar_funcoes_novas.sql     # REVOKE de anon que faltou nas 10 e 11 (ver lição abaixo)
+│   └── ..._push.sql                     # chaves VAPID, aparelhos, fila de envio, agendamento
+├── functions/enviar-push/   # entrega os avisos no celular (chamada pelo pg_cron)
 ├── functions/admin-acesso/  # criar acesso e redefinir senha (precisa da chave de serviço)
 └── tests/local/
     ├── 00_simular_supabase.sql   # imita auth.users, auth.uid() e os papéis do Supabase
@@ -32,6 +34,7 @@ supabase/
     ├── 02_cenario_piloto.sql     # o cenário completo, do primeiro admin aos avisos
     ├── 03_gestao_de_pessoas.sql  # as funções da migração 10
     ├── 04_montar_escala_e_fotos.sql # as funções da migração 11
+    ├── 05_push.sql               # aparelhos e fila de envio
     └── rodar.sh
 ```
 
@@ -106,3 +109,16 @@ Para publicar de novo depois de mudar: `supabase functions deploy admin-acesso -
 ## Lição aprendida 2: toda migração fecha as próprias funções
 
 O `alter default privileges` da migração 09 só vale para funções criadas pelo papel `postgres`. Pelo painel ou pelo MCP a migração pode rodar com outro papel, e aí a função nasce aberta a `PUBLIC` (inclusive a quem não está logado). O verificador pegou `definir_foto` depois da migração 11; a 12 fechou tudo. Regra: **toda migração termina com `revoke execute ... from public, anon` das funções que criou**, mesmo confiando no padrão.
+
+## Notificações push
+
+1. Gatilhos anotam a mudança; `processar_avisos_pendentes` (pg_cron, a cada minuto, 5 min de silêncio) cria o aviso e os destinatários.
+2. O job `enviar-push` (pg_cron + pg_net, a cada minuto) chama a função `enviar-push` **só quando tem destinatário sem push** (`privado.tem_push_pendente`).
+3. A função reserva os pendentes com `reservar_pushes` (`for update skip locked`: ninguém recebe duas vezes) e entrega com a biblioteca `jsr:@negrel/webpush`. Inscrição que sumiu (410) desativa o aparelho; outro erro fica em `aviso_destinatario.push_erro`.
+4. **Chaves VAPID:** a função gera na primeira chamada e guarda em `chave_push` (RLS sem política: só a chave de serviço lê). Ninguém precisou ver a chave privada. O `GET` da função devolve só a pública.
+
+Para conferir se está entregando: `select push_enviado_em, push_erro from aviso_destinatario order by criado_em desc limit 10;`
+
+## Manter acordado
+
+O plano gratuito pausa depois de 7 dias sem uso. `.github/workflows/manter-acordado.yml` faz uma leitura por dia (GitHub Actions). Dá para rodar na hora em Actions → "Manter o Supabase acordado" → Run workflow.

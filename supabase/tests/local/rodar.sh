@@ -18,3 +18,4 @@ $PSQL -d $BANCO -f 01_ajudantes.sql
 $PSQL -d $BANCO -f 02_cenario_piloto.sql 2>&1 >/dev/null | sed "s/^psql:[^:]*:[0-9]*: //; s/^NOTICE:  //"
 $PSQL -d $BANCO -f 03_gestao_de_pessoas.sql 2>&1 >/dev/null | sed "s/^psql:[^:]*:[0-9]*: //; s/^NOTICE:  //"
 $PSQL -d $BANCO -f 04_montar_escala_e_fotos.sql 2>&1 >/dev/null | sed "s/^psql:[^:]*:[0-9]*: //; s/^NOTICE:  //"
+$PSQL -d $BANCO -f 05_push.sql 2>&1 >/dev/null | sed "s/^psql:[^:]*:[0-9]*: //; s/^NOTICE:  //"

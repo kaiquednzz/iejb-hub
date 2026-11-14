@@ -120,3 +120,37 @@ async function cacheEAtualiza(pedido, evento) {
     }
     return daRede;
 }
+
+// ---------------------------------------------------------------------------
+// Notificações push (D18, D25)
+// O servidor (função enviar-push) manda { titulo, corpo, url, tag }.
+// No iPhone, todo push PRECISA virar notificação visível: se o service worker
+// recebe e não mostra nada, o iOS cancela a inscrição depois de algumas vezes.
+// ---------------------------------------------------------------------------
+self.addEventListener('push', (evento) => {
+    let dados = {};
+    try { dados = evento.data?.json() ?? {}; } catch { dados = { corpo: evento.data?.text() }; }
+    evento.waitUntil(self.registration.showNotification(dados.titulo || 'IEJB Hub', {
+        body: dados.corpo || 'Tem novidade na escala.',
+        icon: '/icone-192.png',
+        badge: '/icone-192.png',
+        tag: dados.tag,          // mesma escala: a notificação nova substitui a antiga
+        renotify: !!dados.tag,   // ...mas ainda vibra/toca de novo
+        data: { url: dados.url || '/' },
+    }));
+});
+
+// Tocar na notificação: abre o app (ou traz para frente o que já está aberto)
+self.addEventListener('notificationclick', (evento) => {
+    evento.notification.close();
+    const destino = new URL(evento.notification.data?.url || '/', self.location.origin).href;
+    evento.waitUntil((async () => {
+        const abertos = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+        const app = abertos.find((c) => new URL(c.url).origin === self.location.origin);
+        if (app) {
+            await app.focus();
+            return app.navigate(destino).catch(() => {});
+        }
+        return self.clients.openWindow(destino);
+    })());
+});

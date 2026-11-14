@@ -11,6 +11,7 @@ import { hojeEmBrasilia, somarDias, rotuloDoDia, partesDaData, formatarHorario }
 import { cabecalhoApp, barraAbas, avatar } from './moldura.js';
 import { FUNCAO_MESA, separarMesa } from '../util/escala.js';
 import { blocoRepertorio } from './repertorio.js';
+import { estadoDoPush, ativarPush } from '../util/push.js';
 import { guardarEscala, escalaGuardada, eErroDeRede } from '../offline.js';
 
 const SEMANAS_A_MOSTRAR = 6;
@@ -38,6 +39,7 @@ export function telaEscala(conta) {
             titulo,
             h('p', { class: 'subtitulo-tela' }, 'Aqui estão os próximos cultos do Louvor.'),
             faixaOffline,
+            cartaoAvisos(),
             destaque,
             h('h2', { class: 'titulo-secao' }, 'Próximos cultos'),
             lista,
@@ -245,4 +247,45 @@ function esqueleto() {
         ),
         h('span', { class: 'linha l3' }),
     ));
+}
+
+// "Ativar avisos": só aparece enquanto dá para ativar. No iPhone o pedido de
+// permissão precisa sair de um toque, por isso é um botão e não automático.
+function cartaoAvisos() {
+    if (estadoDoPush() !== 'pode-ativar') return null;
+    const ativar = h('button', { type: 'button', class: 'botao-principal botao-pequeno' }, 'Ativar');
+    const agoraNao = h('button', { type: 'button', class: 'link-discreto' }, 'Agora não');
+    const cartao = h('section', { class: 'cartao-avisos', 'aria-label': 'Avisos no celular' },
+        h('div', { class: 'cartao-avisos-icone', 'aria-hidden': 'true' }, icone('sino')),
+        h('div', { class: 'cartao-avisos-textos' },
+            h('strong', null, 'Receba avisos da escala'),
+            h('span', null, 'Quando você entrar, sair ou o repertório mudar, o celular avisa.')),
+        h('div', { class: 'cartao-avisos-acoes' }, agoraNao, ativar),
+    );
+    const sumir = () => {
+        cartao.classList.add('saindo');
+        setTimeout(() => cartao.remove(), 350);
+    };
+    agoraNao.addEventListener('click', () => { sessionStorage.setItem('iejb-hub-avisos-depois', '1'); sumir(); });
+    ativar.addEventListener('click', () => comCarregando(ativar, async () => {
+        try {
+            const resposta = await ativarPush();
+            if (resposta === 'default') return; // fechou a pergunta: o cartão fica
+            if (resposta === 'granted') {
+                cartao.replaceChildren(h('div', { class: 'cartao-avisos-icone ok', 'aria-hidden': 'true' }, icone('certo')),
+                    h('div', { class: 'cartao-avisos-textos', role: 'status' }, h('strong', null, 'Avisos ativados!'),
+                        h('span', null, 'Você vai saber das mudanças na hora.')));
+                setTimeout(sumir, 2500);
+            } else {
+                cartao.replaceChildren(h('div', { class: 'cartao-avisos-textos', role: 'status' },
+                    h('strong', null, 'Avisos bloqueados'),
+                    h('span', null, 'Para ativar depois: Ajustes do celular → Notificações → IEJB Hub.')));
+            }
+        } catch (erro) {
+            console.error(erro);
+            cartao.querySelector('.cartao-avisos-textos span').textContent = 'Não deu para ativar agora. Tente de novo.';
+        }
+    }));
+    if (sessionStorage.getItem('iejb-hub-avisos-depois')) return null;
+    return cartao;
 }

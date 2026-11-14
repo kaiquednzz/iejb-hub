@@ -446,3 +446,36 @@
     background: #fff;
 }
 .editor-musica .musica-tom { grid-area: auto; }
+
+/* ---------- Cartão "Ativar avisos" ---------- */
+.cartao-avisos {
+    display: grid;
+    grid-template-columns: 44px 1fr;
+    gap: 4px 12px;
+    align-items: center;
+    margin-top: 18px;
+    padding: 14px 14px 10px;
+    border-radius: var(--raio-l);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.92), rgba(246, 238, 236, 0.9));
+    border: 1px solid rgba(191, 38, 43, 0.18);
+    box-shadow: var(--sombra-2), var(--brilho);
+    animation: surgir 0.6s 0.15s var(--mola) backwards;
+    transition: opacity 0.3s ease, translate 0.35s var(--ease-ios);
+}
+.cartao-avisos.saindo { opacity: 0; translate: 0 -8px; }
+.cartao-avisos-icone {
+    width: 44px;
+    height: 44px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: var(--principal);
+    color: #fff;
+}
+/* O sino balança duas vezes e para (sem loop infinito) */
+.cartao-avisos-icone .icone { animation: balancar 1s 0.7s ease-in-out 2; transform-origin: 50% 10%; }
+@keyframes balancar { 20% { rotate: 14deg; } 40% { rotate: -12deg; } 60% { rotate: 7deg; } 80% { rotate: -4deg; } }
+.cartao-avisos-icone.ok { background: var(--verde); animation: surgir 0.5s var(--mola); }
+.cartao-avisos-textos { display: grid; font-size: 14px; color: var(--texto-2); }
+.cartao-avisos-textos strong { font-size: 16px; color: var(--texto-vinho); }
+.cartao-avisos-acoes { grid-column: 1 / -1; display: flex; justify-content: flex-end; align-items: center; gap: 4px; }

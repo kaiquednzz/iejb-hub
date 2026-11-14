@@ -23,6 +23,7 @@ import { telaEscala } from './telas/escala.js';
 import { telaEquipe } from './telas/equipe/index.js';
 import { telaMontar } from './telas/montar/index.js';
 import { eLiderDeLouvor } from './sessao.js';
+import { sincronizarPush } from './util/push.js';
 import { telaErro } from './telas/erro.js';
 import { telaInstalar } from './telas/instalar.js';
 import { precisaInstalar, registrarServiceWorker } from './pwa.js';
@@ -69,6 +70,7 @@ async function decidirTela() {
         else {
             contaPronta = conta;
             tela = telaDaConta(conta);
+            sincronizarPush(); // sem await: não atrasa a tela
         }
     }
 

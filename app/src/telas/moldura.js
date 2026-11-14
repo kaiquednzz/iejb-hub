@@ -2,6 +2,7 @@
 import { h, icone } from '../util/dom.js';
 import { supabase } from '../supabase.js';
 import { eLiderDeLouvor } from '../sessao.js';
+import { removerAparelho } from '../util/push.js';
 
 // Telas de quem ainda não entrou (ou está esperando aprovação):
 // fundo vinho com brilho e um cartão de vidro no meio.
@@ -26,7 +27,8 @@ export function molduraEntrada({ titulo, subtitulo, conteudo, rodape }) {
 export function cabecalhoApp(conta) {
     const botaoSair = h('button', {
         type: 'button', class: 'botao-icone', 'aria-label': 'Sair da conta',
-        onclick: () => supabase.auth.signOut(),
+        // Primeiro desliga o push deste aparelho (ainda logado, o banco deixa apagar)
+        onclick: async () => { await removerAparelho(); supabase.auth.signOut(); },
     }, icone('sair'));
 
     return h('header', { class: 'cabecalho' },

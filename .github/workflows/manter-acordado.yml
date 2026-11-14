@@ -1,0 +1,28 @@
+# Mantém o Supabase acordado (D21 / DT-06).
+#
+# O plano gratuito pausa o projeto depois de 7 dias sem uso, e aí o app para
+# até alguém reativar no painel. Numa semana parada (férias, feriado) isso
+# aconteceria. Este agendamento faz uma leitura simples todo dia, que conta
+# como atividade.
+#
+# A chave usada é a "publishable" (pública por natureza: já está no app).
+# Sem login, o RLS devolve lista vazia; o que importa é a chamada acontecer.
+name: Manter o Supabase acordado
+
+on:
+  schedule:
+    - cron: '17 11 * * *'   # todo dia às 8h17 de Brasília (11h17 UTC)
+  workflow_dispatch: {}      # botão "Run workflow" para testar na hora
+
+jobs:
+  cutucar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Leitura simples na API do Supabase
+        run: |
+          status=$(curl -s -o /dev/null -w '%{http_code}' \
+            'https://hqalztygktkabwybmdyl.supabase.co/rest/v1/ministerio?select=id&limit=1' \
+            -H 'apikey: sb_publishable_Kmg39L8l9I6RhBwNb1BnTw_wIEjTirv')
+          echo "Supabase respondeu $status"
+          test "$status" = "200"

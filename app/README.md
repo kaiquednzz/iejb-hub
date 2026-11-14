@@ -32,6 +32,7 @@ src/telas/equipe/     tela Equipe: pedidos de acesso, pessoas e grupos (uma seç
 src/telas/montar/     tela Montar escala (líder de louvor): mês, semanas, culto, mesa, WhatsApp
 src/util/foto.js      fotos de perfil: comprime no aparelho, sobe, mostra (avatar)
 src/util/escala.js    regra da "Mesa" (função de som) usada em mais de uma tela
+src/util/push.js      ativar avisos, inscrever o aparelho, remover ao sair
 src/util/musica.js    links de busca nas plataformas, ID do YouTube, fila "Tocar no YouTube" (D26)
 src/telas/repertorio.js  bloco do repertório na escala, "Ouvir" e o editor
 src/util/folha.js     folha que sobe de baixo (<dialog>), confirmação e aviso rápido (toast)
@@ -149,6 +150,10 @@ Dentro de cada culto da aba Escala:
 - **Tocar no YouTube:** monta uma fila com os vídeos na ordem do repertório (`youtube.com/watch_videos?video_ids=`) e mostra "N de M" com link. Endereço não oficial (risco aceito na D26).
 - **Montar/Editar repertório:** aparece para o líder de um grupo escalado (depois da escala publicada), o líder de louvor e o admin, a mesma regra que o banco confere em `pode_editar_repertorio`. Busca no catálogo enquanto digita, cadastra música nova (com atalho "Procurar no YouTube" para pegar o link), tom por culto com um toque, sobe/desce na ordem. Mudança depois de publicada gera aviso de "repertório alterado".
 
+## Avisos no celular (push)
+
+Cartão "Receba avisos da escala" na aba Escala enquanto a permissão não foi pedida (no iPhone o pedido precisa sair de um toque, e só funciona com o app instalado, iOS 16.4+). Ao abrir o app com permissão dada, a inscrição é conferida e registrada na conta logada (`registrar_aparelho`). Ao sair da conta, o aparelho é removido antes do logout. O service worker mostra a notificação (`push`) e abre o app no toque (`notificationclick`). Avisos da mesma escala se substituem (tag).
+
 ## Fotos de perfil
 
 Comprimidas no aparelho (quadrado de 320 px, WebP ou JPEG, ~25 KB) antes de subir. O bucket `fotos` recusa mais de 200 KB e só aceita WebP/JPEG. Cada troca gera um nome novo, então o arquivo pode ficar em cache por um ano (só baixa uma vez). Troca a foto: a própria pessoa (Equipe → sua linha), o admin e o líder de louvor.
@@ -170,5 +175,6 @@ Os botões aparecem conforme o papel, mas quem garante a tabela é o banco (RLS 
 
 ## Ainda não tem
 
-- Push (as notificações): precisa de chaves VAPID e da função de servidor que envia.
+- Central de notificações dentro do app (os avisos já ficam guardados em aviso_destinatario).
+- Mensagem de WhatsApp para uma mudança avulsa depois de publicada (a do mês já existe).
 - Cifras e letras (fora do piloto por enquanto).
