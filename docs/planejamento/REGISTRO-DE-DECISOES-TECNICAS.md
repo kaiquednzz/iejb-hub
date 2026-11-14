@@ -4,11 +4,11 @@
 |---|---|
 | **Escopo** | Escolhas de tecnologia do piloto Louvor |
 | **Etapa** | Entre a 3 (modelo de dados) e a 4 (desenvolvimento do MVP) |
-| **Versão** | 0.2 (rascunho para revisão) |
+| **Versão** | 0.3 (rascunho para revisão) |
 | **Última atualização** | 13/11/2026 |
 | **Documentos base** | [Visão geral](VISAO-GERAL-IEJB-HUB.md), [Regras de negócio](REGRAS-DE-NEGOCIO-PILOTO-LOUVOR.md), [Modelo de dados e permissões](MODELO-DE-DADOS-E-PERMISSOES-PILOTO-LOUVOR.md) |
 
-> Cada ponto traz as opções, o que eu recomendo e por quê, e quem decide é Kaique. Em 13/11/2026 Kaique decidiu o backend (DT-01), o plano gratuito (DT-06) e o front-end, este último por delegação (DT-03). Os outros pontos seguem como recomendação até ele aprovar.
+> Cada ponto traz as opções, o que eu recomendo e por quê, e quem decide é Kaique. Em 13/11/2026 Kaique decidiu o backend (DT-01) e o plano gratuito (DT-06), delegou o front-end (DT-03) e aprovou as demais recomendações (DT-02, DT-04, DT-05). Os itens de "A confirmar na etapa 4" são verificações técnicas que podem ajustar detalhes, não a direção.
 >
 > Os limites dos serviços vêm de pesquisa feita em **13/11/2026** (fontes no fim). Planos gratuitos mudam: confirme nos sites oficiais antes de depender de um número.
 
@@ -30,10 +30,10 @@
 | # | Decisão | Recomendação | Status |
 |---|---|---|---|
 | DT-01 | Backend e banco | Supabase (PostgreSQL com RLS) | ✅ |
-| DT-02 | Contas e login | Supabase Auth, sem e-mail, com cadastro por solicitação | 💡 |
+| DT-02 | Contas e login | Supabase Auth, sem e-mail, com cadastro por solicitação | ✅ |
 | DT-03 | Front-end | Vite com JavaScript puro em módulos, sem framework na v1 | ✅ (por delegação) |
-| DT-04 | Hospedagem e domínio | Cloudflare Pages em `app.iejb.com.br` | 💡 |
-| DT-05 | Notificações push | Service worker próprio, VAPID e função de servidor | 💡 |
+| DT-04 | Hospedagem e domínio | Cloudflare Pages em `app.iejb.com.br` | ✅ |
+| DT-05 | Notificações push | Service worker próprio, VAPID e função de servidor | ✅ |
 | DT-06 | Plano gratuito, pausa e backup | Plano gratuito no piloto, com atividade programada e backup próprio | ✅ plano, 💡 mitigações ⚠️ |
 
 ---
@@ -77,7 +77,7 @@
 | **A. Cadastro aberto do Supabase com confirmação de e-mail desligada** | Simples: a tela pública chama o cadastro padrão, e a conta nasce pendente. | Qualquer pessoa pode criar contas com qualquer e-mail, inclusive um que não é dela. Fontes de comunidade apontam spam e abuso de cota como o risco típico. Aqui o dano é limitado, porque conta pendente não vê nada. |
 | **B. Função de servidor pública "solicitar acesso"** | Você controla o que entra, valida e limita a frequência antes de criar a conta. | Mais código e uma função aberta para manter. |
 
-**💡 Recomendação: A**, com limite de frequência e, se o serviço oferecer, verificação anti-robô (precisa ser confirmado na etapa 4). Com 13 pessoas, a função B é complexidade difícil de justificar. A confirmação de e-mail desligada **só é aceitável porque a conta pendente não enxerga nada**: essa política é a trava de segurança do sistema inteiro.
+**✅ Decisão (aprovada por Kaique em 13/11/2026): A**, com limite de frequência e, se o serviço oferecer, verificação anti-robô (precisa ser confirmado na etapa 4). Com 13 pessoas, a função B é complexidade difícil de justificar. A confirmação de e-mail desligada **só é aceitável porque a conta pendente não enxerga nada**: essa política é a trava de segurança do sistema inteiro.
 
 ⚠️ **Se alguém criar uma conta com o e-mail de outro integrante**, a pessoa verdadeira fica impedida de se cadastrar com ele. Mitigação simples: o administrador confere cada solicitação com a pessoa antes de aprovar (já é o fluxo da RN-10) e remove a indevida.
 
@@ -111,7 +111,7 @@
 | GitHub Pages (usado no site institucional) | 💡 Provável que **não sirva** para repositório privado no plano gratuito do GitHub (confirmar). É um dos motivos para preferir o Cloudflare. |
 | Subdomínio | Para `app.iejb.com.br`, basta um registro de DNS apontando para o Cloudflare. ✅ Kaique tem acesso ao DNS e faria a configuração (Q23). 💡 Provavelmente funciona sem migrar o domínio inteiro para o Cloudflare (confirmar na etapa 4). |
 
-**💡 Recomendação:** Cloudflare Pages com deploy automático a cada push na `main`. O limite de 500 builds por mês é folgado para um projeto desse tamanho.
+**✅ Decisão (aprovada por Kaique em 13/11/2026):** Cloudflare Pages com deploy automático a cada push na `main`. O limite de 500 builds por mês é folgado para um projeto desse tamanho.
 
 ---
 
@@ -135,6 +135,8 @@
 | Tabela `dispositivo_push` | Já no modelo (seção 3.1). |
 | Função de servidor que envia | Calcula os destinatários (modelo, seção 6) e dispara. Roda com credencial privilegiada. |
 | Janela de agrupamento (RN-45) | Precisa de algo que rode periodicamente ou com atraso. 💡 Recurso de agendamento do banco, **a confirmar na etapa 4**. |
+
+**✅ Decisão (aprovada por Kaique em 13/11/2026):** service worker próprio, chaves VAPID e função de servidor, com a mensagem de WhatsApp como reserva (D18).
 
 ⚠️ **Teste em aparelho real.** O simulador do iOS não suporta web push. Vale reservar um iPhone e um Android reais já no início da etapa 4.
 
@@ -166,7 +168,7 @@ Este é o ponto de maior risco operacional do projeto.
 
 ## 8. Questões em aberto
 
-Nenhuma pergunta aberta. Falta só o OK de Kaique nas recomendações que continuam em 💡: **DT-02** (login e cadastro), **DT-04** (Cloudflare Pages) e **DT-05** (push).
+Nenhuma.
 
 ### Respondidas
 
@@ -207,3 +209,4 @@ Consultadas em 13/11/2026.
 |---|---|---|
 | 0.1 | 13/11/2026 | Primeiro rascunho: DT-01 a DT-06, riscos do plano gratuito e questões Q23 a Q26. |
 | 0.2 | 13/11/2026 | Q23 a Q26 respondidas: Supabase, plano gratuito, front-end com Vite e JS puro (por delegação) e acesso ao DNS. |
+| 0.3 | 13/11/2026 | Kaique aprovou DT-02, DT-04 e DT-05. Todas as decisões técnicas do piloto estão fechadas. |

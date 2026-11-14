@@ -6,7 +6,7 @@
 | **Instituição** | IEJB, Igreja Evangélica do Jardim Brasil |
 | **Responsável pelo projeto e desenvolvimento** | Kaique |
 | **Status** | Em planejamento. Sem aprovação institucional definitiva e sem início de desenvolvimento. |
-| **Versão deste documento** | 1.2 (decisões técnicas iniciais) |
+| **Versão deste documento** | 1.3 (decisões técnicas fechadas) |
 | **Última atualização** | 13/11/2026 |
 
 > Este documento registra a visão atual do IEJB Hub para que ela possa evoluir depois.
@@ -297,7 +297,7 @@ O WhatsApp continuará sendo útil como canal de comunicação. O Hub deverá fu
 | Endereço | Uso | Status |
 |---|---|---|
 | `iejb.com.br` | Site institucional | Em produção |
-| `app.iejb.com.br` | IEJB Hub | 💡 Proposto |
+| `app.iejb.com.br` | IEJB Hub | ✅ Definido |
 
 ### Repositório
 
@@ -312,11 +312,11 @@ O WhatsApp continuará sendo útil como canal de comunicação. O Hub deverá fu
 | Banco de dados | PostgreSQL | ✅ **Definido** |
 | Autenticação | Supabase Auth | ✅ **Definido** |
 | Segurança | Políticas RLS (Row Level Security) | ✅ **Definido** |
-| Hospedagem | Cloudflare Pages | 💡 Proposto |
-| Versionamento | GitHub | 💡 Proposto |
-| Domínio | Subdomínio `app.iejb.com.br` | 💡 Proposto |
+| Hospedagem | Cloudflare Pages | ✅ **Definido** |
+| Versionamento | GitHub | ✅ **Definido** |
+| Domínio | Subdomínio `app.iejb.com.br` | ✅ **Definido** |
 
-> As decisões técnicas e seus motivos estão no [registro de decisões técnicas](REGISTRO-DE-DECISOES-TECNICAS.md). Hospedagem, domínio e versionamento seguem como proposta.
+> As decisões técnicas e seus motivos estão no [registro de decisões técnicas](REGISTRO-DE-DECISOES-TECNICAS.md).
 
 ### Custos de infraestrutura
 
@@ -437,13 +437,14 @@ A mensalidade contemplaria: utilização, hospedagem, manutenção, correções,
 | D20 | Backend e banco: Supabase (PostgreSQL, Supabase Auth, RLS). Motivos: não hospedar o backend por conta própria e custo zero. |
 | D21 | Planos gratuitos dos serviços no piloto, com atividade programada e backup próprio para reduzir os riscos do plano gratuito. |
 | D22 | Front-end: Vite com JavaScript puro em módulos, sem framework na v1 (escolha delegada por Kaique). |
+| D23 | Login com Supabase Auth, sem e-mail: conta criada pelo administrador ou solicitada pela pessoa (cadastro aberto com confirmação de e-mail desligada) e aprovada por ele. A conta pendente não acessa nada. |
+| D24 | Hospedagem no Cloudflare Pages, código no GitHub, endereço `app.iejb.com.br`. Kaique tem acesso ao DNS. |
+| D25 | Push com service worker próprio, chaves VAPID e função de servidor, com a mensagem de WhatsApp como reserva. |
 
 ### 💡 Proposto
 
 | # | Item |
 |---|---|
-| P1 | Endereço `app.iejb.com.br` para o Hub. |
-| P4 | Hospedagem no Cloudflare Pages e versionamento no GitHub. |
 | P7 | Implantação gratuita, 2 meses de teste e mensalidade a definir. |
 
 ### ❓ Em aberto
@@ -461,7 +462,6 @@ A mensalidade contemplaria: utilização, hospedagem, manutenção, correções,
 | A10 | Aprovação institucional. |
 | A11 | Cronograma de desenvolvimento. |
 | A12 | Confirmação das regras do piloto Louvor com o líder de louvor (documento de regras de negócio). |
-| A13 | Aprovação das recomendações DT-02, DT-04 e DT-05 do registro de decisões técnicas. |
 
 ---
 
@@ -660,3 +660,4 @@ Precisam ser respondidas, de preferência com o líder de louvor, antes de defin
 | 1.0 | 13/11/2026 | Q15 e Q16 confirmadas. Regras do piloto Louvor sem questões em aberto, a confirmar com o líder de louvor. |
 | 1.1 | 13/11/2026 | Sexta rodada (Q19 a Q22), vinda do modelo de dados da etapa 3. |
 | 1.2 | 13/11/2026 | Decisões técnicas: Supabase, planos gratuitos e front-end com Vite e JavaScript puro (D20 a D22). Registro de decisões técnicas criado. |
+| 1.3 | 13/11/2026 | Aprovadas as recomendações de login, hospedagem e push (D23 a D25). Stack do piloto fechada. |
