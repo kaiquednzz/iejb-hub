@@ -14,8 +14,11 @@ export async function carregarEquipe(conta) {
                      membro_ministerio ( ministerio_id, e_lider, ativo ),
                      conta ( id, login, estado, e_administrador, senha_temporaria )`)
             .order('nome'),
+        // "!grupo_membro_grupo_id_fkey": grupo e grupo_membro se ligam por DUAS
+        // chaves (o membro aponta pro grupo; o líder do grupo aponta pro membro,
+        // a trava da RN-12). Sem dizer qual usar, o PostgREST recusa (erro 300).
         supabase.from('grupo')
-            .select('id, nome, ministerio_id, lider_pessoa_id, grupo_membro ( id, pessoa_id, instrumentos )')
+            .select('id, nome, ministerio_id, lider_pessoa_id, grupo_membro!grupo_membro_grupo_id_fkey ( id, pessoa_id, instrumentos )')
             .eq('ativo', true)
             .order('nome'),
         supabase.from('ministerio').select('id').eq('nome', 'Louvor').maybeSingle(),
