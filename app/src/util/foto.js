@@ -99,3 +99,24 @@ export async function trocarFoto(pessoa, arquivo) {
     if (anterior) supabase.storage.from('fotos').remove([anterior]);
     return caminho;
 }
+
+// Imagem de evento (vai para o Google pelo site): sem cortar, só reduz para
+// no máximo 1200 px no lado maior. Fica entre 80 e 200 KB; o bucket aceita 400.
+export async function reduzirImagem(arquivo, maior = 1200) {
+    const imagem = await carregar(arquivo);
+    const escala = Math.min(1, maior / Math.max(imagem.width, imagem.height));
+    const tela = document.createElement('canvas');
+    tela.width = Math.round(imagem.width * escala);
+    tela.height = Math.round(imagem.height * escala);
+    const ctx = tela.getContext('2d');
+    ctx.imageSmoothingQuality = 'high';
+    ctx.drawImage(imagem, 0, 0, tela.width, tela.height);
+    imagem.close?.();
+
+    for (const qualidade of [0.82, 0.7, 0.55]) {
+        let blob = await paraBlob(tela, 'image/webp', qualidade);
+        if (blob?.type !== 'image/webp') blob = await paraBlob(tela, 'image/jpeg', qualidade);
+        if (blob && blob.size <= 400 * 1024) return blob;
+    }
+    throw new Error('A imagem ficou grande demais. Tente outra.');
+}

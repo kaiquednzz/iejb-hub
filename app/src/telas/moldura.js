@@ -44,8 +44,9 @@ export function cabecalhoApp(conta) {
     );
 }
 
-// Barra de abas fixa embaixo (Escala | Montar | Equipe), como num app do iPhone.
-// "Montar" só aparece para o líder de louvor (quem monta a escala, RN-02).
+// Barra de abas fixa embaixo (Escala | Montar | Eventos | Equipe), como num app do iPhone.
+// "Montar" só aparece para o líder de louvor (quem monta a escala, RN-02) e
+// "Eventos" (do site, D34) só para o administrador.
 // O número vermelho em "Equipe" mostra pedidos de acesso esperando o admin.
 export function barraAbas(conta, atual) {
     const aba = (rota, nome, nomeIcone) => h('a', {
@@ -58,6 +59,7 @@ export function barraAbas(conta, atual) {
     const barra = h('nav', { class: 'barra-abas', 'aria-label': 'Seções' },
         aba('#/escala', 'Escala', 'calendario'),
         montar,
+        conta.e_administrador ? aba('#/eventos', 'Eventos', 'megafone') : null,
         equipe,
     );
 

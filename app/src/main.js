@@ -5,13 +5,14 @@
 // Não há "roteador" de verdade: o app tem poucas telas e o estado da conta
 // manda mais do que a URL. O hash só escolhe entre telas do mesmo "andar":
 //   deslogado: #/pedir-acesso ou a tela de entrar
-//   conta pronta: #/equipe ou a escala (barra de abas embaixo)
+//   conta pronta: #/equipe, #/montar, #/eventos ou a escala (barra de abas embaixo)
 import './estilo/tokens.css';
 import './estilo/base.css';
 import './estilo/componentes.css';
 import './estilo/telas.css';
 import './estilo/equipe.css';
 import './estilo/montar.css';
+import './estilo/eventos.css';
 
 import { supabase } from './supabase.js';
 import { carregarConta } from './sessao.js';
@@ -22,6 +23,7 @@ import { telaTrocarSenha } from './telas/trocar-senha.js';
 import { telaEscala } from './telas/escala.js';
 import { telaEquipe } from './telas/equipe/index.js';
 import { telaMontar } from './telas/montar/index.js';
+import { telaEventos } from './telas/eventos.js';
 import { eLiderDeLouvor } from './sessao.js';
 import { sincronizarPush } from './util/push.js';
 import { limparRetornoDoGoogle } from './util/google.js';
@@ -35,10 +37,12 @@ let rodada = 0;          // descarta resultados de decisões antigas que chegare
 let usuarioAtual;        // undefined = ainda não decidiu nenhuma vez
 let contaPronta = null;  // conta ativa e sem senha temporária: pode navegar pelas abas
 
-// Montar escala é só do líder de louvor; para os outros cai na escala
+// Montar escala é só do líder de louvor e Eventos (do site) só do admin;
+// para os outros cai na escala
 const ROTAS_DA_CONTA = {
     '#/equipe': telaEquipe,
     '#/montar': (conta) => (eLiderDeLouvor(conta) ? telaMontar(conta) : telaEscala(conta)),
+    '#/eventos': (conta) => (conta.e_administrador ? telaEventos(conta) : telaEscala(conta)),
 };
 const telaDaConta = (conta) => (ROTAS_DA_CONTA[location.hash] ?? telaEscala)(conta);
 

@@ -1,0 +1,111 @@
+/* ==========================================================================
+   Tela Eventos (eventos do site, D34)
+   ========================================================================== */
+
+/* Com 4 abas (admin que também é líder de louvor) elas encolhem para caber
+   num iPhone de 375 px */
+.barra-abas:has(.aba:nth-child(4)) .aba { min-width: 70px; padding-inline: 10px; }
+.barra-abas:has(.aba:nth-child(4)) .aba-contador { right: 10px; }
+
+.tela-eventos .botao-largo { margin: 4px 0 18px; }
+.eventos-area { display: grid; gap: 14px; }
+
+.lista-eventos { list-style: none; display: grid; gap: 10px; }
+.lista-eventos li { animation: subir 0.5s calc(0.04s + var(--i, 0) * 0.06s) var(--ease-out) backwards; }
+
+.evento-linha {
+    width: 100%;
+    display: grid;
+    grid-template-columns: auto 1fr auto auto;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 12px 12px 10px;
+    border: 1px solid var(--vidro-borda);
+    border-radius: var(--raio-l);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.86), rgba(255, 255, 255, 0.66));
+    box-shadow: var(--sombra-1), var(--brilho);
+    font: inherit;
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+    transition: transform 0.5s var(--mola);
+}
+.evento-linha:active { transform: scale(0.97); transition-duration: 0.12s; }
+.evento-linha.esqueleto { min-height: 76px; cursor: default; animation: respirar 0.9s ease-in-out infinite alternate; }
+.evento-linha-textos { display: grid; min-width: 0; }
+.evento-linha-categoria { font-size: 12px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--principal); }
+.evento-linha-titulo { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.evento-linha-detalhe { font-size: 14px; color: var(--texto-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.eventos-antigos summary {
+    padding: 10px 4px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--texto-2);
+    cursor: pointer;
+}
+.eventos-antigos .lista-eventos { opacity: 0.7; }
+
+/* --- Formulário -------------------------------------------------------- */
+.campo-revelado { animation: surgir 0.45s var(--mola); }
+.link-site { display: inline-flex; align-items: center; gap: 6px; justify-self: center; font-weight: 600; color: var(--principal); }
+
+.evento-imagem {
+    display: grid;
+    place-items: center;
+    min-height: 120px;
+    border-radius: var(--raio-s);
+    border: 1.5px dashed rgba(58, 10, 9, 0.16);
+    background: rgba(255, 255, 255, 0.6);
+    overflow: hidden;
+}
+.evento-imagem img { width: 100%; max-height: 220px; object-fit: cover; display: block; }
+.evento-imagem-vazia { display: inline-flex; align-items: center; gap: 8px; color: var(--texto-2); font-size: 14px; }
+
+/* --- Prévia: o cartão do site em miniatura ------------------------------ */
+.previa-evento { display: grid; gap: 6px; }
+.previa-rotulo { font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--texto-2); }
+.previa-cartao {
+    display: grid;
+    grid-template-columns: 74px 1fr;
+    gap: 12px;
+    padding: 12px;
+    border-radius: var(--raio-l);
+    background: #fff;
+    border: 1px solid var(--vidro-borda);
+    box-shadow: var(--sombra-2);
+}
+.previa-data {
+    display: grid;
+    align-content: center;
+    justify-items: center;
+    padding: 8px 4px;
+    border-radius: var(--raio-s);
+    background: linear-gradient(160deg, var(--principal), var(--principal-brighter));
+    color: #fff;
+    text-align: center;
+    font-size: 11px;
+    line-height: 1.25;
+}
+.previa-data strong { font-family: var(--fonte-titulo); font-size: 26px; line-height: 1.1; }
+.previa-textos { display: grid; gap: 3px; min-width: 0; }
+.previa-categoria { font-size: 11px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--principal); }
+.previa-titulo { font-family: var(--fonte-titulo); font-size: 18px; line-height: 1.25; color: var(--texto-vinho); overflow-wrap: anywhere; }
+.previa-titulo strong { color: var(--principal); }
+.previa-descricao { font-size: 13px; color: var(--texto-2); overflow-wrap: anywhere; }
+.previa-info { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; font-size: 13px; color: var(--texto-2); }
+.previa-info .icone + .icone, .previa-info .icone:not(:first-child) { margin-left: 6px; }
+.previa-botao {
+    justify-self: start;
+    margin-top: 4px;
+    padding: 5px 12px;
+    border-radius: var(--raio-capsula);
+    background: var(--principal);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+/* Item de grid tem min-width: auto: o campo de hora (com AM/PM em alguns
+   aparelhos) empurrava a coluna para fora da folha */
+.campos-lado > .campo { min-width: 0; }

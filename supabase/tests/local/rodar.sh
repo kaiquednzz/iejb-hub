@@ -41,3 +41,4 @@ for migracao in "${depois[@]}"; do
   $PSQL -d $BANCO -f "$migracao"
 done
 cenario 06_lider_de_grupo_edita.sql
+cenario 07_eventos_do_site.sql
