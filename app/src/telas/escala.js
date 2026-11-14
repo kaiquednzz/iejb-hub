@@ -11,6 +11,7 @@ import { hojeEmBrasilia, somarDias, rotuloDoDia, partesDaData, formatarHorario }
 import { cabecalhoApp, barraAbas, avatar } from './moldura.js';
 import { FUNCAO_MESA, separarMesa } from '../util/escala.js';
 import { blocoRepertorio } from './repertorio.js';
+import { blocoPedido } from './pedido-alteracao.js';
 import { estadoDoPush, ativarPush } from '../util/push.js';
 import { guardarEscala, escalaGuardada, eErroDeRede } from '../offline.js';
 
@@ -22,7 +23,8 @@ const CONSULTA = `
     escala (
         id, estado,
         escala_item ( id, pessoa_id, instrumento_exibido, pessoa:pessoa_id ( nome, apelido, foto ) ),
-        escala_grupo ( grupo:grupo_id ( nome, lider_pessoa_id ) )
+        escala_grupo ( grupo:grupo_id ( nome, lider_pessoa_id ) ),
+        solicitacao_alteracao ( id, texto, estado, motivo, criado_em, autor_pessoa_id )
     ),
     repertorio_item ( id, posicao, tom, musica:musica_id ( id, titulo, artista, link ) )
 `;
@@ -174,6 +176,7 @@ function cartaoCulto(culto, meuId, indice, extras) {
         ),
         !cancelado && corpoDaEscala(escala, meuId),
         !cancelado && blocoRepertorio(culto, extras.conta, extras.recarregar, extras.offline),
+        !cancelado && !extras.offline && blocoPedido(culto, extras.conta, extras.recarregar),
     );
 }
 

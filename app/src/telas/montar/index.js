@@ -17,6 +17,7 @@ import { nomeCurto } from '../../sessao.js';
 import { cabecalhoApp, barraAbas } from '../moldura.js';
 import { carregarMontagem, somarMes, nomeDoMes, mesSugerido, nomesDosGrupos, textoDoMes } from './dados.js';
 import { abrirCulto, folhaMesa, folhaCultoEspecial } from './culto.js';
+import { carregarPedidosPendentes, secaoPedidosPendentes } from '../pedido-alteracao.js';
 
 const LEMBRAR = 'iejb-hub-montar-mes';
 
@@ -31,6 +32,7 @@ export function telaMontar(conta) {
     proximo.addEventListener('click', () => trocarMes(1));
 
     const resumo = h('p', { class: 'mes-resumo' });
+    const areaPedidos = h('div', { class: 'area-pedidos' });
     const area = h('div', { class: 'montar-area', 'aria-busy': 'true' }, esqueleto());
     const barraAcoes = h('div', { class: 'montar-acoes' });
 
@@ -39,6 +41,7 @@ export function telaMontar(conta) {
         h('main', { id: 'conteudo', class: 'app-conteudo' },
             h('h1', { tabindex: -1, class: 'titulo-tela' }, 'Montar escala'),
             h('p', { class: 'subtitulo-tela' }, 'Um toque no grupo da semana escala domingo e terça.'),
+            areaPedidos,
             h('div', { class: 'mes-navegacao' }, anterior, tituloMes, proximo),
             resumo,
             area,
@@ -54,7 +57,29 @@ export function telaMontar(conta) {
     };
 
     carregar();
+    carregarPedidos();
     return tela;
+
+    // Pedidos de alteração dos líderes de grupo (RN-38): ficam no topo até decidir
+    async function carregarPedidos() {
+        const pedidos = await carregarPedidosPendentes();
+        areaPedidos.replaceChildren(...[secaoPedidosPendentes(pedidos, {
+            abrirCulto: abrirCultoDeQualquerMes,
+            aoDecidir: async () => { await Promise.all([carregarPedidos(), carregar()]); },
+        })].filter(Boolean));
+    }
+
+    // O culto do pedido pode ser de outro mês: troca o mês e abre
+    async function abrirCultoDeQualquerMes(cultoId, data) {
+        if (!dados?.cultos.some((c) => c.id === cultoId)) {
+            const domingo = somarDias(data, -new Date(`${data}T12:00:00Z`).getUTCDay());
+            mes = domingo.slice(0, 7);
+            sessionStorage.setItem(LEMBRAR, mes);
+            area.setAttribute('aria-busy', 'true');
+            await carregar();
+        }
+        if (dados?.cultos.some((c) => c.id === cultoId)) abrirCulto(cultoId, ctx);
+    }
 
     function trocarMes(passo) {
         mes = somarMes(mes, passo);

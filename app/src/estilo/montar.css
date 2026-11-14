@@ -479,3 +479,66 @@
 .cartao-avisos-textos { display: grid; font-size: 14px; color: var(--texto-2); }
 .cartao-avisos-textos strong { font-size: 16px; color: var(--texto-vinho); }
 .cartao-avisos-acoes { grid-column: 1 / -1; display: flex; justify-content: flex-end; align-items: center; gap: 4px; }
+
+/* ---------- Pedido de alteração ---------- */
+.bloco-pedido { margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(58, 10, 9, 0.08); display: grid; gap: 8px; }
+.link-pedido {
+    justify-self: start;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    min-height: 40px;
+    padding: 6px 4px;
+    border: none;
+    background: none;
+    color: var(--principal);
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+}
+.meus-pedidos { list-style: none; display: grid; gap: 6px; }
+.meus-pedidos li { padding: 10px 12px; border-radius: 12px; background: var(--fundo-rosado); display: grid; gap: 4px; justify-items: start; }
+.pedido-texto { font-size: 15px; color: var(--texto); white-space: pre-wrap; }
+.pedido-motivo { font-size: 14px; color: var(--texto-2); }
+.estado-pedido-pendente { background: rgba(154, 91, 0, 0.12); color: var(--ambar); }
+.estado-pedido-aprovada { background: rgba(31, 122, 77, 0.1); color: var(--verde); }
+.estado-pedido-reprovada { background: rgba(84, 84, 88, 0.12); color: var(--texto-2); }
+
+.campo-texto {
+    width: 100%;
+    padding: 12px 14px;
+    font: inherit;
+    font-size: 17px;
+    border: 1.5px solid rgba(58, 10, 9, 0.14);
+    border-radius: var(--raio-s);
+    background: #fff;
+    resize: vertical;
+}
+.campo-texto:focus { outline: none; border-color: var(--principal-brighter); box-shadow: 0 0 0 4px rgba(191, 38, 43, 0.16); }
+.contador { text-align: right; }
+.citado { padding: 10px 14px; border-left: 3px solid var(--principal); background: var(--fundo-rosado); border-radius: 0 12px 12px 0; }
+
+.area-pedidos:empty { display: none; }
+.pedidos-pendentes { display: grid; gap: 10px; margin-top: 18px; animation: surgir 0.6s 0.1s var(--mola) backwards; }
+.titulo-pedidos {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ambar);
+}
+.cartao-pedido-alteracao {
+    display: grid;
+    gap: 10px;
+    padding: 14px;
+    border-radius: var(--raio-l);
+    background: #fff;
+    border: 1px solid rgba(154, 91, 0, 0.28);
+    box-shadow: var(--sombra-2), 0 0 0 3px rgba(154, 91, 0, 0.06);
+}
+.pedido-cabeca { display: flex; align-items: center; gap: 10px; }
+.pedido-botoes { display: grid; grid-template-columns: 1fr 1fr 1.2fr; gap: 6px; }
+.pedido-botoes > * { padding-inline: 8px; }

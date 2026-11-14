@@ -9,7 +9,7 @@ import { avatar } from '../../util/foto.js';
 import { nomeCurto } from '../../sessao.js';
 import { campo, caixaDeAviso } from '../moldura.js';
 import { seletorInstrumentos, interruptor } from '../equipe/pecas.js';
-import { candidatosAMesa } from './dados.js';
+import { candidatosAMesa, nomesDosGrupos } from './dados.js';
 
 const ROTULO_CEIA = 'Ceia';
 const SUGESTOES = ['Voz', 'Violão', 'Guitarra', 'Baixo', 'Teclado', 'Bateria', 'Cajón', FUNCAO_MESA];
@@ -121,6 +121,13 @@ export function abrirCulto(cultoId, ctx) {
 
         // Publicar este (o botão grande da tela publica o mês todo)
         const finais = [];
+        // Reserva do push (RN-43): mensagem pronta desta escala para o grupo do WhatsApp
+        if (publicada) {
+            finais.push(h('a', {
+                class: 'botao-secundario botao-largo', target: '_blank', rel: 'noopener noreferrer',
+                href: `https://wa.me/?text=${encodeURIComponent(mensagemDoCulto(culto, dados))}`,
+            }, icone('whatsapp'), 'Mandar esta escala no WhatsApp'));
+        }
         if (!publicada && culto.itens.length > 0) {
             const publicar = h('button', { type: 'button', class: 'botao-principal botao-largo' }, 'Publicar só este culto');
             publicar.addEventListener('click', () => comCarregando(publicar, () =>
@@ -300,4 +307,21 @@ export function folhaCultoEspecial(dados, ctx) {
         });
     });
     const folha = abrirFolha({ titulo: 'Culto especial', conteudo: form });
+}
+
+// RN-43: "Escala atualizada: Culto de Oração, ter 18/11, 19h30 / Tocam: G2 + Fulano"
+function mensagemDoCulto(culto, dados) {
+    const grupos = nomesDosGrupos(culto, dados);
+    const avulsos = culto.itens
+        .filter((i) => !i.origem_grupo_id && i.instrumento_exibido.some((x) => x !== FUNCAO_MESA))
+        .map((i) => nomeCurto(dados.porId.get(i.pessoa_id)));
+    const tocam = [...grupos, ...avulsos].join(' + ') || 'a definir';
+    return [
+        `*Escala atualizada: ${culto.nome}${culto.rotulo ? ` (${culto.rotulo})` : ''}*`,
+        `${rotuloDoDia(culto.data)}, ${formatarHorario(culto.horario)}`,
+        `Tocam: ${tocam}`,
+        culto.mesa.length ? `Mesa: ${culto.mesa.map((p) => nomeCurto(p)).join(', ')}` : null,
+        '',
+        `Veja no Hub: ${location.origin}`,
+    ].filter((l) => l !== null).join('\n');
 }

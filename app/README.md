@@ -35,6 +35,7 @@ src/util/escala.js    regra da "Mesa" (função de som) usada em mais de uma tel
 src/util/push.js      ativar avisos, inscrever o aparelho, remover ao sair
 src/util/musica.js    links de busca nas plataformas, ID do YouTube, fila "Tocar no YouTube" (D26)
 src/telas/repertorio.js  bloco do repertório na escala, "Ouvir" e o editor
+src/telas/pedido-alteracao.js  pedir (líder de grupo) e decidir (líder de louvor)
 src/util/folha.js     folha que sobe de baixo (<dialog>), confirmação e aviso rápido (toast)
 src/util/erros.js     traduz erros do banco e da função admin-acesso
 src/util/dom.js       h() monta HTML sem innerHTML (proteção contra XSS) + ícones
@@ -150,6 +151,13 @@ Dentro de cada culto da aba Escala:
 - **Tocar no YouTube:** monta uma fila com os vídeos na ordem do repertório (`youtube.com/watch_videos?video_ids=`) e mostra "N de M" com link. Endereço não oficial (risco aceito na D26).
 - **Montar/Editar repertório:** aparece para o líder de um grupo escalado (depois da escala publicada), o líder de louvor e o admin, a mesma regra que o banco confere em `pode_editar_repertorio`. Busca no catálogo enquanto digita, cadastra música nova (com atalho "Procurar no YouTube" para pegar o link), tom por culto com um toque, sobe/desce na ordem. Mudança depois de publicada gera aviso de "repertório alterado".
 
+## Pedido de alteração (RN-37 a 39)
+
+- **Líder de grupo** (não líder de louvor), num culto publicado em que o grupo dele foi escalado: "Pedir alteração na escala" no cartão do culto, texto livre. Os pedidos dele aparecem ali com o estado (esperando, aprovado, reprovado + motivo).
+- **Líder de louvor:** os pendentes ficam no topo da tela Montar (e com contador na aba). Aprovar avisa o autor e já abre o culto para fazer a mudança (aprovar não muda a escala sozinho, RN-39). Reprovar pede um motivo opcional.
+- Os avisos do pedido (RN-46, 47) são criados por gatilho no banco e vão por push; o de pedido novo abre direto a aba Montar.
+- **Reserva do push (RN-43):** na folha de um culto publicado, "Mandar esta escala no WhatsApp" gera a mensagem pronta da mudança.
+
 ## Avisos no celular (push)
 
 Cartão "Receba avisos da escala" na aba Escala enquanto a permissão não foi pedida (no iPhone o pedido precisa sair de um toque, e só funciona com o app instalado, iOS 16.4+). Ao abrir o app com permissão dada, a inscrição é conferida e registrada na conta logada (`registrar_aparelho`). Ao sair da conta, o aparelho é removido antes do logout. O service worker mostra a notificação (`push`) e abre o app no toque (`notificationclick`). Avisos da mesma escala se substituem (tag).
@@ -176,5 +184,4 @@ Os botões aparecem conforme o papel, mas quem garante a tabela é o banco (RLS 
 ## Ainda não tem
 
 - Central de notificações dentro do app (os avisos já ficam guardados em aviso_destinatario).
-- Mensagem de WhatsApp para uma mudança avulsa depois de publicada (a do mês já existe).
 - Cifras e letras (fora do piloto por enquanto).

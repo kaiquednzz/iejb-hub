@@ -5,8 +5,8 @@
 | **Nome** | IEJB Hub |
 | **Instituição** | IEJB, Igreja Evangélica do Jardim Brasil |
 | **Responsável pelo projeto e desenvolvimento** | Kaique |
-| **Status** | Em desenvolvimento (etapa 4): banco, login, escala, PWA gestão de pessoas e acessos, montagem da escala, repertório com botões de streaming, fotos de perfil e avisos por push prontos; app publicado em `app.iejb.com.br`. Sem aprovação institucional definitiva. |
-| **Versão deste documento** | 1.8 (avisos no celular) |
+| **Status** | Em desenvolvimento (etapa 4): banco, login, escala, PWA gestão de pessoas e acessos, montagem da escala, repertório com botões de streaming, fotos de perfil, avisos por push e pedido de alteração prontos (todas as regras do piloto têm tela); app publicado em `app.iejb.com.br`. Sem aprovação institucional definitiva. |
+| **Versão deste documento** | 1.9 (pedido de alteração) |
 | **Última atualização** | 13/11/2026 |
 
 > Este documento registra a visão atual do IEJB Hub para que ela possa evoluir depois.
@@ -667,6 +667,7 @@ Precisam ser respondidas, de preferência com o líder de louvor, antes de defin
 | 1.1 | 13/11/2026 | Sexta rodada (Q19 a Q22), vinda do modelo de dados da etapa 3. |
 | 1.2 | 13/11/2026 | Decisões técnicas: Supabase, planos gratuitos e front-end com Vite e JavaScript puro (D20 a D22). Registro de decisões técnicas criado. |
 | 1.3 | 13/11/2026 | Aprovadas as recomendações de login, hospedagem e push (D23 a D25). Stack do piloto fechada. |
+| 1.9 | 14/11/2026 | Pedido de alteração do líder de grupo e decisão do líder de louvor (RN-37 a 39); mensagem de WhatsApp de uma mudança (RN-43). Todas as regras do piloto Louvor têm tela. |
 | 1.8 | 14/11/2026 | Avisos por push (D31) e o "mantenha acordado" diário. |
 | 1.7 | 14/11/2026 | Repertório implementado como na D26: ouvir nas plataformas, tocar no YouTube em sequência, editor para líderes de grupo. |
 | 1.6 | 14/11/2026 | Tela de montar escala (D29), com mesa de som e ceia vindas da planilha do líder, e fotos de perfil (D30). |

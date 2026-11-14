@@ -69,7 +69,8 @@ Deno.serve(async (req) => {
             const mensagem = JSON.stringify({
                 titulo: TITULOS[e.tipo] ?? 'IEJB Hub',
                 corpo: e.resumo,
-                url: '/#/escala',
+                // Pedido novo vai para quem monta a escala; o resto, para a escala
+                url: e.tipo === 'solicitacao_nova' ? '/#/montar' : '/#/escala',
                 // Mesma escala = mesma notificação: a mais nova substitui a antiga
                 tag: e.escala_id ? `escala-${e.escala_id}` : e.tipo,
             });

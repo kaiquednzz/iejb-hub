@@ -53,11 +53,21 @@ export function barraAbas(conta, atual) {
     }, icone(nomeIcone), h('span', null, nome));
 
     const equipe = aba('#/equipe', 'Equipe', 'pessoas');
+    const montar = eLiderDeLouvor(conta) ? aba('#/montar', 'Montar', 'montar') : null;
     const barra = h('nav', { class: 'barra-abas', 'aria-label': 'Seções' },
         aba('#/escala', 'Escala', 'calendario'),
-        eLiderDeLouvor(conta) && aba('#/montar', 'Montar', 'montar'),
+        montar,
         equipe,
     );
+
+    if (montar) {
+        supabase.from('solicitacao_alteracao').select('id', { count: 'exact', head: true }).eq('estado', 'pendente')
+            .then(({ count }) => {
+                if (!count) return;
+                montar.append(h('span', { class: 'aba-contador' },
+                    String(count), h('span', { class: 'sr-only' }, count === 1 ? ' pedido de alteração' : ' pedidos de alteração')));
+            });
+    }
 
     if (conta.e_administrador) {
         supabase.from('conta').select('id', { count: 'exact', head: true }).eq('estado', 'pendente')
