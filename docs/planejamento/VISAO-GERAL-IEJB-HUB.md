@@ -6,7 +6,7 @@
 | **Instituição** | IEJB, Igreja Evangélica do Jardim Brasil |
 | **Responsável pelo projeto e desenvolvimento** | Kaique |
 | **Status** | Em planejamento. Sem aprovação institucional definitiva e sem início de desenvolvimento. |
-| **Versão deste documento** | 1.0 (regras do Louvor fechadas) |
+| **Versão deste documento** | 1.1 (modelo de dados em andamento) |
 | **Última atualização** | 13/11/2026 |
 
 > Este documento registra a visão atual do IEJB Hub para que ela possa evoluir depois.
@@ -630,6 +630,17 @@ Precisam ser respondidas, de preferência com o líder de louvor, antes de defin
 | Q16 | Uma pessoa pode ter mais de um instrumento? | Sim; na escala aparece o que o líder do grupo definir (por vínculo pessoa + grupo). Leitura confirmada. |
 | Q17 | Como o líder de louvor fica sabendo de uma troca? | Aviso simples e informal, sem regra. |
 
+### 13.14. Sexta rodada de respostas
+
+> **Fonte:** Kaique, 13/11/2026. Surgiram durante o [modelo de dados](MODELO-DE-DADOS-E-PERMISSOES-PILOTO-LOUVOR.md) (etapa 3).
+
+| # | Pergunta | Resposta |
+|---|---|---|
+| Q19 | Quem tem mais de um instrumento aparece com todos, ou varia por culto? | Varia por culto: padrão por grupo (ex.: bateria no G2, violão e canto no G3), ajustável em cada culto. |
+| Q20 | O líder de grupo pede alteração em qual culto? | Só nos cultos do próprio grupo. |
+| Q21 | Quando o líder de grupo edita o repertório? | Depois da escala, quando ele quiser. |
+| Q22 | Integrantes veem o contato uns dos outros? | Sim. |
+
 ---
 
 ## Histórico de alterações
@@ -646,3 +657,4 @@ Precisam ser respondidas, de preferência com o líder de louvor, antes de defin
 | 0.8 | 13/11/2026 | Quarta rodada: líder de louvor atualiza a escala em trocas, aviso só aos afetados, escala visível a todos e repertório pelos líderes dos grupos. |
 | 0.9 | 13/11/2026 | Quinta rodada: acesso sem e-mail com aprovação do administrador (D19), repertório em culto só com avulsos, afetados, membros do grupo e instrumento por vínculo. |
 | 1.0 | 13/11/2026 | Q15 e Q16 confirmadas. Regras do piloto Louvor sem questões em aberto, a confirmar com o líder de louvor. |
+| 1.1 | 13/11/2026 | Sexta rodada (Q19 a Q22), vinda do modelo de dados da etapa 3. |

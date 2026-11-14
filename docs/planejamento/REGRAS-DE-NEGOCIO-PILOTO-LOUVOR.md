@@ -4,7 +4,7 @@
 |---|---|
 | **Escopo** | MVP do IEJB Hub, restrito ao ministério de Louvor |
 | **Etapa** | 2. Definição de requisitos e regras de negócio |
-| **Versão** | 0.5 (rascunho para revisão) |
+| **Versão** | 0.6 (rascunho para revisão) |
 | **Última atualização** | 13/11/2026 |
 | **Documento base** | [Visão geral do IEJB Hub](VISAO-GERAL-IEJB-HUB.md), seção 13 |
 
@@ -126,13 +126,13 @@ Legenda: ✔️ pode · ✖️ não pode · ❓ a confirmar
 
 **RN-13** 💡 Pessoas que saem do Louvor são **desativadas**, não apagadas. Assim as escalas e os repertórios antigos continuam mostrando quem tocou.
 
-**RN-14** 💡 Dados mínimos da pessoa: nome, como é chamada no Louvor (apelido) e meio de contato da conta. Nenhum dado além do necessário para o piloto funcionar.
+**RN-14** 💡 Dados mínimos da pessoa: nome, como é chamada no Louvor (apelido) e meio de contato da conta. Nenhum dado além do necessário para o piloto funcionar. ✅ O contato é **visível para todos os integrantes** (Q22).
 
 **RN-15** ✅ O Hub registra o **instrumento ou função** de cada pessoa (bateria, violão, voz etc.) e **mostra na escala** (Q5). Uma pessoa pode ter **mais de um** instrumento, e na escala aparece **o que o líder do grupo definir** (Q16).
 
 **RN-16** ✅ O líder de grupo **adiciona e tira membros do próprio grupo**, além do líder de louvor e do administrador (Q15 e Q18).
 
-**RN-17** ✅ O instrumento mostrado na escala é definido **por vínculo pessoa + grupo**: quem tem o instrumento "violão" no G2 aparece assim quando o G2 é usado. Pessoa avulsa, sem grupo, tem o instrumento definido pelo líder de louvor (Q18). A mesma pessoa pode ter instrumentos diferentes em grupos diferentes.
+**RN-17** ✅ O instrumento mostrado na escala é definido **por vínculo pessoa + grupo**: quem tem o instrumento "violão" no G2 aparece assim quando o G2 é usado. Pessoa avulsa, sem grupo, tem o instrumento definido pelo líder de louvor (Q18). A mesma pessoa pode ter instrumentos diferentes em grupos diferentes. ✅ Em um culto específico o instrumento pode ser diferente do padrão do grupo, e o líder de louvor ajusta na escala (Q19). Exemplo: quem toca bateria no G2 e violão com voz no G3 pode inverter num culto.
 
 ---
 
@@ -173,7 +173,7 @@ Isso permite ao líder montar o mês inteiro com calma e só avisar quando estiv
 
 **RN-36** ✅ Todo integrante vê a **escala completa de todos os cultos** (Q6). 💡 Além disso, o Hub destaca **"minhas escalas"**, só com os cultos em que a pessoa está escalada. Essa é a principal diferença em relação ao PDF atual (visão geral, seção 13.3).
 
-**RN-37** ✅ O **líder de grupo não edita a escala**. Ele envia uma **solicitação de alteração** para um culto específico (Q2).
+**RN-37** ✅ O **líder de grupo não edita a escala**. Ele envia uma **solicitação de alteração** para um culto específico **em que o grupo dele foi escalado** (Q2, Q20).
 
 **RN-38** ✅ O **líder de louvor aprova ou reprova** cada solicitação (Q2).
 
@@ -247,7 +247,7 @@ Veja no Hub: app.iejb.com.br/...
 
 **RN-55** ✅ Mudança no repertório **gera aviso** (Q10). 💡 O aviso vai para as pessoas escaladas naquele culto, e a regra de agrupar avisos seguidos (RN-45) também vale aqui.
 
-**RN-56** 💡 Como a escala é de pessoas (RN-31), o Hub precisa guardar **quais grupos foram usados** para montar cada culto, só para saber quais líderes podem editar o repertório. Todos esses líderes editam o mesmo repertório; vale a última alteração salva. Líder de louvor e administrador editam o repertório de qualquer culto. ✅ Em culto só com pessoas avulsas, sem grupo, o repertório é editado apenas pelo **líder de louvor e pelo administrador** (Q13).
+**RN-56** 💡 Como a escala é de pessoas (RN-31), o Hub precisa guardar **quais grupos foram usados** para montar cada culto, só para saber quais líderes podem editar o repertório. Todos esses líderes editam o mesmo repertório; vale a última alteração salva. Líder de louvor e administrador editam o repertório de qualquer culto. ✅ Em culto só com pessoas avulsas, sem grupo, o repertório é editado apenas pelo **líder de louvor e pelo administrador** (Q13). ✅ O líder de grupo edita o repertório **depois que a escala é publicada**, quando quiser (Q21).
 
 ---
 
@@ -301,6 +301,10 @@ Nenhuma no momento. O piloto está com as regras fechadas, a confirmar com o lí
 | Q16 | Uma pessoa pode ter mais de um instrumento? | Sim; na escala aparece o que o líder do grupo definir. | RN-15, RN-17 |
 | Q17 | Como o líder de louvor fica sabendo de uma troca? | Aviso simples e informal, sem regra. | RN-71 |
 | Q18 | Leitura da Q15 e da Q16 está certa? | Sim: líder de grupo e líder de louvor/admin editam membros; instrumento por vínculo pessoa + grupo. | RN-16, RN-17 |
+| Q19 | Quem tem mais de um instrumento aparece com todos, ou varia por culto? | Varia por culto: padrão por grupo, ajustável em cada culto. | RN-17 |
+| Q20 | O líder de grupo pede alteração em qual culto? | Só nos cultos do próprio grupo. | RN-37 |
+| Q21 | Quando o líder de grupo edita o repertório? | Depois da escala, quando ele quiser. | RN-56 |
+| Q22 | Integrantes veem o contato uns dos outros? | Sim. | RN-14 |
 
 ---
 
@@ -313,3 +317,4 @@ Nenhuma no momento. O piloto está com as regras fechadas, a confirmar com o lí
 | 0.3 | 13/11/2026 | Q4 a Q11 respondidas. Novas questões: Q12 (acesso sem e-mail) e Q13 (repertório em culto sem grupo). |
 | 0.4 | 13/11/2026 | Q12 a Q17 respondidas: acesso sem e-mail com aprovação do administrador, líder de grupo edita membros do próprio grupo, instrumento por vínculo, aviso só aos afetados. Nova questão Q18. |
 | 0.5 | 13/11/2026 | Q18 confirmada. Sem questões em aberto no piloto. |
+| 0.6 | 13/11/2026 | Q19 a Q22 (da etapa 3) incorporadas: instrumento ajustável por culto, solicitação só nos cultos do próprio grupo, repertório após a escala, contato visível. |

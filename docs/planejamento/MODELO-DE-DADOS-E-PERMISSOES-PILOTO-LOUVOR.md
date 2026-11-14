@@ -4,7 +4,7 @@
 |---|---|
 | **Escopo** | MVP do IEJB Hub, restrito ao ministério de Louvor |
 | **Etapa** | 3. Planejamento do banco de dados e das permissões |
-| **Versão** | 0.1 (rascunho para revisão) |
+| **Versão** | 0.2 (rascunho para revisão) |
 | **Última atualização** | 13/11/2026 |
 | **Documento base** | [Regras de negócio do piloto Louvor](REGRAS-DE-NEGOCIO-PILOTO-LOUVOR.md), v0.5 |
 
@@ -84,7 +84,8 @@ Todas as tabelas têm identificador próprio, `criado_em` e `atualizado_em`, que
 |---|---|
 | `nome` | Nome completo. |
 | `apelido` | Como é chamada no Louvor. |
-| `contato` | Meio de contato. Visibilidade na [Q22](#8-questões-em-aberto). |
+| `contato` | Meio de contato, **visível para todos os integrantes** (Q22). O login da conta não aparece para os outros. |
+| `instrumentos` | 💡 O que a pessoa toca ou canta em geral (ex.: bateria, violão, canto). Serve de sugestão ao definir o padrão em cada grupo; não é uma trava. |
 | `ativa` | `falso` quando sai do Louvor (RN-13). Nunca se apaga. |
 
 **`conta`**: acesso de uma pessoa ao Hub (RN-10, RN-64, RN-65).
@@ -135,7 +136,7 @@ Todas as tabelas têm identificador próprio, `criado_em` e `atualizado_em`, que
 | Campo | Descrição |
 |---|---|
 | `grupo_id`, `pessoa_id` | O vínculo. Único por par; a pessoa pode estar em vários grupos. |
-| `instrumentos` | Instrumentos ou funções dessa pessoa **nesse grupo**, definidos pelo líder do grupo (Q16, Q18). Pode ter mais de um. |
+| `instrumentos` | Instrumentos ou funções dessa pessoa **nesse grupo**, definidos pelo líder do grupo (Q16, Q18). Pode ter mais de um. Funcionam como o **padrão** ao escalar o grupo (Q19). |
 
 ### 3.3. Cultos
 
@@ -173,14 +174,14 @@ Todas as tabelas têm identificador próprio, `criado_em` e `atualizado_em`, que
 | Campo | Descrição |
 |---|---|
 | `escala_id`, `pessoa_id` | Única por par: ninguém aparece duas vezes (RN-33). |
-| `instrumento_exibido` | Texto mostrado na escala. 💡 **É uma cópia** do instrumento do vínculo no momento em que a pessoa entra, e o líder de louvor pode ajustar (RN-17, Q19). A cópia evita que mudar o instrumento de alguém hoje reescreva escalas antigas. |
+| `instrumento_exibido` | Texto mostrado na escala. Começa como **cópia do padrão** da pessoa no grupo usado, e o líder de louvor muda por culto quando precisar, inclusive invertendo os papéis (RN-17, Q19). 💡 A cópia evita que mudar o padrão de alguém hoje reescreva escalas antigas. |
 | `origem_grupo_id` | Grupo usado como atalho para incluir a pessoa. Vazio para avulsas. Só informativo. |
 
 **`escala_grupo`**: grupos usados para montar a escala (RN-56).
 
 | Campo | Descrição |
 |---|---|
-| `escala_id`, `grupo_id` | Existe para saber quais líderes de grupo podem editar o repertório. Gravado quando o líder de louvor escolhe o grupo como atalho. 💡 Ele pode remover um grupo da lista. |
+| `escala_id`, `grupo_id` | Existe para saber quais líderes de grupo podem editar o repertório e pedir alterações naquele culto (Q20, Q21). Gravado quando o líder de louvor escolhe o grupo como atalho. 💡 Ele pode remover um grupo da lista. |
 
 **`escala_alteracao`**: registro de cada mudança feita em uma escala publicada.
 
@@ -196,7 +197,7 @@ Todas as tabelas têm identificador próprio, `criado_em` e `atualizado_em`, que
 
 | Campo | Descrição |
 |---|---|
-| `escala_id`, `autor_pessoa_id` | Escala sobre a qual é o pedido e quem pediu. |
+| `escala_id`, `autor_pessoa_id` | Escala sobre a qual é o pedido e quem pediu. O autor precisa ser líder de um grupo que consta em `escala_grupo` dessa escala (Q20). |
 | `texto` | Texto livre (RN-39). |
 | `estado` | `pendente`, `aprovada` ou `reprovada`. |
 | `motivo` | Opcional, usado na reprovação. |
@@ -298,14 +299,14 @@ Legenda: **ver** · **criar** · **editar** · **-** sem acesso. "Integrante" va
 | Tabela | Administrador | Líder de louvor | Líder de grupo | Integrante |
 |---|---|---|---|---|
 | `conta` | ver todas; criar; aprovar ou recusar; redefinir senha; designar administrador | - | só a própria | só a própria (ver; trocar a própria senha) |
-| `pessoa` | ver e editar todas | ver e editar todas | ver nome e apelido de todas; editar o próprio contato | igual ao líder de grupo |
+| `pessoa` | ver e editar todas | ver e editar todas | ver nome, apelido e contato de todas; editar o próprio contato | igual ao líder de grupo |
 | `membro_ministerio` | ver e editar; designa o líder de louvor | ver e editar | ver | ver |
 | `grupo` | criar e editar (inclui trocar o líder) | criar e editar (inclui trocar o líder) | ver | ver |
 | `grupo_membro` | ver e editar | ver e editar | ver; editar **só do próprio grupo** (RN-16) | ver |
 | `tipo_culto`, `culto` | criar e editar, cancelar | criar e editar, cancelar | ver | ver |
 | `escala`, `escala_item`, `escala_grupo` | ver **só as publicadas** | ver e editar tudo, inclusive rascunho; publicar | ver só publicadas | ver só publicadas |
 | `escala_alteracao` | ver | ver | - | - |
-| `solicitacao_alteracao` | - | ver todas; decidir | criar; ver as próprias | - |
+| `solicitacao_alteracao` | - | ver todas; decidir | criar só em cultos do próprio grupo; ver as próprias | - |
 | `musica` | criar e editar | criar e editar | criar e editar | ver |
 | `repertorio_item` | editar de qualquer culto | editar de qualquer culto | editar só quando o grupo está em `escala_grupo` de uma escala **publicada** do culto | ver |
 | `aviso`, `aviso_destinatario` | ver os próprios | ver os próprios | ver os próprios | ver os próprios |
@@ -319,7 +320,7 @@ Quem **escreve** em `escala_alteracao`, `aviso`, `aviso_destinatario` e `registr
 1. **Administrador não edita escala** (RN-02). Por coerência com RN-34 ("rascunho: só quem pode editar"), 💡 ele também **não vê rascunhos**, a não ser que acumule o papel de líder de louvor. Se você preferir que ele veja, é um ajuste simples.
 2. **Rascunho é invisível para integrantes e líderes de grupo** (RN-34). Isso precisa ser garantido no banco, senão basta abrir o app com a consulta certa para ver a escala antes da publicação.
 3. **Repertório de um culto sem grupos** (só avulsos, ou sem escala): só líder de louvor e administrador editam (Q13).
-4. **Repertório e rascunho:** como o líder de grupo não vê rascunhos, 💡 ele só ganha acesso ao repertório quando a escala é **publicada** ([Q21](#8-questões-em-aberto)).
+4. **Repertório e rascunho:** como o líder de grupo não vê rascunhos, ele só edita o repertório depois que a escala é **publicada**, sem prazo: quando quiser (Q21).
 5. **Solicitação aprovada não altera a escala sozinha** (RN-39). O líder de louvor edita manualmente, e o aviso sai da edição, não da aprovação.
 6. **Senha temporária** (RN-10, RN-65): enquanto `senha_temporaria` estiver ativa, a pessoa só pode trocar a senha. 💡 Isso vale no banco, não só na tela. A senha temporária deve ser de uso único: depois da troca, nem o administrador a conhece.
 7. **Conta pendente** (RN-10): pode existir, mas não lê nem grava nada. Como a tela "pedir acesso" é pública, essa trava é a única coisa entre um desconhecido e os dados do Louvor.
@@ -334,6 +335,7 @@ Algumas operações não podem rodar no navegador do usuário, porque dependem d
 | Aprovar solicitação de acesso e ligar a uma pessoa | Muda `estado` e `pessoa_id` da conta. |
 | Calcular destinatários e enviar push | Lê dispositivos de outras pessoas (RN-42). |
 | Designar administrador | Muda `e_administrador`. |
+8. **`escala_grupo` manda em duas permissões:** repertório e solicitação de alteração. Se o líder de louvor tirar um grupo dessa lista, o líder daquele grupo perde as duas naquele culto.
 
 ---
 
@@ -363,12 +365,16 @@ Para a comunidade e outros ministérios entrarem depois (D14, A5) sem refazer a 
 
 ## 8. Questões em aberto
 
-| # | Questão | Proposta | Afeta |
+Nenhuma no momento.
+
+### Respondidas
+
+| # | Questão | Resposta | Onde aparece |
 |---|---|---|---|
-| Q19 | Quando uma pessoa tem **mais de um instrumento** no grupo (ex.: violão e voz), a escala mostra todos sempre, ou muda de culto para culto? | Mostra todos, e o líder de louvor ajusta por culto quando precisar. | `grupo_membro`, `escala_item` |
-| Q20 | O líder de grupo pode pedir alteração em **qualquer** culto publicado, ou só nos cultos em que o grupo dele foi escalado? | Qualquer culto, já que hoje eles "podem mudar praticamente tudo". | `solicitacao_alteracao` |
-| Q21 | O líder de grupo só edita o repertório **depois que a escala é publicada**, porque antes não enxerga quais grupos foram usados. Isso encaixa no jeito que vocês trabalham, ou os líderes escolhem o repertório antes da escala sair? | Só após a publicação. Se vocês escolhem antes, o líder de louvor passa a liberar o repertório por culto. | `repertorio_item` |
-| Q22 | Os integrantes veem o **contato** (e-mail ou telefone) uns dos outros? | Não: só o administrador, o líder de louvor e a própria pessoa. | `pessoa` |
+| Q19 | Quem tem mais de um instrumento aparece com todos, ou varia por culto? | Varia por culto. A pessoa tem o padrão de cada grupo (ex.: bateria no G2, violão e canto no G3), e num culto específico pode inverter. | `grupo_membro`, `escala_item` |
+| Q20 | O líder de grupo pede alteração em qual culto? | Só nos cultos do próprio grupo. | `solicitacao_alteracao`, `escala_grupo` |
+| Q21 | Quando o líder de grupo edita o repertório? | Depois da escala, quando ele quiser. | `repertorio_item` |
+| Q22 | Integrantes veem o contato uns dos outros? | Sim. | `pessoa` |
 
 ---
 
@@ -377,3 +383,4 @@ Para a comunidade e outros ministérios entrarem depois (D14, A5) sem refazer a 
 | Versão | Data | Descrição |
 |---|---|---|
 | 0.1 | 13/11/2026 | Primeiro rascunho: entidades, integridade, permissões por tabela, cálculo de avisos e questões Q19 a Q22. |
+| 0.2 | 13/11/2026 | Q19 a Q22 respondidas: instrumento padrão por grupo ajustável por culto, solicitação só nos cultos do próprio grupo, repertório após a escala, contato visível a todos os integrantes. |
