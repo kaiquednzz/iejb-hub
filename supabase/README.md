@@ -5,8 +5,8 @@ Banco do piloto Louvor, construído a partir do [modelo de dados e permissões](
 | | |
 |---|---|
 | Projeto Supabase | `iejb-hub` (organização IEJB Hub), região São Paulo (`sa-east-1`), Postgres 17 |
-| Estado | 10 migrações aplicadas (a 10 em 14/11/2026) e a função de servidor `admin-acesso`. |
-| Testes | 93 verificações, todas passando (`tests/local/rodar.sh`) |
+| Estado | 11 migrações aplicadas (10 e 11 em 14/11/2026), a função de servidor `admin-acesso` e o bucket `fotos`. |
+| Testes | 114 verificações, todas passando (`tests/local/rodar.sh`) |
 
 ## Estrutura
 
@@ -22,13 +22,15 @@ supabase/
 │   ├── ..._privilegios_e_agendamento.sql# GRANTs e o pg_cron que processa avisos
 │   ├── ..._dados_iniciais.sql           # Louvor, G1 a G3, cultos da semana
 │   ├── ..._ajustes_do_verificador.sql   # correções apontadas pelo Supabase (ver abaixo)
-│   └── ..._gestao_de_pessoas.sql        # cadastrar_pessoa, aprovar_pedido, definir_pessoa_ativa
+│   ├── ..._gestao_de_pessoas.sql        # cadastrar_pessoa, aprovar_pedido, definir_pessoa_ativa
+│   └── ..._montar_escala_e_fotos.sql    # grupos por culto, mesa de som, rótulo (Ceia), fotos
 ├── functions/admin-acesso/  # criar acesso e redefinir senha (precisa da chave de serviço)
 └── tests/local/
     ├── 00_simular_supabase.sql   # imita auth.users, auth.uid() e os papéis do Supabase
     ├── 01_ajudantes.sql          # teste.ok, teste.deve_falhar, teste.entrar
     ├── 02_cenario_piloto.sql     # o cenário completo, do primeiro admin aos avisos
     ├── 03_gestao_de_pessoas.sql  # as funções da migração 10
+    ├── 04_montar_escala_e_fotos.sql # as funções da migração 11
     └── rodar.sh
 ```
 

@@ -8,17 +8,18 @@ import { h, icone, comCarregando } from '../util/dom.js';
 import { supabase } from '../supabase.js';
 import { nomeCurto } from '../sessao.js';
 import { hojeEmBrasilia, somarDias, rotuloDoDia, partesDaData, formatarHorario } from '../util/datas.js';
-import { cabecalhoApp, barraAbas, iniciais } from './moldura.js';
+import { cabecalhoApp, barraAbas, avatar } from './moldura.js';
+import { FUNCAO_MESA, separarMesa } from '../util/escala.js';
 import { guardarEscala, escalaGuardada, eErroDeRede } from '../offline.js';
 
 const SEMANAS_A_MOSTRAR = 6;
 const SEMANAS_PARA_GERAR = 8;
 
 const CONSULTA = `
-    id, nome, data, horario, estado,
+    id, nome, rotulo, data, horario, estado,
     escala (
         id, estado,
-        escala_item ( id, pessoa_id, instrumento_exibido, pessoa:pessoa_id ( nome, apelido ) ),
+        escala_item ( id, pessoa_id, instrumento_exibido, pessoa:pessoa_id ( nome, apelido, foto ) ),
         escala_grupo ( grupo:grupo_id ( nome ) )
     ),
     repertorio_item ( id, posicao, tom, musica:musica_id ( titulo, artista, link ) )
@@ -158,7 +159,8 @@ function cartaoCulto(culto, meuId, indice) {
                 h('span', { class: 'cartao-data-mes' }, datas.mes),
             ),
             h('div', { class: 'cartao-titulos' },
-                h('h3', { id: `titulo-${culto.id}` }, culto.nome),
+                h('h3', { id: `titulo-${culto.id}` }, culto.nome,
+                    culto.rotulo && h('span', { class: 'rotulo-culto' }, culto.rotulo)),
                 h('p', { class: 'cartao-quando' },
                     icone('relogio', 'icone icone-p'),
                     `${rotuloDoDia(culto.data)}, ${formatarHorario(culto.horario)}`),
@@ -175,20 +177,26 @@ function corpoDaEscala(escala, meuId) {
         return h('p', { class: 'cartao-vazio' }, 'Escala ainda não publicada.');
     }
     const grupos = escala.escala_grupo.map((g) => g.grupo?.nome).filter(Boolean).sort();
-    const pessoas = [...escala.escala_item].sort((a, b) =>
+    // Quem só está pela mesa de som vai numa linha à parte, como na planilha
+    const { tocam, mesa } = separarMesa(escala.escala_item);
+    const pessoas = [...tocam].sort((a, b) =>
         nomeCurto(a.pessoa).localeCompare(nomeCurto(b.pessoa), 'pt-BR'));
 
     return h('div', { class: 'cartao-escala' },
         grupos.length > 0 && h('p', { class: 'cartao-grupos' }, grupos.length > 1 ? 'Grupos ' : 'Grupo ', grupos.join(' + ')),
         h('ul', { class: 'lista-pessoas' },
             pessoas.map((item) => h('li', { class: item.pessoa_id === meuId ? 'sou-eu' : null },
-                h('span', { class: 'pessoa-avatar', 'aria-hidden': 'true' }, iniciais(item.pessoa)),
+                avatar(item.pessoa),
                 h('span', { class: 'pessoa-nome' },
                     nomeCurto(item.pessoa, 'Pessoa'),
                     item.pessoa_id === meuId && h('span', { class: 'sr-only' }, ' (você)')),
-                h('span', { class: 'pessoa-instrumento' }, item.instrumento_exibido.join(' · ') || '—'),
+                h('span', { class: 'pessoa-instrumento' },
+                    item.instrumento_exibido.filter((i) => i !== FUNCAO_MESA).join(' · ') || '—'),
             )),
         ),
+        mesa.length > 0 && h('p', { class: 'cartao-mesa' },
+            h('span', null, 'Mesa de som'),
+            h('strong', null, mesa.map((item) => nomeCurto(item.pessoa, 'Pessoa')).join(', '))),
     );
 }
 

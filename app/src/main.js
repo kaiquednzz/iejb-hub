@@ -11,6 +11,7 @@ import './estilo/base.css';
 import './estilo/componentes.css';
 import './estilo/telas.css';
 import './estilo/equipe.css';
+import './estilo/montar.css';
 
 import { supabase } from './supabase.js';
 import { carregarConta } from './sessao.js';
@@ -20,6 +21,8 @@ import { telaAguardando } from './telas/aguardando.js';
 import { telaTrocarSenha } from './telas/trocar-senha.js';
 import { telaEscala } from './telas/escala.js';
 import { telaEquipe } from './telas/equipe/index.js';
+import { telaMontar } from './telas/montar/index.js';
+import { eLiderDeLouvor } from './sessao.js';
 import { telaErro } from './telas/erro.js';
 import { telaInstalar } from './telas/instalar.js';
 import { precisaInstalar, registrarServiceWorker } from './pwa.js';
@@ -30,7 +33,11 @@ let rodada = 0;          // descarta resultados de decisões antigas que chegare
 let usuarioAtual;        // undefined = ainda não decidiu nenhuma vez
 let contaPronta = null;  // conta ativa e sem senha temporária: pode navegar pelas abas
 
-const ROTAS_DA_CONTA = { '#/equipe': telaEquipe };
+// Montar escala é só do líder de louvor; para os outros cai na escala
+const ROTAS_DA_CONTA = {
+    '#/equipe': telaEquipe,
+    '#/montar': (conta) => (eLiderDeLouvor(conta) ? telaMontar(conta) : telaEscala(conta)),
+};
 const telaDaConta = (conta) => (ROTAS_DA_CONTA[location.hash] ?? telaEscala)(conta);
 
 async function decidirTela() {

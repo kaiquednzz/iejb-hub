@@ -10,7 +10,7 @@ import { supabase } from '../../supabase.js';
 export async function carregarEquipe(conta) {
     const [pessoas, grupos, ministerio, pedidos] = await Promise.all([
         supabase.from('pessoa')
-            .select(`id, nome, apelido, contato, instrumentos, ativa,
+            .select(`id, nome, apelido, contato, instrumentos, ativa, foto,
                      membro_ministerio ( ministerio_id, e_lider, ativo ),
                      conta ( id, login, estado, e_administrador, senha_temporaria )`)
             .order('nome'),
@@ -77,7 +77,8 @@ export function eLiderDeLouvor(pessoa, ministerioId) {
 
 // Instrumentos que aparecem como sugestão: os comuns + tudo o que já foi usado,
 // para ninguém escrever "Violao" e "violão" como coisas diferentes.
-const COMUNS = ['Voz', 'Violão', 'Guitarra', 'Baixo', 'Teclado', 'Bateria', 'Cajón'];
+// "Mesa" é quem opera o som: marcar aqui faz a pessoa aparecer primeiro na escolha da mesa
+const COMUNS = ['Voz', 'Violão', 'Guitarra', 'Baixo', 'Teclado', 'Bateria', 'Cajón', 'Mesa'];
 export function sugestoesDeInstrumento(dados) {
     const vistos = new Map(COMUNS.map((i) => [chave(i), i]));
     const juntar = (lista) => lista.forEach((i) => { if (!vistos.has(chave(i))) vistos.set(chave(i), i); });

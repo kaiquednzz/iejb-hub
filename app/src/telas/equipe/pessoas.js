@@ -9,8 +9,9 @@ import { campo, caixaDeAviso } from '../moldura.js';
 import { sugestoesDeInstrumento, eLiderDeLouvor } from './dados.js';
 import {
     seletorInstrumentos, interruptor, linhaPessoa, selo, vazio,
-    gerarSenhaTemporaria, mensagemDeAcesso,
+    gerarSenhaTemporaria, mensagemDeAcesso, blocoFoto,
 } from './pecas.js';
+import { avatar } from '../../util/foto.js';
 
 export function secaoPessoas(dados, ctx) {
     const { papeis } = dados;
@@ -22,7 +23,11 @@ export function secaoPessoas(dados, ctx) {
         sou: pessoa.id === dados.minhaPessoa,
         detalhe: pessoa.instrumentos.join(', '),
         selos: selosDaPessoa(pessoa, dados),
-        aoTocar: () => (papeis.gerePessoas ? folhaPessoa(pessoa, dados, ctx) : folhaContato(pessoa)),
+        aoTocar: () => {
+            if (papeis.gerePessoas) folhaPessoa(pessoa, dados, ctx);
+            else if (pessoa.id === dados.minhaPessoa) folhaMeuPerfil(pessoa, ctx);
+            else folhaContato(pessoa);
+        },
     });
 
     const novo = papeis.gerePessoas
@@ -65,6 +70,7 @@ function folhaContato(pessoa) {
     abrirFolha({
         titulo: pessoa.apelido || pessoa.nome,
         conteudo: h('div', { class: 'form' },
+            h('div', { class: 'foto-lugar' }, avatar(pessoa, 'pessoa-avatar avatar-grande')),
             pessoa.apelido && h('p', { class: 'folha-texto' }, pessoa.nome),
             pessoa.instrumentos.length > 0 && h('p', { class: 'folha-texto' }, pessoa.instrumentos.join(', ')),
             contato
@@ -131,7 +137,39 @@ function folhaPessoa(pessoa, dados, ctx) {
 
     const folha = abrirFolha({
         titulo: nova ? 'Cadastrar pessoa' : (pessoa.apelido || pessoa.nome),
-        conteudo: h('div', { class: 'folha-pilha' }, form, extras),
+        conteudo: h('div', { class: 'folha-pilha' },
+            !nova && blocoFoto(pessoa, () => ctx.recarregar()),
+            form, extras),
+    });
+}
+
+// Integrante comum na própria linha: foto e contato (o resto é com a liderança)
+function folhaMeuPerfil(pessoa, ctx) {
+    const aviso = caixaDeAviso();
+    const botao = h('button', { type: 'submit', class: 'botao-principal botao-largo' }, 'Salvar contato');
+    const form = h('form', { class: 'form', novalidate: true },
+        campo({ rotulo: 'Seu contato', nome: 'contato', tipo: 'tel', autocomplete: 'tel', required: false,
+            dica: 'Todo o Louvor consegue ver.', value: pessoa.contato ?? '' }),
+        aviso.elemento,
+        botao,
+    );
+    form.addEventListener('submit', async (evento) => {
+        evento.preventDefault();
+        await comCarregando(botao, async () => {
+            const { error } = await supabase.rpc('atualizar_meu_contato', { p_contato: form.elements.contato.value });
+            if (error) return aviso.mostrar(mensagemDoBanco(error));
+            avisar('Contato salvo.');
+            folha.fechar();
+            await ctx.recarregar();
+        });
+    });
+    const folha = abrirFolha({
+        titulo: 'Seu perfil',
+        conteudo: h('div', { class: 'folha-pilha' },
+            blocoFoto(pessoa, () => ctx.recarregar()),
+            form,
+            h('p', { class: 'folha-texto' }, 'Nome e instrumentos são definidos pela liderança do Louvor.'),
+        ),
     });
 }
 

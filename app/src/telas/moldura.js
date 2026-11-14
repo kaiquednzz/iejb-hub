@@ -1,6 +1,7 @@
 // Peças de layout repetidas entre as telas.
 import { h, icone } from '../util/dom.js';
 import { supabase } from '../supabase.js';
+import { eLiderDeLouvor } from '../sessao.js';
 
 // Telas de quem ainda não entrou (ou está esperando aprovação):
 // fundo vinho com brilho e um cartão de vidro no meio.
@@ -40,7 +41,8 @@ export function cabecalhoApp(conta) {
     );
 }
 
-// Barra de abas fixa embaixo (Escala | Equipe), como num app do iPhone.
+// Barra de abas fixa embaixo (Escala | Montar | Equipe), como num app do iPhone.
+// "Montar" só aparece para o líder de louvor (quem monta a escala, RN-02).
 // O número vermelho em "Equipe" mostra pedidos de acesso esperando o admin.
 export function barraAbas(conta, atual) {
     const aba = (rota, nome, nomeIcone) => h('a', {
@@ -51,6 +53,7 @@ export function barraAbas(conta, atual) {
     const equipe = aba('#/equipe', 'Equipe', 'pessoas');
     const barra = h('nav', { class: 'barra-abas', 'aria-label': 'Seções' },
         aba('#/escala', 'Escala', 'calendario'),
+        eLiderDeLouvor(conta) && aba('#/montar', 'Montar', 'montar'),
         equipe,
     );
 
@@ -65,11 +68,7 @@ export function barraAbas(conta, atual) {
     return barra;
 }
 
-// Iniciais para o círculo da pessoa: "Gabi" → G, "Ana Souza" → AS
-export function iniciais(pessoa) {
-    const partes = (pessoa?.apelido || pessoa?.nome || '?').trim().split(/\s+/);
-    return (partes[0][0] + (partes.length > 1 ? partes.at(-1)[0] : '')).toUpperCase();
-}
+export { iniciais, avatar } from '../util/foto.js';
 
 // Campo de formulário com rótulo de verdade (acessível e com área de toque boa)
 export function campo({ rotulo, nome, tipo = 'text', autocomplete, dica, ...resto }) {

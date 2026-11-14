@@ -1,6 +1,7 @@
 // Peças reaproveitadas entre Pedidos, Pessoas e Grupos.
-import { h, icone } from '../../util/dom.js';
-import { iniciais } from '../moldura.js';
+import { h, icone, comCarregando } from '../../util/dom.js';
+import { avatar, trocarFoto } from '../../util/foto.js';
+import { avisar } from '../../util/folha.js';
 import { chave } from './dados.js';
 
 // Escolha de instrumentos: fichas que ligam/desligam com um toque, mais um
@@ -89,7 +90,7 @@ export function interruptor({ rotulo, descricao, ligado, aoMudar }) {
 // Linha de pessoa numa lista. Vira botão quando tocar nela faz alguma coisa.
 export function linhaPessoa({ pessoa, detalhe, selos = [], aoTocar, sou }) {
     const conteudo = [
-        h('span', { class: 'pessoa-avatar', 'aria-hidden': 'true' }, iniciais(pessoa)),
+        avatar(pessoa),
         h('span', { class: 'linha-textos' },
             h('span', { class: 'linha-nome' },
                 pessoa.apelido || pessoa.nome,
@@ -132,3 +133,42 @@ export function gerarSenhaTemporaria() {
 export function mensagemDeAcesso(email, senha) {
     return `Seu acesso ao IEJB Hub (escalas do Louvor):\n${location.origin}\n\nE-mail: ${email}\nSenha temporária: ${senha}\n\nNo primeiro acesso o app pede pra você criar a sua senha.`;
 }
+
+// Foto de perfil dentro da folha: o círculo grande + escolher/tirar.
+// A compressão acontece no aparelho (util/foto.js) antes de subir.
+export function blocoFoto(pessoa, aoMudar) {
+    let atual = pessoa;
+    const lugar = h('div', { class: 'foto-lugar' }, avatar(pessoa, 'pessoa-avatar avatar-grande'));
+    const entrada = h('input', { type: 'file', accept: 'image/*', class: 'sr-only', tabindex: -1, 'aria-hidden': 'true' });
+    const escolher = h('button', { type: 'button', class: 'botao-secundario botao-pequeno' }, pessoa.foto ? 'Trocar foto' : 'Pôr foto');
+    const tirar = h('button', { type: 'button', class: 'link-discreto', hidden: !pessoa.foto }, 'Tirar foto');
+
+    escolher.addEventListener('click', () => entrada.click());
+    entrada.addEventListener('change', () => {
+        const arquivo = entrada.files?.[0];
+        entrada.value = '';
+        if (arquivo) mudar(arquivo);
+    });
+    tirar.addEventListener('click', () => mudar(null));
+
+    async function mudar(arquivo) {
+        const botao = arquivo ? escolher : tirar;
+        await comCarregando(botao, async () => {
+            try {
+                const caminho = await trocarFoto(atual, arquivo);
+                atual = { ...atual, foto: caminho };
+                lugar.replaceChildren(avatar(atual, 'pessoa-avatar avatar-grande'));
+                lugar.firstChild.classList.add('foto-nova');
+                escolher.textContent = caminho ? 'Trocar foto' : 'Pôr foto';
+                tirar.hidden = !caminho;
+                aoMudar?.(caminho);
+            } catch (erro) {
+                console.error(erro);
+                avisar(/size|large|grande/i.test(erro?.message ?? '') ? 'A foto ficou grande demais. Tente outra.' : 'Não deu para trocar a foto. Tente de novo.');
+            }
+        });
+    }
+
+    return h('div', { class: 'bloco-foto' }, lugar, h('div', { class: 'foto-acoes' }, escolher, tirar), entrada);
+}
+

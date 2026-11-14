@@ -29,6 +29,9 @@ src/supabase.js       o cliente único do Supabase
 src/sessao.js         lê a conta logada, nome curto, tradução de erros
 src/telas/            uma função por tela; cada uma devolve um elemento pronto
 src/telas/equipe/     tela Equipe: pedidos de acesso, pessoas e grupos (uma seção por arquivo)
+src/telas/montar/     tela Montar escala (líder de louvor): mês, semanas, culto, mesa, WhatsApp
+src/util/foto.js      fotos de perfil: comprime no aparelho, sobe, mostra (avatar)
+src/util/escala.js    regra da "Mesa" (função de som) usada em mais de uma tela
 src/util/folha.js     folha que sobe de baixo (<dialog>), confirmação e aviso rápido (toast)
 src/util/erros.js     traduz erros do banco e da função admin-acesso
 src/util/dom.js       h() monta HTML sem innerHTML (proteção contra XSS) + ícones
@@ -45,7 +48,7 @@ com sessão
   conta pendente ───► Aguardando ("Conferir de novo")
   recusada/desativ. ► Aguardando (explica e oferece Sair)
   senha temporária ─► Trocar senha (obrigatório)
-  ativa ────────────► Escala (#/escala) ⇄ Equipe (#/equipe), pela barra de abas
+  ativa ────────────► Escala (#/escala) ⇄ Montar (#/montar, só líder de louvor) ⇄ Equipe (#/equipe)
 ```
 
 A tela é só conveniência. Se alguém forçar a tela da escala mexendo no JS, o
@@ -123,6 +126,23 @@ mostra a escala guardada com a faixa de sem conexão.
    antes de alguém usar o *Pedir acesso*. Ligado, o Supabase manda e-mail de
    confirmação (contra a D19) e a pessoa não consegue entrar até clicar nele.
 
+## Tela Montar escala
+
+Feita a partir da planilha que o líder manda hoje (PDF no WhatsApp com Data, Grupo e Mesa por culto):
+
+- **O mês são as semanas que começam no mês** (como a planilha: a terça 01/12 está na escala de novembro).
+- **Grupo da semana:** um toque em G1/G2/G3 no cabeçalho da semana escala domingo e terça juntos. Cada culto pode ser trocado sozinho, e culto especial pode juntar grupos.
+- **Mesa:** quem opera o som em cada culto. No banco é uma pessoa da escala com a função "Mesa", então entra no aviso de mudança como qualquer um. Quem tem "Mesa" nos instrumentos aparece primeiro.
+- **Ceia:** rótulo do culto, destacado na escala e na mensagem.
+- **Culto especial:** Jovens no sábado, vigília etc.
+- **Publicar** solta tudo o que está em rascunho de uma vez. Depois disso, cada mudança avisa só quem foi afetado.
+- **WhatsApp:** gera o resumo do mês em texto (substitui o PDF), com o link do app.
+- Os cultos fixos do mês são gerados sozinhos ao abrir (gerar_cultos é idempotente).
+
+## Fotos de perfil
+
+Comprimidas no aparelho (quadrado de 320 px, WebP ou JPEG, ~25 KB) antes de subir. O bucket `fotos` recusa mais de 200 KB e só aceita WebP/JPEG. Cada troca gera um nome novo, então o arquivo pode ficar em cache por um ano (só baixa uma vez). Troca a foto: a própria pessoa (Equipe → sua linha), o admin e o líder de louvor.
+
 ## Tela Equipe
 
 Todo integrante entra: vê as pessoas (com o contato, Q22) e os grupos. O que cada um pode mexer:
@@ -141,4 +161,4 @@ Os botões aparecem conforme o papel, mas quem garante a tabela é o banco (RLS 
 ## Ainda não tem
 
 - Push (as notificações): precisa de chaves VAPID e da função de servidor que envia.
-- Telas do líder: montar e publicar escala, repertório (com os botões da D26).
+- Repertório pelo líder do grupo (com os botões da D26).

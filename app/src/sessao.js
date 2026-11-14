@@ -21,7 +21,8 @@ export async function carregarConta(idUsuario) {
 async function buscarConta(idUsuario) {
     const { data, error } = await supabase
         .from('conta')
-        .select('id, login, estado, e_administrador, senha_temporaria, nome_informado, pessoa:pessoa_id (id, nome, apelido)')
+        .select(`id, login, estado, e_administrador, senha_temporaria, nome_informado,
+                 pessoa:pessoa_id ( id, nome, apelido, foto, membro_ministerio ( e_lider, ativo ) )`)
         .eq('id', idUsuario)
         .maybeSingle()
         // O supabase-js tenta de novo sozinho em erro de rede (espera 1s, 2s, 4s).
@@ -33,6 +34,12 @@ async function buscarConta(idUsuario) {
     // Não deveria acontecer: o gatilho criar_conta cria a linha junto com o usuário
     if (!data) return { erro: new Error('Conta não encontrada.') };
     return { conta: data };
+}
+
+// Líder de louvor: quem monta a escala. No piloto só existe o Louvor, então
+// "líder em algum vínculo ativo" basta (o banco confere por ministério).
+export function eLiderDeLouvor(conta) {
+    return !!conta?.pessoa?.membro_ministerio?.some((m) => m.e_lider && m.ativo);
 }
 
 // Como a pessoa quer ser chamada: apelido, senão o primeiro nome
