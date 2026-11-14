@@ -6,8 +6,8 @@
 
 | Documento | Descrição | Status |
 |---|---|---|
-| [Visão geral do IEJB Hub](planejamento/VISAO-GERAL-IEJB-HUB.md) | Conceito, pilares, módulos, permissões, arquitetura considerada, modelo financeiro e pontos em aberto do IEJB Hub. | Em planejamento (v0.8) |
-| [Regras de negócio do piloto Louvor](planejamento/REGRAS-DE-NEGOCIO-PILOTO-LOUVOR.md) | Entidades, papéis e permissões, regras de escala, repertório, avisos e acesso do MVP, com as questões em aberto. | Rascunho (v0.3) |
+| [Visão geral do IEJB Hub](planejamento/VISAO-GERAL-IEJB-HUB.md) | Conceito, pilares, módulos, permissões, arquitetura considerada, modelo financeiro e pontos em aberto do IEJB Hub. | Em planejamento (v0.9) |
+| [Regras de negócio do piloto Louvor](planejamento/REGRAS-DE-NEGOCIO-PILOTO-LOUVOR.md) | Entidades, papéis e permissões, regras de escala, repertório, avisos e acesso do MVP, com as questões em aberto. | Rascunho (v0.4) |
 
 ## Convenções
 

@@ -6,7 +6,7 @@
 | **Instituição** | IEJB, Igreja Evangélica do Jardim Brasil |
 | **Responsável pelo projeto e desenvolvimento** | Kaique |
 | **Status** | Em planejamento. Sem aprovação institucional definitiva e sem início de desenvolvimento. |
-| **Versão deste documento** | 0.8 (quarta rodada sobre o Louvor) |
+| **Versão deste documento** | 0.9 (quinta rodada sobre o Louvor) |
 | **Última atualização** | 13/11/2026 |
 
 > Este documento registra a visão atual do IEJB Hub para que ela possa evoluir depois.
@@ -433,6 +433,7 @@ A mensalidade contemplaria: utilização, hospedagem, manutenção, correções,
 | D16 | Substituições não têm fluxo próprio no MVP: são combinadas pessoalmente e o líder de louvor atualiza a escala no Hub. |
 | D17 | No celular, o Hub só é usado instalado como PWA; no computador, funciona no navegador sem exigir instalação. |
 | D18 | Avisos de mudança do líder de louvor: notificação push como canal principal e mensagem pronta para o WhatsApp como reserva. |
+| D19 | O Hub não envia e-mail. A conta é criada pelo administrador (senha temporária) ou solicitada pela pessoa e aprovada pelo administrador; senha esquecida é redefinida pelo administrador. |
 
 ### 💡 Proposto
 
@@ -616,6 +617,19 @@ Precisam ser respondidas, de preferência com o líder de louvor, antes de defin
 | Q10 | Mudança no repertório avisa? | Sim. |
 | Q11 | Em troca combinada, o líder atualiza a escala no Hub? | Sim. |
 
+### 13.13. Quinta rodada de respostas
+
+> **Fonte:** Kaique, 13/11/2026. As regras derivadas estão no [documento de regras de negócio](REGRAS-DE-NEGOCIO-PILOTO-LOUVOR.md).
+
+| # | Pergunta | Resposta |
+|---|---|---|
+| Q12 | Como a pessoa recebe acesso e recupera a senha sem e-mail? | O administrador cria a conta com senha temporária, ou a pessoa solicita com nome e senha e o administrador aprova. |
+| Q13 | Quem edita o repertório de culto só com avulsos? | Líder de louvor e administrador. |
+| Q14 | Quem são os "afetados" no aviso? | Quem entrou, saiu ou continua escalado. |
+| Q15 | O líder de grupo mexe nos membros do próprio grupo? | "Os dois" (leitura a confirmar). |
+| Q16 | Uma pessoa pode ter mais de um instrumento? | Sim; na escala aparece o que o líder do grupo definir. |
+| Q17 | Como o líder de louvor fica sabendo de uma troca? | Aviso simples e informal, sem regra. |
+
 ---
 
 ## Histórico de alterações
@@ -630,3 +644,4 @@ Precisam ser respondidas, de preferência com o líder de louvor, antes de defin
 | 0.6 | 13/11/2026 | Terceira rodada: avisos esclarecidos, líder de louvor usaria o Hub, cerca de 13 integrantes. Levantamento inicial do Louvor concluído. |
 | 0.7 | 13/11/2026 | PWA obrigatório no celular (não no computador), push como canal principal e WhatsApp como reserva. |
 | 0.8 | 13/11/2026 | Quarta rodada: líder de louvor atualiza a escala em trocas, aviso só aos afetados, escala visível a todos e repertório pelos líderes dos grupos. |
+| 0.9 | 13/11/2026 | Quinta rodada: acesso sem e-mail com aprovação do administrador (D19), repertório em culto só com avulsos, afetados, membros do grupo e instrumento por vínculo. |

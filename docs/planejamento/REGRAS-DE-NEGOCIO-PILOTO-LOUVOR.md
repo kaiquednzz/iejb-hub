@@ -4,7 +4,7 @@
 |---|---|
 | **Escopo** | MVP do IEJB Hub, restrito ao ministério de Louvor |
 | **Etapa** | 2. Definição de requisitos e regras de negócio |
-| **Versão** | 0.3 (rascunho para revisão) |
+| **Versão** | 0.4 (rascunho para revisão) |
 | **Última atualização** | 13/11/2026 |
 | **Documento base** | [Visão geral do IEJB Hub](VISAO-GERAL-IEJB-HUB.md), seção 13 |
 
@@ -18,7 +18,7 @@ Cada regra indica de onde veio:
 
 | Origem | Significado |
 |---|---|
-| 🗣️ **Levantamento** | Vem das respostas sobre como o Louvor funciona hoje (visão geral, seções 13.7 a 13.12). |
+| 🗣️ **Levantamento** | Vem das respostas sobre como o Louvor funciona hoje (visão geral, seções 13.7 a 13.13). |
 | ✅ **Decisão** | Decisão já registrada por Kaique na visão geral. |
 | 💡 **Proposta** | Sugestão para fechar uma lacuna. Precisa ser aceita ou ajustada por Kaique. |
 | ❓ **Em aberto** | Ainda não há resposta. Listado na [seção 10](#10-questões-em-aberto). |
@@ -56,6 +56,7 @@ As regras são numeradas (`RN-xx`) para poderem ser citadas no código, nos test
 |---|---|
 | **Pessoa** | Alguém que faz parte do Louvor. 💡 Existe independentemente de ter conta, para que no futuro a comunidade inteira caiba no mesmo cadastro (decisão D14). |
 | **Conta** | Acesso de uma pessoa ao Hub. Uma pessoa tem no máximo uma conta. |
+| **Solicitação de acesso** | Pedido feito pela própria pessoa, com seu nome e senha, que o administrador aprova ou recusa (RN-10). |
 | **Ministério** | No piloto existe só um: **Louvor**. 💡 Já é uma entidade própria para que outros ministérios entrem depois sem refazer a base. |
 | **Grupo** | Subdivisão do Louvor: **G1, G2 e G3**. |
 | **Membro do grupo** | Ligação entre uma pessoa e um grupo. Uma pessoa pode estar em vários grupos. |
@@ -87,11 +88,13 @@ Legenda: ✔️ pode · ✖️ não pode · ❓ a confirmar
 
 | Ação | Admin | Líder de louvor | Líder de grupo | Integrante |
 |---|---|---|---|---|
-| Criar contas e convidar pessoas | ✔️ | ✖️ | ✖️ | ✖️ |
+| Criar contas | ✔️ | ✖️ | ✖️ | ✖️ |
 | Designar outros administradores | ✔️ | ✖️ | ✖️ | ✖️ |
 | Cadastrar e editar pessoas do Louvor | ✔️ | ✔️ | ✖️ | ✖️ |
 | Editar os próprios dados de contato | ✔️ | ✔️ | ✔️ | ✔️ |
-| Criar e editar grupos e seus membros | ✔️ | ✔️ | ❓ | ✖️ |
+| Criar e editar grupos | ✔️ | ✔️ | ✖️ | ✖️ |
+| Adicionar e tirar membros de um grupo | ✔️ | ✔️ | ✔️ só do próprio grupo (RN-16) | ✖️ |
+| Aprovar solicitações de acesso | ✔️ | ✖️ | ✖️ | ✖️ |
 | Criar cultos especiais | ✔️ | ✔️ | ✖️ | ✖️ |
 | Montar, editar e publicar escalas | ✖️ (RN-02) | ✔️ | ✖️ | ✖️ |
 | Solicitar alteração em uma escala | ✖️ | ✖️ | ✔️ (ver RN-37) | ✖️ |
@@ -110,7 +113,12 @@ Legenda: ✔️ pode · ✖️ não pode · ❓ a confirmar
 
 ## 4. Pessoas, contas e grupos
 
-**RN-10** 💡 Uma pessoa pode estar cadastrada sem ter conta. A conta é criada por **convite de um administrador**, enviado por e-mail; a pessoa define a própria senha ao aceitar (ver RN-64).
+**RN-10** ✅ O Hub **não envia e-mail** (Q12). Uma pessoa pode estar cadastrada sem ter conta, e a conta nasce por um de dois caminhos:
+
+1. **Criada pelo administrador**, com senha temporária que a pessoa troca no primeiro login.
+2. **Solicitada pela própria pessoa**, com o nome e a senha que ela escolher, e **aprovada pelo administrador**.
+
+💡 Detalhes propostos: uma conta pendente não vê nada até ser aprovada (vale a RN-01, no banco). Ao aprovar, o administrador liga a solicitação a uma pessoa do Louvor. Fica para a etapa 3 como isso se encaixa no Supabase Auth, que exige a confirmação de e-mail desligada.
 
 **RN-11** 🗣️ Uma pessoa pode ser membro de **mais de um grupo** (caso do G2 e G3).
 
@@ -120,7 +128,11 @@ Legenda: ✔️ pode · ✖️ não pode · ❓ a confirmar
 
 **RN-14** 💡 Dados mínimos da pessoa: nome, como é chamada no Louvor (apelido) e meio de contato da conta. Nenhum dado além do necessário para o piloto funcionar.
 
-**RN-15** ✅ O Hub registra o **instrumento ou função** de cada pessoa (bateria, violão, voz etc.) e **mostra na escala** (Q5). 💡 Se uma pessoa pode ter mais de um instrumento fica para a etapa 3.
+**RN-15** ✅ O Hub registra o **instrumento ou função** de cada pessoa (bateria, violão, voz etc.) e **mostra na escala** (Q5). Uma pessoa pode ter **mais de um** instrumento, e na escala aparece **o que o líder do grupo definir** (Q16).
+
+**RN-16** ✅ O líder de grupo **adiciona e tira membros do próprio grupo**, além do líder de louvor e do administrador (Q15, ver Q18).
+
+**RN-17** 💡 O instrumento mostrado na escala é definido **por vínculo pessoa + grupo**: quem tem o instrumento "violão" no G2 aparece assim quando o G2 é usado. Pessoa avulsa, sem grupo, tem o instrumento definido pelo líder de louvor. Ver Q18.
 
 ---
 
@@ -189,7 +201,7 @@ Isso permite ao líder montar o mês inteiro com calma e só avisar quando estiv
 
 **RN-70** ✅ Quando duas pessoas combinam uma troca pessoalmente, o **líder de louvor atualiza a escala no Hub** (Q11). Não existe fluxo próprio de substituição no piloto (decisão D16). A atualização gera o aviso normal (RN-40), então quem entrou e quem saiu são avisados pelo próprio Hub.
 
-**RN-71** 💡 Risco conhecido: se a troca não chegar ao líder de louvor, a escala mostra quem não vai tocar. Hoje só o líder de grupo consegue pedir alteração pelo Hub (RN-37). Permitir que qualquer integrante avise o líder pelo Hub fica como melhoria depois do piloto.
+**RN-71** 💡 Risco conhecido: se a troca não chegar ao líder de louvor, a escala mostra quem não vai tocar. Hoje o aviso ao líder é um **recado informal, sem regra** (Q17), e o Hub não muda isso no piloto. Só o líder de grupo consegue pedir alteração pelo Hub (RN-37). Permitir que qualquer integrante avise o líder pelo Hub fica como melhoria depois do piloto.
 
 ---
 
@@ -197,7 +209,7 @@ Isso permite ao líder montar o mês inteiro com calma e só avisar quando estiv
 
 **RN-40** ✅ Quando o **líder de louvor** publica ou altera uma escala publicada, as pessoas são avisadas (levantamento, seção 13.10).
 
-**RN-41** ✅ O aviso vai **só para as pessoas afetadas**, não para o Louvor inteiro (Q7). 💡 Definição proposta de "afetado": quem entrou, quem saiu e quem continua escalado naquele culto, já que a equipe que toca mudou.
+**RN-41** ✅ O aviso vai **só para as pessoas afetadas**, não para o Louvor inteiro (Q7). ✅ "Afetado" é quem **entrou, saiu ou continua escalado** naquele culto (Q14).
 
 **RN-42** ✅ Canal principal: **notificação push** (decisão D18).
 
@@ -235,7 +247,7 @@ Veja no Hub: app.iejb.com.br/...
 
 **RN-55** ✅ Mudança no repertório **gera aviso** (Q10). 💡 O aviso vai para as pessoas escaladas naquele culto, e a regra de agrupar avisos seguidos (RN-45) também vale aqui.
 
-**RN-56** 💡 Como a escala é de pessoas (RN-31), o Hub precisa guardar **quais grupos foram usados** para montar cada culto, só para saber quais líderes podem editar o repertório. Todos esses líderes editam o mesmo repertório; vale a última alteração salva. Líder de louvor e administrador editam o repertório de qualquer culto. ❓ Pessoas avulsas, sem grupo, não têm líder de grupo (Q13).
+**RN-56** 💡 Como a escala é de pessoas (RN-31), o Hub precisa guardar **quais grupos foram usados** para montar cada culto, só para saber quais líderes podem editar o repertório. Todos esses líderes editam o mesmo repertório; vale a última alteração salva. Líder de louvor e administrador editam o repertório de qualquer culto. ✅ Em culto só com pessoas avulsas, sem grupo, o repertório é editado apenas pelo **líder de louvor e pelo administrador** (Q13).
 
 ---
 
@@ -251,13 +263,13 @@ Veja no Hub: app.iejb.com.br/...
 
 **RN-64** ✅ Login com **e-mail e senha** (Q3, escolhido a partir da recomendação abaixo).
 
-**RN-65** 💡 A pessoa pode **redefinir a senha** por e-mail.
+**RN-65** ✅ A **senha esquecida é redefinida pelo administrador** (Q12), que passa uma nova senha temporária. Não há redefinição por e-mail.
 
 **Por que e-mail e senha, e não as alternativas:**
 
 | Opção | Problema no Hub |
 |---|---|
-| Nome de usuário + senha | Sem e-mail, não há como recuperar a senha esquecida, e o Supabase Auth (backend proposto) trabalha com e-mail ou telefone. |
+| Nome de usuário + senha | O Supabase Auth (backend proposto) trabalha com e-mail ou telefone. |
 | Link mágico por e-mail | No iPhone, o link abre no Safari, que **não compartilha a sessão** com o app instalado na tela de início. A pessoa faria login no lugar errado. |
 | Conta Google | Nem todo integrante usa Google, e o redirecionamento de login dentro de um PWA instalado é menos previsível. Pode ser adicionado depois. |
 
@@ -267,8 +279,7 @@ Veja no Hub: app.iejb.com.br/...
 
 | # | Questão | Afeta |
 |---|---|---|
-| Q12 | Sem enviar e-mail, como a pessoa recebe o acesso e recupera a senha? Proposta: o administrador cria a conta com senha temporária (troca obrigatória no primeiro acesso) e redefine senhas esquecidas. | RN-10, RN-65 |
-| Q13 | Pessoas avulsas na escala (sem grupo) não têm líder de grupo. Quem edita o repertório quando o culto não tem grupo? Proposta: só líder de louvor e administrador. | RN-56 |
+| Q18 | Confirmar a leitura de duas respostas: (a) "os dois" na Q15 significa que o líder de grupo **e** o líder de louvor/administrador editam membros; (b) o instrumento mostrado na escala fica por vínculo pessoa + grupo (RN-17), podendo ser diferente em cada grupo. | RN-16, RN-17 |
 
 ### Respondidas
 
@@ -276,7 +287,7 @@ Veja no Hub: app.iejb.com.br/...
 |---|---|---|---|
 | Q1 | Quem é o administrador? | Kaique, que pode designar outros. | RN-03, RN-10 |
 | Q2 | Líder de grupo pode editar a escala? | Não. Ele solicita a alteração e o líder de louvor aprova ou reprova. | RN-02, RN-37 a RN-39 |
-| Q3 | Como as pessoas fazem login? | E-mail e senha. O envio de e-mail pelo Hub ficou em aberto (Q12). | RN-64, RN-65 |
+| Q3 | Como as pessoas fazem login? | E-mail e senha. O Hub não envia e-mail (Q12). | RN-64, RN-65 |
 | Q4 | Algum grupo tem mais de um líder? | Não. | RN-12 |
 | Q5 | A escala mostra o instrumento de cada pessoa? | Sim. | RN-15 |
 | Q6 | O integrante vê só a própria escala ou todas? | Todas. | RN-36 |
@@ -285,6 +296,12 @@ Veja no Hub: app.iejb.com.br/...
 | Q9 | A ordem das músicas importa? | Sim. | RN-53 |
 | Q10 | Mudança no repertório avisa? | Sim. | RN-55 |
 | Q11 | Em troca combinada, o líder atualiza a escala no Hub? | Sim. | RN-70, RN-71 |
+| Q12 | Como a pessoa recebe acesso e recupera a senha sem e-mail? | O administrador cria a conta com senha temporária, ou a pessoa solicita com nome e senha e o administrador aprova. Senha esquecida: o administrador redefine. | RN-10, RN-65 |
+| Q13 | Quem edita o repertório de culto só com avulsos? | Líder de louvor e administrador. | RN-56 |
+| Q14 | "Afetados" no aviso, quem é? | Quem entrou, saiu ou continua escalado. | RN-41 |
+| Q15 | O líder de grupo mexe nos membros do próprio grupo? | "Os dois" (leitura a confirmar, Q18). | RN-16 |
+| Q16 | Uma pessoa pode ter mais de um instrumento? | Sim; na escala aparece o que o líder do grupo definir. | RN-15, RN-17 |
+| Q17 | Como o líder de louvor fica sabendo de uma troca? | Aviso simples e informal, sem regra. | RN-71 |
 
 ---
 
@@ -295,3 +312,4 @@ Veja no Hub: app.iejb.com.br/...
 | 0.1 | 13/11/2026 | Rascunho inicial das regras de negócio do piloto Louvor. |
 | 0.2 | 13/11/2026 | Q1 a Q3 respondidas: Kaique como administrador, solicitação de alteração com aprovação do líder de louvor, login com e-mail e senha. |
 | 0.3 | 13/11/2026 | Q4 a Q11 respondidas. Novas questões: Q12 (acesso sem e-mail) e Q13 (repertório em culto sem grupo). |
+| 0.4 | 13/11/2026 | Q12 a Q17 respondidas: acesso sem e-mail com aprovação do administrador, líder de grupo edita membros do próprio grupo, instrumento por vínculo, aviso só aos afetados. Nova questão Q18. |
