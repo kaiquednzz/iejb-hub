@@ -86,4 +86,11 @@ select public.definir_foto(:'p_gabi', null);
 select teste.ok(true, 'líder de louvor pode tirar a foto de alguém');
 reset role;
 
+
+
+-- Migração 12: quem não está logado não chama nenhuma função nova
+set role anon;
+select teste.deve_falhar($$select public.definir_foto(gen_random_uuid(), null)$$, 'deslogado não chama definir_foto');
+select teste.deve_falhar($$select public.definir_mesa(gen_random_uuid(), gen_random_uuid(), null)$$, 'deslogado não chama definir_mesa');
+reset role;
 \warn 'TESTES DE MONTAR ESCALA E FOTOS PASSARAM'

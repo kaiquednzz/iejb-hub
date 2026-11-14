@@ -5,8 +5,8 @@ Banco do piloto Louvor, construído a partir do [modelo de dados e permissões](
 | | |
 |---|---|
 | Projeto Supabase | `iejb-hub` (organização IEJB Hub), região São Paulo (`sa-east-1`), Postgres 17 |
-| Estado | 11 migrações aplicadas (10 e 11 em 14/11/2026), a função de servidor `admin-acesso` e o bucket `fotos`. |
-| Testes | 114 verificações, todas passando (`tests/local/rodar.sh`) |
+| Estado | 12 migrações aplicadas (10 a 12 em 14/11/2026), a função de servidor `admin-acesso` e o bucket `fotos`. |
+| Testes | 116 verificações, todas passando (`tests/local/rodar.sh`) |
 
 ## Estrutura
 
@@ -23,7 +23,8 @@ supabase/
 │   ├── ..._dados_iniciais.sql           # Louvor, G1 a G3, cultos da semana
 │   ├── ..._ajustes_do_verificador.sql   # correções apontadas pelo Supabase (ver abaixo)
 │   ├── ..._gestao_de_pessoas.sql        # cadastrar_pessoa, aprovar_pedido, definir_pessoa_ativa
-│   └── ..._montar_escala_e_fotos.sql    # grupos por culto, mesa de som, rótulo (Ceia), fotos
+│   ├── ..._montar_escala_e_fotos.sql    # grupos por culto, mesa de som, rótulo (Ceia), fotos
+│   └── ..._fechar_funcoes_novas.sql     # REVOKE de anon que faltou nas 10 e 11 (ver lição abaixo)
 ├── functions/admin-acesso/  # criar acesso e redefinir senha (precisa da chave de serviço)
 └── tests/local/
     ├── 00_simular_supabase.sql   # imita auth.users, auth.uid() e os papéis do Supabase
@@ -101,3 +102,7 @@ Criar um login e trocar a senha de outra pessoa exigem a chave de serviço (`ser
 A função confere quem chamou pelo token, exige conta ativa de administrador e faz as marcações no banco (`aprovar_conta`, `marcar_senha_temporaria`) **com o token de quem chamou**, então o banco confere de novo e a auditoria registra o admin certo. Publicada com `verify_jwt` desligado porque a própria função valida o token (o padrão novo de chaves do Supabase recomenda assim).
 
 Para publicar de novo depois de mudar: `supabase functions deploy admin-acesso --no-verify-jwt` (ou pelo MCP).
+
+## Lição aprendida 2: toda migração fecha as próprias funções
+
+O `alter default privileges` da migração 09 só vale para funções criadas pelo papel `postgres`. Pelo painel ou pelo MCP a migração pode rodar com outro papel, e aí a função nasce aberta a `PUBLIC` (inclusive a quem não está logado). O verificador pegou `definir_foto` depois da migração 11; a 12 fechou tudo. Regra: **toda migração termina com `revoke execute ... from public, anon` das funções que criou**, mesmo confiando no padrão.
