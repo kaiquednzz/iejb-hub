@@ -1,0 +1,90 @@
+# Banco de dados do IEJB Hub (Supabase)
+
+Banco do piloto Louvor, construído a partir do [modelo de dados e permissões](../docs/planejamento/MODELO-DE-DADOS-E-PERMISSOES-PILOTO-LOUVOR.md) (v0.3) e das [regras de negócio](../docs/planejamento/REGRAS-DE-NEGOCIO-PILOTO-LOUVOR.md) (v0.6). Os comentários dentro dos arquivos citam as regras (`RN-xx`, `Qxx`) de onde cada coisa veio.
+
+| | |
+|---|---|
+| Projeto Supabase | `iejb-hub` (organização IEJB Hub), região São Paulo (`sa-east-1`), Postgres 17 |
+| Estado | 9 migrações aplicadas em 13/11/2026. Banco vazio de pessoas, com Louvor, G1 a G3 e os três tipos de culto. |
+| Testes | 79 verificações, todas passando (`tests/local/rodar.sh`) |
+
+## Estrutura
+
+```
+supabase/
+├── migrations/          # aplicadas em ordem, nunca editadas depois de aplicadas
+│   ├── ..._pessoas_e_contas.sql         # pessoa, conta, ministério, quem-sou-eu, funções de admin
+│   ├── ..._grupos.sql                   # G1/G2/G3, membros, instrumento padrão por grupo
+│   ├── ..._cultos.sql                   # tipos de culto, cultos, gerar_cultos()
+│   ├── ..._escalas.sql                  # escala, itens, grupos usados, registro de alterações, solicitações
+│   ├── ..._repertorio.sql               # músicas, repertório ordenado, quem pode editar
+│   ├── ..._avisos.sql                   # avisos, central de notificações, aparelhos de push
+│   ├── ..._privilegios_e_agendamento.sql# GRANTs e o pg_cron que processa avisos
+│   ├── ..._dados_iniciais.sql           # Louvor, G1 a G3, cultos da semana
+│   └── ..._ajustes_do_verificador.sql   # correções apontadas pelo Supabase (ver abaixo)
+└── tests/local/
+    ├── 00_simular_supabase.sql   # imita auth.users, auth.uid() e os papéis do Supabase
+    ├── 01_ajudantes.sql          # teste.ok, teste.deve_falhar, teste.entrar
+    ├── 02_cenario_piloto.sql     # o cenário completo, do primeiro admin aos avisos
+    └── rodar.sh
+```
+
+## Guia de estudo
+
+Sugestão de ordem, do mais importante para o resto.
+
+1. **A trava central: `privado.minha_pessoa_id()`** (migração 01). Quase toda política começa por ela. Ela só devolve alguém quando a conta está ativa, sem senha temporária e com a pessoa ativa. Entendendo essa função, você entende por que uma conta pendente não vê nada.
+2. **As duas camadas: GRANT e RLS** (migração 07). O GRANT diz se o papel pode usar a tabela em geral; o RLS diz se pode usar *aquela linha*. As duas precisam deixar passar.
+3. **`security definer` x `security invoker`.** Funções "definer" rodam com o poder do dono e por isso conferem o papel por dentro (`aprovar_conta`). Funções "invoker" rodam com o poder de quem chamou e deixam o RLS decidir (`preencher_escala_com_grupo`, `gerar_cultos`). Repare que toda função definer tem `set search_path = ''` e escreve `public.tabela` por extenso: é o que impede alguém de enganar a função.
+4. **Escala é de pessoas** (migração 04): `escala_item` são as pessoas, `escala_grupo` são só os grupos usados como atalho. É `escala_grupo` que decide quem edita o repertório e pede alteração.
+5. **Avisos sem duplicar** (migrações 04 e 06): os gatilhos só *anotam* em `escala_alteracao`. Quem transforma isso em aviso é `processar_avisos_pendentes`, rodando a cada minuto, depois de 5 minutos de silêncio (RN-45). É assim que dá para avisar quem *saiu* da escala.
+6. **Truques de integridade** que valem estudar: a chave estrangeira composta `grupo_lider_e_membro` (o líder precisa estar no grupo) e a restrição `deferrable` do repertório (reordenar num único UPDATE).
+7. **O cenário de testes** (`02_cenario_piloto.sql`) lê como uma história: cada bloco é um papel tentando fazer algo. É o melhor jeito de ver as regras funcionando.
+
+## Como rodar os testes localmente
+
+Precisa de um Postgres (16 ou mais novo). Os testes criam um banco próprio do zero.
+
+```bash
+cd supabase/tests/local
+PGHOST=localhost PGPORT=5432 PGUSER=postgres ./rodar.sh
+```
+
+A saída termina com `TODOS OS TESTES PASSARAM`. Se uma regra quebrar, o teste para e mostra `FALHOU:` com o nome da regra.
+
+## Lição aprendida: o verificador do Supabase
+
+Depois de aplicar as 8 primeiras migrações, o verificador de segurança (*advisors*) mostrou que o Supabase dá `EXECUTE` em toda função nova direto ao papel `authenticated`. Os testes locais não pegaram porque o Postgres comum não faz isso. Resultado: `inicializar_primeiro_admin` ficou chamável por qualquer conta logada, e antes de existir admin uma conta pendente poderia se promover. O projeto estava vazio, então nada foi explorado.
+
+Correções:
+- Migração 09 tira o privilégio e faz as funções novas do `public` nascerem fechadas.
+- O simulador local agora imita os privilégios padrão do Supabase, e o cenário testa esse caso.
+
+**Regra daqui para frente:** depois de cada migração aplicada, rodar o verificador de segurança e o de desempenho. Os avisos restantes sobre as funções `aprovar_conta`, `decidir_solicitacao` etc. são intencionais: são ações do app e conferem o papel por dentro.
+
+## Configurações do painel que faltam
+
+Não dá para fazer por migração; precisam ser feitas no painel do Supabase antes do app ir ao ar.
+
+| Onde | O quê | Por quê |
+|---|---|---|
+| Authentication → Sign In / Providers → Email | Desligar **Confirm email** | O Hub não envia e-mail (D19). Seguro só porque a conta pendente não vê nada. |
+| Authentication → Rate Limits | Conferir limite de cadastros | Freia robôs na tela "pedir acesso" (DT-02). |
+| Authentication → URL Configuration | Site URL `https://app.iejb.com.br` | Quando o front existir. |
+
+## Primeiro administrador
+
+1. Crie sua conta pelo app (ou em Authentication → Users → Add user). Ela nasce pendente.
+2. No SQL Editor do Supabase, rode:
+   ```sql
+   select public.inicializar_primeiro_admin('seu@email', 'Kaique');
+   ```
+3. Só funciona uma vez. Depois disso, novos administradores são definidos por `definir_administrador`.
+
+## O que ainda falta fora do banco
+
+| Item | Onde | Regra |
+|---|---|---|
+| Criar conta com senha temporária e redefinir senha | Função de servidor (Edge Function) com a chave de serviço, chamando depois `aprovar_conta(..., true)` ou `marcar_senha_temporaria` com o token do admin | RN-10, RN-65 |
+| Enviar os pushes | Edge Function que lê `aviso_destinatario` sem `push_enviado_em`, envia para `dispositivo_push` e marca o envio | D25 |
+| Manter o projeto ativo e fazer backup | Tarefa agendada fora do Supabase (ex.: GitHub Actions) | DT-06, D21 |

@@ -4,7 +4,7 @@
 |---|---|
 | **Escopo** | MVP do IEJB Hub, restrito ao ministério de Louvor |
 | **Etapa** | 3. Planejamento do banco de dados e das permissões |
-| **Versão** | 0.3 (rascunho para revisão) |
+| **Versão** | 0.4 (implementado no Supabase) |
 | **Última atualização** | 13/11/2026 |
 | **Documento base** | [Regras de negócio do piloto Louvor](REGRAS-DE-NEGOCIO-PILOTO-LOUVOR.md), v0.5 |
 
@@ -378,6 +378,24 @@ Nenhuma no momento.
 
 ---
 
+## 9. Implementação
+
+O modelo foi implementado em 13/11/2026 no projeto Supabase `iejb-hub`, em [`supabase/migrations`](../../supabase/migrations), com 79 verificações automáticas em [`supabase/tests/local`](../../supabase/tests/local). Guia de estudo e pendências no [README do banco](../../supabase/README.md).
+
+Diferenças em relação ao texto acima, todas pequenas:
+
+| Onde | Diferença | Motivo |
+|---|---|---|
+| `escala_item.instrumento_exibido` | Lista de textos, não texto único | Uma pessoa pode ter mais de um instrumento no mesmo culto (Q19). |
+| `conta.nome_informado` | Campo novo | Guarda o nome digitado ao pedir acesso, para o administrador reconhecer quem é. |
+| `escala_alteracao` | Tipo novo `repertorio_alterado` e campo `processada_em` | O aviso de repertório (RN-55) usa a mesma fila da escala; `processada_em` tira da fila mesmo quando ninguém recebe. |
+| `dispositivo_push` | `endpoint`, `chave_p256dh`, `chave_auth` em vez de `assinatura` | São as três partes da inscrição de push. |
+| `musica` | Título e artista únicos, sem diferenciar maiúsculas | Evita a mesma música cadastrada duas vezes. |
+| `pessoa` | Líder de louvor de qualquer ministério edita qualquer pessoa | No piloto só existe o Louvor; revisar quando entrar o segundo ministério. |
+| Seção 5.3, caso 1 | Administrador não vê rascunho | A proposta foi mantida como estava. |
+
+---
+
 ## Histórico de alterações
 
 | Versão | Data | Descrição |
@@ -385,3 +403,4 @@ Nenhuma no momento.
 | 0.1 | 13/11/2026 | Primeiro rascunho: entidades, integridade, permissões por tabela, cálculo de avisos e questões Q19 a Q22. |
 | 0.2 | 13/11/2026 | Q19 a Q22 respondidas: instrumento padrão por grupo ajustável por culto, solicitação só nos cultos do próprio grupo, repertório após a escala, contato visível a todos os integrantes. |
 | 0.3 | 13/11/2026 | Atualiza a nota sobre banco e backend: Supabase decidido (D20). Sem mudança no modelo. |
+| 0.4 | 13/11/2026 | Modelo implementado no Supabase (9 migrações). Nova seção 9 com as diferenças da implementação. |
