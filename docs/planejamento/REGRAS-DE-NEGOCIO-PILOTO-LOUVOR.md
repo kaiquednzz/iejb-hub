@@ -97,8 +97,8 @@ Legenda: ✔️ pode · ✖️ não pode · ❓ a confirmar
 | Aprovar solicitações de acesso | ✔️ | ✖️ | ✖️ | ✖️ |
 | Criar cultos especiais | ✔️ | ✔️ | ✖️ | ✖️ |
 | Montar, editar e publicar escalas | ✖️ (RN-02) | ✔️ | ✖️ | ✖️ |
-| Solicitar alteração em uma escala | ✖️ | ✖️ | ✔️ (ver RN-37) | ✖️ |
-| Aprovar ou reprovar solicitações | ✖️ | ✔️ | ✖️ | ✖️ |
+| Ajustar pessoas e instrumentos de um culto publicado | ✖️ | ✔️ | ✔️ só nos cultos do próprio grupo (RN-37) | ✖️ |
+| Mesa de som, grupo do culto, cancelar | ✖️ | ✔️ | ✖️ (RN-38) | ✖️ |
 | Cadastrar músicas | ✔️ | ✔️ | ✔️ | ✖️ |
 | Montar o repertório de um culto | ✔️ | ✔️ | ✔️ (ver RN-50) | ✖️ |
 | Ver escalas e repertórios | ✔️ | ✔️ | ✔️ | ✔️ (ver RN-36) |
@@ -199,7 +199,7 @@ Isso permite ao líder montar o mês inteiro com calma e só avisar quando estiv
 
 **RN-70** ✅ Quando duas pessoas combinam uma troca pessoalmente, o **líder de louvor atualiza a escala no Hub** (Q11). Não existe fluxo próprio de substituição no piloto (decisão D16). A atualização gera o aviso normal (RN-40), então quem entrou e quem saiu são avisados pelo próprio Hub.
 
-**RN-71** 💡 Risco conhecido: se a troca não chegar ao líder de louvor, a escala mostra quem não vai tocar. Hoje o aviso ao líder é um **recado informal, sem regra** (Q17), e o Hub não muda isso no piloto. Só o líder de grupo consegue pedir alteração pelo Hub (RN-37). Permitir que qualquer integrante avise o líder pelo Hub fica como melhoria depois do piloto.
+**RN-71** 💡 Risco conhecido: se a troca não chegar ao líder de louvor, a escala mostra quem não vai tocar. Hoje o aviso ao líder é um **recado informal, sem regra** (Q17), e o Hub não muda isso no piloto. Desde a Q23 o líder de grupo ajusta a escala sozinho (RN-37), o que diminui esse risco nos cultos do grupo dele. Permitir que qualquer integrante avise o líder pelo Hub fica como melhoria depois do piloto.
 
 ---
 
