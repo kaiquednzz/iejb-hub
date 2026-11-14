@@ -71,7 +71,9 @@ export function folhaOuvir(musica) {
     const grade = h('div', { class: 'grade-streaming' });
     const nota = h('p', { class: 'folha-texto folha-texto-pequeno', role: 'status' }, 'Procurando a música nos apps…');
 
+    let ultimos = null;
     function desenhar(achados) {
+        ultimos = achados;
         grade.replaceChildren(...linksDeBusca(musica, achados).map((l) => {
             const marca = h('span', { class: 'streaming-marca', 'aria-hidden': 'true' });
             const logo = h('img', { src: `/marcas/${LOGOS[l.classe]}`, alt: '', width: 22, height: 22, class: 'streaming-logo' });
@@ -80,7 +82,7 @@ export function folhaOuvir(musica) {
             marca.append(logo);
             const link = h('a', { class: `botao-streaming streaming-${l.classe}${l.direto ? ' direto' : ''}`, href: l.url,
                 target: l.reserva ? null : '_blank', rel: 'noopener noreferrer' }, marca, l.nome);
-            if (l.reserva) link.addEventListener('click', (e) => abrirComReserva(e, l.reserva));
+            if (l.reserva) link.addEventListener('click', () => abrirComReserva(() => desenhar(ultimos)));
             return link;
         }));
     }

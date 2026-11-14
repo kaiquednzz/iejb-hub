@@ -21,15 +21,23 @@ export function termoDeBusca(musica) {
 // navegador, para quem não tem o app (ver abrirComReserva).
 const CELULAR = /iphone|ipad|ipod|android/i.test(navigator.userAgent);
 
+// Não dá para saber de antemão se o app do Spotify está instalado. Se o
+// endereço spotify: falha (o iPhone mostra "endereço inválido" e a página
+// continua na frente), o aparelho guarda isso e passa a abrir a busca no
+// navegador. Se um dia o app abrir (a página some), a marca é apagada.
+const SEM_SPOTIFY = 'iejb-sem-app-spotify';
+const lerMarca = () => { try { return localStorage.getItem(SEM_SPOTIFY) === '1'; } catch { return false; } };
+const marcar = (sem) => { try { sem ? localStorage.setItem(SEM_SPOTIFY, '1') : localStorage.removeItem(SEM_SPOTIFY); } catch { /* sem armazenamento: tenta o app de novo da próxima vez */ } };
+
 export function linksDeBusca(musica, achados = null) {
     const termo = encodeURIComponent(termoDeBusca(musica));
     const spotifyWeb = `https://open.spotify.com/search/${termo}`;
     return [
         achados?.spotify
             ? { nome: 'Spotify', classe: 'spotify', url: achados.spotify }
-            : CELULAR
+            : CELULAR && !lerMarca()
                 ? { nome: 'Spotify', classe: 'spotify', url: `spotify:search:${termo}`, reserva: spotifyWeb }
-                : { nome: 'Spotify', classe: 'spotify', url: spotifyWeb },
+                : { nome: CELULAR ? 'Spotify (navegador)' : 'Spotify', classe: 'spotify', url: spotifyWeb },
         { nome: 'YouTube Music', classe: 'ytmusic', url: achados?.ytmusic ?? `https://music.youtube.com/search?q=${termo}` },
         { nome: 'Apple Music', classe: 'apple', url: achados?.apple ?? `https://music.apple.com/br/search?term=${termo}` },
         { nome: 'YouTube', classe: 'youtube', url: achados?.youtube ?? `https://www.youtube.com/results?search_query=${termo}` },
@@ -37,12 +45,24 @@ export function linksDeBusca(musica, achados = null) {
 }
 
 // Endereço de app (spotify:): se em 1,5 s a página continua na frente, o app
-// não abriu (não instalado) e vai para a busca no navegador.
-export function abrirComReserva(evento, reserva) {
-    const timer = setTimeout(() => {
-        if (document.visibilityState === 'visible') window.open(reserva, '_blank', 'noopener');
+// não abriu. Abrir o navegador sozinho nessa hora o iPhone bloqueia (não veio
+// de um toque), então só guarda a marca e chama aoFalhar, que troca o botão
+// para a busca no navegador. Abriu o app em até 15 s: apaga a marca.
+export function abrirComReserva(aoFalhar) {
+    let abriu = false;
+    const aoSumir = () => {
+        if (document.visibilityState !== 'hidden') return;
+        abriu = true;
+        marcar(false);
+        document.removeEventListener('visibilitychange', aoSumir);
+    };
+    document.addEventListener('visibilitychange', aoSumir);
+    setTimeout(() => document.removeEventListener('visibilitychange', aoSumir), 15000);
+    setTimeout(() => {
+        if (abriu || document.visibilityState !== 'visible') return;
+        marcar(true);
+        aoFalhar?.();
     }, 1500);
-    document.addEventListener('visibilitychange', () => clearTimeout(timer), { once: true });
 }
 
 // Pede ao servidor os links diretos (uma vez por música e por sessão; o
