@@ -6,7 +6,7 @@
 | **Instituição** | IEJB, Igreja Evangélica do Jardim Brasil |
 | **Responsável pelo projeto e desenvolvimento** | Kaique |
 | **Status** | Em planejamento. Sem aprovação institucional definitiva e sem início de desenvolvimento. |
-| **Versão deste documento** | 1.1 (modelo de dados em andamento) |
+| **Versão deste documento** | 1.2 (decisões técnicas iniciais) |
 | **Última atualização** | 13/11/2026 |
 
 > Este documento registra a visão atual do IEJB Hub para que ela possa evoluir depois.
@@ -307,20 +307,20 @@ O WhatsApp continuará sendo útil como canal de comunicação. O Hub deverá fu
 
 | Camada | Opção considerada | Status |
 |---|---|---|
-| Front-end | HTML, CSS e JavaScript são possibilidades. React também está sendo considerado. | ❓ **Em aberto** |
-| Backend | Supabase | 💡 Proposto |
-| Banco de dados | PostgreSQL | 💡 Proposto |
-| Autenticação | Supabase Auth | 💡 Proposto |
-| Segurança | Políticas RLS (Row Level Security) | 💡 Proposto |
+| Front-end | Vite com JavaScript puro em módulos, sem framework na v1 (escolha delegada por Kaique, ver registro de decisões técnicas). | ✅ **Definido** |
+| Backend | Supabase | ✅ **Definido** |
+| Banco de dados | PostgreSQL | ✅ **Definido** |
+| Autenticação | Supabase Auth | ✅ **Definido** |
+| Segurança | Políticas RLS (Row Level Security) | ✅ **Definido** |
 | Hospedagem | Cloudflare Pages | 💡 Proposto |
 | Versionamento | GitHub | 💡 Proposto |
 | Domínio | Subdomínio `app.iejb.com.br` | 💡 Proposto |
 
-> ⚠️ Nenhuma tecnologia de front-end deve ser tratada como decisão definitiva.
+> As decisões técnicas e seus motivos estão no [registro de decisões técnicas](REGISTRO-DE-DECISOES-TECNICAS.md). Hospedagem, domínio e versionamento seguem como proposta.
 
 ### Custos de infraestrutura
 
-💡 **Proposto:** utilizar os planos gratuitos dos serviços, sem assumir custos adicionais de infraestrutura durante o planejamento e o desenvolvimento, respeitando os limites e condições de cada serviço.
+✅ **Definido** (Kaique, 13/11/2026): utilizar os planos gratuitos dos serviços, sem assumir custos adicionais de infraestrutura durante o planejamento e o desenvolvimento, respeitando os limites e condições de cada serviço. O plano gratuito do Supabase pausa o projeto por inatividade e não tem backup; as mitigações estão no registro de decisões técnicas (DT-06).
 
 ---
 
@@ -434,22 +434,22 @@ A mensalidade contemplaria: utilização, hospedagem, manutenção, correções,
 | D17 | No celular, o Hub só é usado instalado como PWA; no computador, funciona no navegador sem exigir instalação. |
 | D18 | Avisos de mudança do líder de louvor: notificação push como canal principal e mensagem pronta para o WhatsApp como reserva. |
 | D19 | O Hub não envia e-mail. A conta é criada pelo administrador (senha temporária) ou solicitada pela pessoa e aprovada pelo administrador; senha esquecida é redefinida pelo administrador. |
+| D20 | Backend e banco: Supabase (PostgreSQL, Supabase Auth, RLS). Motivos: não hospedar o backend por conta própria e custo zero. |
+| D21 | Planos gratuitos dos serviços no piloto, com atividade programada e backup próprio para reduzir os riscos do plano gratuito. |
+| D22 | Front-end: Vite com JavaScript puro em módulos, sem framework na v1 (escolha delegada por Kaique). |
 
 ### 💡 Proposto
 
 | # | Item |
 |---|---|
 | P1 | Endereço `app.iejb.com.br` para o Hub. |
-| P3 | Supabase (PostgreSQL, Supabase Auth, RLS) como backend. |
 | P4 | Hospedagem no Cloudflare Pages e versionamento no GitHub. |
-| P5 | Uso dos planos gratuitos dos serviços. |
 | P7 | Implantação gratuita, 2 meses de teste e mensalidade a definir. |
 
 ### ❓ Em aberto
 
 | # | Item |
 |---|---|
-| A1 | Tecnologia do front-end. |
 | A2 | Design final. |
 | A3 | Lista definitiva de módulos. |
 | A4 | Quais pessoas terão contas. |
@@ -461,6 +461,7 @@ A mensalidade contemplaria: utilização, hospedagem, manutenção, correções,
 | A10 | Aprovação institucional. |
 | A11 | Cronograma de desenvolvimento. |
 | A12 | Confirmação das regras do piloto Louvor com o líder de louvor (documento de regras de negócio). |
+| A13 | Aprovação das recomendações DT-02, DT-04 e DT-05 do registro de decisões técnicas. |
 
 ---
 
@@ -658,3 +659,4 @@ Precisam ser respondidas, de preferência com o líder de louvor, antes de defin
 | 0.9 | 13/11/2026 | Quinta rodada: acesso sem e-mail com aprovação do administrador (D19), repertório em culto só com avulsos, afetados, membros do grupo e instrumento por vínculo. |
 | 1.0 | 13/11/2026 | Q15 e Q16 confirmadas. Regras do piloto Louvor sem questões em aberto, a confirmar com o líder de louvor. |
 | 1.1 | 13/11/2026 | Sexta rodada (Q19 a Q22), vinda do modelo de dados da etapa 3. |
+| 1.2 | 13/11/2026 | Decisões técnicas: Supabase, planos gratuitos e front-end com Vite e JavaScript puro (D20 a D22). Registro de decisões técnicas criado. |

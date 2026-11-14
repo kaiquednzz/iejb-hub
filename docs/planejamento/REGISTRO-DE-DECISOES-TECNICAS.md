@@ -4,11 +4,11 @@
 |---|---|
 | **Escopo** | Escolhas de tecnologia do piloto Louvor |
 | **Etapa** | Entre a 3 (modelo de dados) e a 4 (desenvolvimento do MVP) |
-| **Versão** | 0.1 (rascunho para revisão) |
+| **Versão** | 0.2 (rascunho para revisão) |
 | **Última atualização** | 13/11/2026 |
 | **Documentos base** | [Visão geral](VISAO-GERAL-IEJB-HUB.md), [Regras de negócio](REGRAS-DE-NEGOCIO-PILOTO-LOUVOR.md), [Modelo de dados e permissões](MODELO-DE-DADOS-E-PERMISSOES-PILOTO-LOUVOR.md) |
 
-> **Nada neste documento está decidido.** Cada ponto traz as opções, o que eu recomendo e por quê, e quem decide é Kaique. A visão geral (seção 6) trata toda a stack como proposta (P3, P4, A1), e este registro continua nesse espírito.
+> Cada ponto traz as opções, o que eu recomendo e por quê, e quem decide é Kaique. Em 13/11/2026 Kaique decidiu o backend (DT-01), o plano gratuito (DT-06) e o front-end, este último por delegação (DT-03). Os outros pontos seguem como recomendação até ele aprovar.
 >
 > Os limites dos serviços vêm de pesquisa feita em **13/11/2026** (fontes no fim). Planos gratuitos mudam: confirme nos sites oficiais antes de depender de um número.
 
@@ -18,7 +18,7 @@
 
 | Marcador | Significado |
 |---|---|
-| ✅ **Decidido** | Kaique escolheu. Nenhum item chegou a este estado ainda. |
+| ✅ **Decidido** | Kaique escolheu, ou delegou a escolha. |
 | 💡 **Recomendação** | Minha sugestão com justificativa. Pode ser trocada. |
 | ❓ **Em aberto** | Precisa de resposta de Kaique. Listado na [seção 8](#8-questões-em-aberto). |
 | ⚠️ **Risco** | Algo que pode dar errado e precisa de mitigação. |
@@ -29,12 +29,12 @@
 
 | # | Decisão | Recomendação | Status |
 |---|---|---|---|
-| DT-01 | Backend e banco | Supabase (PostgreSQL com RLS) | 💡 |
+| DT-01 | Backend e banco | Supabase (PostgreSQL com RLS) | ✅ |
 | DT-02 | Contas e login | Supabase Auth, sem e-mail, com cadastro por solicitação | 💡 |
-| DT-03 | Front-end | Vite com JavaScript puro em módulos, sem framework na v1 | 💡 (confiança baixa) |
+| DT-03 | Front-end | Vite com JavaScript puro em módulos, sem framework na v1 | ✅ (por delegação) |
 | DT-04 | Hospedagem e domínio | Cloudflare Pages em `app.iejb.com.br` | 💡 |
 | DT-05 | Notificações push | Service worker próprio, VAPID e função de servidor | 💡 |
-| DT-06 | Pausa e backup do plano gratuito | Aceitar o plano gratuito no piloto, com backup próprio | 💡 ⚠️ |
+| DT-06 | Plano gratuito, pausa e backup | Plano gratuito no piloto, com atividade programada e backup próprio | ✅ plano, 💡 mitigações ⚠️ |
 
 ---
 
@@ -50,6 +50,8 @@
 | **B. Flask + PostgreSQL** (o que Kaique já estuda) | Reaproveita Python, Flask e PostgreSQL. Controle total. | Você passa a construir e manter login, sessões, envio de push e as regras de permissão por conta própria. Hospedar Flask de graça costuma trazer limitações (desligar por inatividade, banco à parte). Mais código, mais superfície de segurança, para um piloto de 13 pessoas. |
 
 **💡 Recomendação: A (Supabase).** O ponto decisivo é a segurança: com RLS, a regra "integrante não vê rascunho" mora no banco e vale para qualquer cliente. Em Flask, cada rota precisa lembrar de conferir isso. Por outro lado, a opção B ensinaria mais sobre backend, e isso pesa para o seu objetivo de aprender. Se o aprendizado de backend for o foco, vale discutir.
+
+**✅ Decisão de Kaique (13/11/2026): Supabase.** Motivos dele: não quer hospedar o backend por conta própria e quer custo zero.
 
 **Riscos.** Veja DT-06. Além disso, RLS errada falha em silêncio (dados vazios ou vazando). O plano é **testar cada política com cada papel** antes de usar com pessoas reais.
 
@@ -93,7 +95,9 @@
 | **B. Vite + JS puro em módulos** | Mantém o JavaScript que você já está aprendendo, mas ganha módulos, variáveis de ambiente e o build que a PWA precisa. Não exige aprender um framework junto com RLS e push. | Ainda é você quem organiza telas e estado. Exige disciplina de estrutura. |
 | **C. React (ou outro framework) + Vite** | Componentes, ecossistema grande, muito pedido no mercado e bom para portfólio. | Três coisas difíceis ao mesmo tempo: framework, RLS e push. Risco de o projeto emperrar no aprendizado do framework. |
 
-**💡 Recomendação: B, com confiança baixa.** Pelo seu perfil (HTML e CSS fortes, JavaScript em evolução) e pela sua preferência de não adicionar biblioteca sem motivo concreto. A camada que conversa com o banco fica separada das telas, e isso deixa a migração para React viável depois, se o código ficar pesado. **Mas é a decisão mais pessoal do documento:** se o seu objetivo de portfólio for React, a opção C é legítima, e a decisão é sua (Q24).
+**💡 Recomendação: B, com confiança baixa.** Pelo seu perfil (HTML e CSS fortes, JavaScript em evolução) e pela sua preferência de não adicionar biblioteca sem motivo concreto. A camada que conversa com o banco fica separada das telas, e isso deixa a migração para React viável depois, se o código ficar pesado. 
+
+**✅ Decisão (Kaique delegou a escolha a Claude, 13/11/2026): B, Vite com JavaScript puro em módulos, sem framework na v1.** Valem os motivos acima. Duas condições para não virar bagunça: (1) tudo que fala com o Supabase fica em uma camada separada das telas; (2) ao terminar a primeira funcionalidade completa (por exemplo, ver a escala), avalia-se se a camada de telas está repetindo código demais. Se estiver, migra-se para um framework **antes** de construir as outras telas, não depois. React continua possível nessa migração.
 
 ---
 
@@ -105,7 +109,7 @@
 |---|---|
 | Cloudflare Pages, plano gratuito | Limites atuais: 500 builds por mês, 1 build por vez, banda e requisições estáticas ilimitadas. Funções do Pages entram na cota de requisições do Workers, o que o app não deve usar. |
 | GitHub Pages (usado no site institucional) | 💡 Provável que **não sirva** para repositório privado no plano gratuito do GitHub (confirmar). É um dos motivos para preferir o Cloudflare. |
-| Subdomínio | O site `iejb.com.br` já tem domínio próprio. Para `app.iejb.com.br`, basta um registro de DNS apontando para o Cloudflare, **mas é preciso ter acesso ao DNS** (Q23). Se o DNS for gerido em outro lugar, 💡 isso provavelmente funciona sem migrar o domínio inteiro (confirmar na etapa 4). |
+| Subdomínio | Para `app.iejb.com.br`, basta um registro de DNS apontando para o Cloudflare. ✅ Kaique tem acesso ao DNS e faria a configuração (Q23). 💡 Provavelmente funciona sem migrar o domínio inteiro para o Cloudflare (confirmar na etapa 4). |
 
 **💡 Recomendação:** Cloudflare Pages com deploy automático a cada push na `main`. O limite de 500 builds por mês é folgado para um projeto desse tamanho.
 
@@ -148,7 +152,9 @@ Este é o ponto de maior risco operacional do projeto.
 
 **Por que importa aqui.** O Louvor usa o Hub toda semana, então a pausa tende a não acontecer. Mas uma semana sem culto (férias, recesso de fim de ano) pode zerar a atividade, e uma escala indisponível num domingo seria justamente o oposto da diretriz do projeto: "não criar mais uma obrigação". Além disso, os dados **pertencem à igreja** (D8). Perder tudo por falta de backup seria sério.
 
-**💡 Recomendação para o piloto**
+**✅ Decisão de Kaique:** plano gratuito. 💡 Para isso ser seguro, os itens 1 e 2 abaixo precisam entrar na etapa 4.
+
+**💡 Mitigações propostas**
 
 1. Ficar no plano gratuito, mas com **atividade programada** que mantenha o projeto ativo (por exemplo, uma tarefa agendada no GitHub fazendo uma consulta simples). Fontes divergem sobre se isso basta, então vale confirmar no painel de quem usa.
 2. **Backup próprio**: exportação periódica do banco para um lugar seguro, atendendo também a exportação prometida na D8.
@@ -160,12 +166,16 @@ Este é o ponto de maior risco operacional do projeto.
 
 ## 8. Questões em aberto
 
-| # | Questão | Proposta |
+Nenhuma pergunta aberta. Falta só o OK de Kaique nas recomendações que continuam em 💡: **DT-02** (login e cadastro), **DT-04** (Cloudflare Pages) e **DT-05** (push).
+
+### Respondidas
+
+| # | Questão | Resposta |
 |---|---|---|
-| Q23 | Quem controla o DNS de `iejb.com.br` (você, outra pessoa ou a liderança da igreja)? Sem acesso, o `app.iejb.com.br` não sai. | Descobrir antes de começar a etapa 4. |
-| Q24 | Front-end: JS puro com Vite (recomendado) ou React? | Vite com JS puro, pelo seu estágio atual de aprendizado. |
-| Q25 | Plano gratuito com atividade programada e backup próprio, ou Pro desde o início? | Gratuito com mitigação no piloto. |
-| Q26 | Backend: Supabase (recomendado) ou Flask + PostgreSQL, para treinar backend? | Supabase pelo RLS. |
+| Q23 | Quem controla o DNS de `iejb.com.br`? | Kaique tem acesso e faria a configuração. |
+| Q24 | Front-end: JS puro com Vite ou React? | Kaique deixou a escolha com Claude: Vite com JS puro (DT-03). |
+| Q25 | Plano gratuito ou Pro? | Gratuito. |
+| Q26 | Supabase ou Flask + PostgreSQL? | Supabase, porque não quer hospedar o backend e quer custo zero. |
 
 ### A confirmar na etapa 4
 
@@ -174,7 +184,7 @@ Este é o ponto de maior risco operacional do projeto.
 | Verificação anti-robô no cadastro do Supabase | Reforçaria a DT-02. |
 | Recurso de agendamento do banco e da função de servidor | Necessário para a janela de avisos (DT-05). |
 | GitHub Pages com repositório privado | Confirmaria por que o Cloudflare é necessário. |
-| Subdomínio no Cloudflare Pages sem migrar o DNS | Depende de Q23. |
+| Subdomínio no Cloudflare Pages sem migrar o DNS | Kaique tem acesso ao DNS; falta confirmar o procedimento. |
 
 ---
 
@@ -196,3 +206,4 @@ Consultadas em 13/11/2026.
 | Versão | Data | Descrição |
 |---|---|---|
 | 0.1 | 13/11/2026 | Primeiro rascunho: DT-01 a DT-06, riscos do plano gratuito e questões Q23 a Q26. |
+| 0.2 | 13/11/2026 | Q23 a Q26 respondidas: Supabase, plano gratuito, front-end com Vite e JS puro (por delegação) e acesso ao DNS. |

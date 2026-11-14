@@ -4,13 +4,13 @@
 |---|---|
 | **Escopo** | MVP do IEJB Hub, restrito ao ministério de Louvor |
 | **Etapa** | 3. Planejamento do banco de dados e das permissões |
-| **Versão** | 0.2 (rascunho para revisão) |
+| **Versão** | 0.3 (rascunho para revisão) |
 | **Última atualização** | 13/11/2026 |
 | **Documento base** | [Regras de negócio do piloto Louvor](REGRAS-DE-NEGOCIO-PILOTO-LOUVOR.md), v0.5 |
 
 > Este documento descreve **quais dados existem, como se relacionam e quem pode fazer o quê com eles**. Ele não contém SQL, telas nem código: isso é da etapa 4. Os nomes são conceituais e podem mudar na implementação.
 >
-> Banco e backend (PostgreSQL, Supabase, RLS) ainda são **propostas** (P3), não decisões. O modelo foi pensado para funcionar em qualquer banco relacional.
+> Banco e backend (PostgreSQL, Supabase, RLS) foram decididos em 13/11/2026 (D20), com os motivos no [registro de decisões técnicas](REGISTRO-DE-DECISOES-TECNICAS.md). O modelo continua escrito de forma conceitual, sem SQL.
 
 ---
 
@@ -384,3 +384,4 @@ Nenhuma no momento.
 |---|---|---|
 | 0.1 | 13/11/2026 | Primeiro rascunho: entidades, integridade, permissões por tabela, cálculo de avisos e questões Q19 a Q22. |
 | 0.2 | 13/11/2026 | Q19 a Q22 respondidas: instrumento padrão por grupo ajustável por culto, solicitação só nos cultos do próprio grupo, repertório após a escala, contato visível a todos os integrantes. |
+| 0.3 | 13/11/2026 | Atualiza a nota sobre banco e backend: Supabase decidido (D20). Sem mudança no modelo. |
