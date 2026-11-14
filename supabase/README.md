@@ -5,8 +5,8 @@ Banco do piloto Louvor, construído a partir do [modelo de dados e permissões](
 | | |
 |---|---|
 | Projeto Supabase | `iejb-hub` (organização IEJB Hub), região São Paulo (`sa-east-1`), Postgres 17 |
-| Estado | 9 migrações aplicadas em 13/11/2026. Banco vazio de pessoas, com Louvor, G1 a G3 e os três tipos de culto. |
-| Testes | 79 verificações, todas passando (`tests/local/rodar.sh`) |
+| Estado | 10 migrações aplicadas (a 10 em 14/11/2026) e a função de servidor `admin-acesso`. |
+| Testes | 93 verificações, todas passando (`tests/local/rodar.sh`) |
 
 ## Estrutura
 
@@ -21,11 +21,14 @@ supabase/
 │   ├── ..._avisos.sql                   # avisos, central de notificações, aparelhos de push
 │   ├── ..._privilegios_e_agendamento.sql# GRANTs e o pg_cron que processa avisos
 │   ├── ..._dados_iniciais.sql           # Louvor, G1 a G3, cultos da semana
-│   └── ..._ajustes_do_verificador.sql   # correções apontadas pelo Supabase (ver abaixo)
+│   ├── ..._ajustes_do_verificador.sql   # correções apontadas pelo Supabase (ver abaixo)
+│   └── ..._gestao_de_pessoas.sql        # cadastrar_pessoa, aprovar_pedido, definir_pessoa_ativa
+├── functions/admin-acesso/  # criar acesso e redefinir senha (precisa da chave de serviço)
 └── tests/local/
     ├── 00_simular_supabase.sql   # imita auth.users, auth.uid() e os papéis do Supabase
     ├── 01_ajudantes.sql          # teste.ok, teste.deve_falhar, teste.entrar
     ├── 02_cenario_piloto.sql     # o cenário completo, do primeiro admin aos avisos
+    ├── 03_gestao_de_pessoas.sql  # as funções da migração 10
     └── rodar.sh
 ```
 
@@ -88,3 +91,11 @@ Não dá para fazer por migração; precisam ser feitas no painel do Supabase an
 | Criar conta com senha temporária e redefinir senha | Função de servidor (Edge Function) com a chave de serviço, chamando depois `aprovar_conta(..., true)` ou `marcar_senha_temporaria` com o token do admin | RN-10, RN-65 |
 | Enviar os pushes | Edge Function que lê `aviso_destinatario` sem `push_enviado_em`, envia para `dispositivo_push` e marca o envio | D25 |
 | Manter o projeto ativo e fazer backup | Tarefa agendada fora do Supabase (ex.: GitHub Actions) | DT-06, D21 |
+
+## Função de servidor `admin-acesso`
+
+Criar um login e trocar a senha de outra pessoa exigem a chave de serviço (`service_role`), que ignora o RLS e por isso nunca pode ir para o app. Ela só existe dentro da função, no servidor do Supabase.
+
+A função confere quem chamou pelo token, exige conta ativa de administrador e faz as marcações no banco (`aprovar_conta`, `marcar_senha_temporaria`) **com o token de quem chamou**, então o banco confere de novo e a auditoria registra o admin certo. Publicada com `verify_jwt` desligado porque a própria função valida o token (o padrão novo de chaves do Supabase recomenda assim).
+
+Para publicar de novo depois de mudar: `supabase functions deploy admin-acesso --no-verify-jwt` (ou pelo MCP).
