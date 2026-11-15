@@ -16,7 +16,7 @@ import { abrirFolha, confirmar, avisar } from '../util/folha.js';
 import { mensagemDoBanco } from '../util/erros.js';
 import { hojeEmBrasilia, formatarHorario, rotuloDoDia } from '../util/datas.js';
 import { reduzirImagem } from '../util/foto.js';
-import { cabecalhoApp, barraAbas, campo, caixaDeAviso } from './moldura.js';
+import { cabecalhoApp, campo, caixaDeAviso } from './moldura.js';
 import { interruptor } from './equipe/pecas.js';
 
 const SITE = 'https://iejb.com.br';
@@ -31,14 +31,13 @@ export function telaEventos(conta) {
     novo.addEventListener('click', () => abrirEvento(null, carregar));
 
     const tela = h('div', { class: 'tela tela-app tela-eventos' },
-        cabecalhoApp(conta),
+        cabecalhoApp(conta, { modulo: 'Eventos do site' }),
         h('main', { id: 'conteudo', class: 'app-conteudo' },
             h('h1', { tabindex: -1, class: 'titulo-tela' }, 'Eventos do site'),
             h('p', { class: 'subtitulo-tela' }, 'O que estiver publicado aqui aparece na agenda de iejb.com.br em até 15 minutos.'),
             novo,
             area,
         ),
-        barraAbas(conta, '#/eventos'),
     );
 
     carregar();

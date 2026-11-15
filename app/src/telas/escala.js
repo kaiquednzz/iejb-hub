@@ -37,7 +37,7 @@ export function telaEscala(conta) {
     const titulo = h('h1', { tabindex: -1, class: 'titulo-tela' }, `Oi, ${nomeCurto(conta.pessoa, 'tudo bem')}!`);
 
     const tela = h('div', { class: 'tela tela-app' },
-        cabecalhoApp(conta),
+        cabecalhoApp(conta, { modulo: 'Louvor' }),
         h('main', { id: 'conteudo', class: 'app-conteudo' },
             titulo,
             h('p', { class: 'subtitulo-tela' }, 'Aqui estão os próximos cultos do Louvor.'),

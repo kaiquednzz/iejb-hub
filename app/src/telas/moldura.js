@@ -25,18 +25,25 @@ export function molduraEntrada({ titulo, subtitulo, conteudo, rodape }) {
 }
 
 // Cabeçalho de vidro das telas de dentro do app
-export function cabecalhoApp(conta) {
+// Dentro de um módulo (opcoes.modulo = 'Louvor', 'Eventos do site'...), a
+// marca dá lugar a "‹ Início" + o nome do módulo: a pessoa sempre sabe onde
+// está e como voltar. No Início, aparece a marca do Hub.
+export function cabecalhoApp(conta, opcoes = {}) {
     const botaoSair = h('button', {
         type: 'button', class: 'botao-icone', 'aria-label': 'Sair da conta',
         // Primeiro desliga o push deste aparelho (ainda logado, o banco deixa apagar)
         onclick: async () => { await removerAparelho(); supabase.auth.signOut(); },
     }, icone('sair'));
 
-    return h('header', { class: 'cabecalho' },
-        h('div', { class: 'cabecalho-marca' },
+    const marca = opcoes.modulo
+        ? h('div', { class: 'cabecalho-marca cabecalho-modulo' },
+            h('a', { class: 'botao-voltar', href: '#/inicio', 'aria-label': 'Voltar ao Início' }, icone('seta', 'icone icone-p seta-esquerda'), h('span', null, 'Início')),
+            h('span', { class: 'cabecalho-titulo-modulo' }, opcoes.modulo))
+        : h('div', { class: 'cabecalho-marca' },
             h('img', { src: '/logo-iejb-pequeno.png', alt: '', width: 32, height: 32 }),
-            h('span', { class: 'cabecalho-nome' }, 'IEJB ', h('span', null, 'Hub')),
-        ),
+            h('span', { class: 'cabecalho-nome' }, 'IEJB ', h('span', null, 'Hub')));
+    return h('header', { class: 'cabecalho' },
+        marca,
         h('div', { class: 'cabecalho-acoes' },
             conta.e_administrador && h('span', { class: 'selo' }, 'Admin'),
             botaoSair,
@@ -44,9 +51,9 @@ export function cabecalhoApp(conta) {
     );
 }
 
-// Barra de abas fixa embaixo (Escala | Montar | Eventos | Equipe), como num app do iPhone.
-// "Montar" só aparece para o líder de louvor (quem monta a escala, RN-02) e
-// "Eventos" (do site, D34) só para o administrador.
+// Abas do módulo Louvor, fixas embaixo (Escala | Montar | Repertórios | Equipe),
+// como num app do iPhone. "Montar" só aparece para o líder de louvor (RN-02).
+// Os outros módulos (Eventos...) abrem pelo Início e não têm abas.
 // O número vermelho em "Equipe" mostra pedidos de acesso esperando o admin.
 export function barraAbas(conta, atual) {
     const aba = (rota, nome, nomeIcone) => h('a', {
@@ -59,7 +66,7 @@ export function barraAbas(conta, atual) {
     const barra = h('nav', { class: 'barra-abas', 'aria-label': 'Seções' },
         aba('#/escala', 'Escala', 'calendario'),
         montar,
-        conta.e_administrador ? aba('#/eventos', 'Eventos', 'megafone') : null,
+        aba('#/repertorios', 'Repertórios', 'musica'),
         equipe,
     );
 

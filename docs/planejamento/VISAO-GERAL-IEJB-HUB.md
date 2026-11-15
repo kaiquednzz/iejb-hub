@@ -6,7 +6,7 @@
 | **Instituição** | IEJB, Igreja Evangélica do Jardim Brasil |
 | **Responsável pelo projeto e desenvolvimento** | Kaique |
 | **Status** | Em desenvolvimento (etapa 4): banco, login, escala, PWA gestão de pessoas e acessos, montagem da escala, repertório com botões de streaming, fotos de perfil, avisos por push e ajuste da escala pelo líder de grupo prontos (todas as regras do piloto têm tela); app publicado em `app.iejb.com.br`. Sem aprovação institucional definitiva. |
-| **Versão deste documento** | 2.6 (cifras revogadas; revisão de interface) |
+| **Versão deste documento** | 2.7 (Início com módulos; histórico de repertórios) |
 | **Última atualização** | 13/11/2026 |
 
 > Este documento registra a visão atual do IEJB Hub para que ela possa evoluir depois.
@@ -448,6 +448,8 @@ A mensalidade contemplaria: utilização, hospedagem, manutenção, correções,
 | D35 | **"Não vou poder ir".** Com a escala publicada e até o culto começar, o próprio integrante marca que não vai. Ele continua na escala, riscado ("Não vai"), e o líder do grupo do culto e o(s) líder(es) de louvor recebem aviso na hora; dá para voltar atrás, com novo aviso. Não é o fluxo de substituição (D16 continua): quem troca é o líder. Precisa ser confirmado com o líder de louvor (A12). |
 | D36 | **Repertório só de quem é do culto.** Veem o repertório de um culto: os escalados, os integrantes dos grupos do culto, o líder do grupo, o líder de louvor e o administrador (regra no banco). Revê a Q6 só para o repertório: a escala continua visível para todos. |
 | D37 | **Links que abrem a música** (ajusta a D26). No iPhone, os links de busca abrem o Spotify e o Apple Music sem a busca. Apple Music: uma função de servidor (`links-da-musica`) acha a faixa no catálogo público do iTunes (prefere título igual e a mesma versão, estúdio ou ao vivo) e guarda na música; o botão abre a faixa. Spotify: no celular usa o endereço do próprio app (`spotify:search:`), que abre já buscando, e cai na busca do navegador se o app não abrir. O song.link, que traduziria a faixa para o Spotify, fechou a API pública em 14/11/2026. Ícones oficiais dos quatro serviços em `public/marcas`. |
+| D39 | **Histórico de repertórios.** Depois que o culto começa, o repertório dele é de todo o ministério (antes, só de quem é do culto, D36). Tela "Repertórios" no Louvor: por mês, busca por música ("tocada 3 vezes · última em ..."), filtro por grupo. Culto cancelado não entra. |
+| D40 | **Início e módulos.** O app abre no Início: saudação, próximo compromisso, pedidos de acesso (admin) e a grade de módulos. Cada módulo declara quem vê e para onde vai; Pregações, Kids e Financeiro aparecem como "Em breve" (decisão de Kaique: mostrar para onde o Hub vai). Dentro do Louvor ficam as abas Escala, Montar, Repertórios e Equipe; Eventos do site é módulo próprio do admin. O cabeçalho dos módulos tem "‹ Início". |
 | D38 | ~~Cifras integradas~~ **Revogada em 15/11/2026.** Foi feita (colar do Cifra Club, ChordPro, transpor para o tom do culto, offline), mas o Cifra Club não tem API e bloqueia leitura automática por servidor (403, testado), e colar a cifra pelo celular ficou trabalhoso para líderes leigos. Pela diretriz principal, saiu. O código está no git (commit bb2f9d6). |
 | D34 | **Eventos do site pelo Hub.** O administrador cadastra, edita, apaga e publica os eventos de `iejb.com.br` na aba Eventos do Hub (com prévia do cartão do site). Um GitHub Action do repositório do site lê a cada 15 minutos os eventos publicados por uma função pública só de leitura (`eventos_do_site`) e reescreve o bloco de eventos do `index.html` no mesmo HTML de antes, fazendo commit só quando algo mudou. Motivos: o site continua estático (o Google lê sem JS) e independente do Hub (D3); o site não guarda nenhuma chave secreta. Evento que passou sai sozinho. Por enquanto só o administrador publica. Risco aceito: atraso de até ~15 min (o GitHub às vezes atrasa mais). |
 | D32 | (Q23) O líder de grupo ajusta sozinho pessoas e instrumentos nos cultos publicados do grupo dele; o líder de louvor é avisado de cada ajuste, com o nome de quem mudou. Mesa, grupo do culto, cancelar e publicar seguem com o líder de louvor. O pedido de alteração (RN-37 a 39 antigas) saiu do app. **Inverte a Q2 e a RN-44; precisa ser confirmado com o líder de louvor (A12).** |
@@ -674,6 +676,7 @@ Precisam ser respondidas, de preferência com o líder de louvor, antes de defin
 | 1.1 | 13/11/2026 | Sexta rodada (Q19 a Q22), vinda do modelo de dados da etapa 3. |
 | 1.2 | 13/11/2026 | Decisões técnicas: Supabase, planos gratuitos e front-end com Vite e JavaScript puro (D20 a D22). Registro de decisões técnicas criado. |
 | 1.3 | 13/11/2026 | Aprovadas as recomendações de login, hospedagem e push (D23 a D25). Stack do piloto fechada. |
+| 2.7 | 15/11/2026 | Início com módulos (D40) e histórico de repertórios (D39). |
 | 2.6 | 15/11/2026 | Cifras revogadas (D38): sem fonte automática viável. |
 | 2.5 | 15/11/2026 | Cifras integradas em ChordPro (D38). |
 | 2.4 | 14/11/2026 | Não vou poder ir (D35), repertório só de quem é do culto (D36), links diretos nos streamings (D37), recorte da foto de perfil. |

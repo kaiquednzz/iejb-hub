@@ -5,7 +5,9 @@
 // Não há "roteador" de verdade: o app tem poucas telas e o estado da conta
 // manda mais do que a URL. O hash só escolhe entre telas do mesmo "andar":
 //   deslogado: #/pedir-acesso ou a tela de entrar
-//   conta pronta: #/equipe, #/montar, #/eventos ou a escala (barra de abas embaixo)
+//   conta pronta: #/inicio (porta de entrada, D40) e os módulos:
+//     Louvor: #/escala, #/montar, #/repertorios, #/equipe (abas embaixo)
+//     Eventos do site: #/eventos (admin)
 import './estilo/tokens.css';
 import './estilo/base.css';
 import './estilo/componentes.css';
@@ -13,6 +15,7 @@ import './estilo/telas.css';
 import './estilo/equipe.css';
 import './estilo/montar.css';
 import './estilo/eventos.css';
+import './estilo/inicio.css';
 
 import { supabase } from './supabase.js';
 import { carregarConta } from './sessao.js';
@@ -24,6 +27,8 @@ import { telaEscala } from './telas/escala.js';
 import { telaEquipe } from './telas/equipe/index.js';
 import { telaMontar } from './telas/montar/index.js';
 import { telaEventos } from './telas/eventos.js';
+import { telaInicio } from './telas/inicio.js';
+import { telaRepertorios } from './telas/repertorios.js';
 import { eLiderDeLouvor } from './sessao.js';
 import { sincronizarPush } from './util/push.js';
 import { limparRetornoDoGoogle } from './util/google.js';
@@ -40,11 +45,14 @@ let contaPronta = null;  // conta ativa e sem senha temporária: pode navegar pe
 // Montar escala é só do líder de louvor e Eventos (do site) só do admin;
 // para os outros cai na escala
 const ROTAS_DA_CONTA = {
+    '#/inicio': telaInicio,
+    '#/escala': telaEscala,
+    '#/repertorios': telaRepertorios,
     '#/equipe': telaEquipe,
     '#/montar': (conta) => (eLiderDeLouvor(conta) ? telaMontar(conta) : telaEscala(conta)),
     '#/eventos': (conta) => (conta.e_administrador ? telaEventos(conta) : telaEscala(conta)),
 };
-const telaDaConta = (conta) => (ROTAS_DA_CONTA[location.hash] ?? telaEscala)(conta);
+const telaDaConta = (conta) => (ROTAS_DA_CONTA[location.hash] ?? telaInicio)(conta);
 
 async function decidirTela() {
     const minhaRodada = ++rodada;

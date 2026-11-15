@@ -21,7 +21,7 @@ export function telaEquipe(conta) {
     let atual = sessionStorage.getItem(LEMBRAR);
 
     const tela = h('div', { class: 'tela tela-app' },
-        cabecalhoApp(conta),
+        cabecalhoApp(conta, { modulo: 'Louvor' }),
         h('main', { id: 'conteudo', class: 'app-conteudo' },
             h('h1', { tabindex: -1, class: 'titulo-tela' }, 'Equipe'),
             h('p', { class: 'subtitulo-tela' }, 'Quem faz parte do Louvor e em que grupo toca.'),

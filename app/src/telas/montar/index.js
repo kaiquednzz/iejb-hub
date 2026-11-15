@@ -35,7 +35,7 @@ export function telaMontar(conta) {
     const barraAcoes = h('div', { class: 'montar-acoes' });
 
     const tela = h('div', { class: 'tela tela-app tela-montar' },
-        cabecalhoApp(conta),
+        cabecalhoApp(conta, { modulo: 'Louvor' }),
         h('main', { id: 'conteudo', class: 'app-conteudo' },
             h('h1', { tabindex: -1, class: 'titulo-tela' }, 'Montar escala'),
             h('p', { class: 'subtitulo-tela' }, 'Um toque no grupo da semana escala domingo e terça.'),
