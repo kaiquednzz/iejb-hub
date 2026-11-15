@@ -50,6 +50,7 @@ export function telaEscala(conta) {
         barraAbas(conta, '#/escala'),
     );
 
+    const seletores = new Map(); // culto.id → abre o bloco dele
     carregar();
     return tela;
 
@@ -101,17 +102,28 @@ export function telaEscala(conta) {
         }
         // Repertório: quem pode monta ali mesmo; ao fechar o editor, recarrega
         const extras = { conta, recarregar: carregar, offline: !!offlineDesde };
-        // Cartão da semana: domingo e terça (e o sábado de jovens) andam
-        // juntos, com o mesmo grupo; ficam num bloco só (D43)
+        // Semana em blocos (D43): cada culto é um bloco (DOM 15 · TER 17);
+        // tocar abre os detalhes embaixo, sem empilhar tudo na tela.
+        // A semana atual já abre no próximo culto; as outras ficam fechadas.
+        seletores.clear();
         let i = 0;
-        lista.replaceChildren(...semanasDe(cultos).map((semana, s) => h('section', {
-            class: 'semana-escala', style: { '--i': Math.min(s, 6) }, 'aria-label': tituloDaSemana(semana),
-        },
-            h('header', { class: 'semana-escala-topo' },
-                h('h2', { class: 'semana-escala-titulo' }, tituloDaSemana(semana)),
-                grupoDaSemana(semana) && h('span', { class: 'semana-escala-grupo' }, grupoDaSemana(semana))),
-            semana.cultos.map((culto, j) => cartaoCulto(culto, meuId, i++, { ...extras, anterior: semana.cultos[j - 1] })),
-        )));
+        lista.replaceChildren(...semanasDe(cultos).map((semana, s) =>
+            semanaEmBlocos(semana, s, meuId, extras, () => i++, seletores, s === 0)));
+        // O cartão "Seu próximo culto" e links #culto-... abrem o bloco certo
+        destaque.querySelector('a.destaque')?.addEventListener('click', (evento) => {
+            evento.preventDefault();
+            focarCulto(evento.currentTarget.getAttribute('href').slice(7));
+        });
+        if (location.hash.startsWith('#culto-')) focarCulto(location.hash.slice(7));
+    }
+
+    function focarCulto(id) {
+        const abrir = seletores.get(id);
+        if (!abrir) return;
+        abrir(true);
+        const bloco = lista.querySelector(`[data-culto="${CSS.escape(id)}"]`);
+        bloco?.closest('.semana-escala')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        bloco?.focus({ preventScroll: true });
     }
 
     async function gerarCultos() {
@@ -237,6 +249,91 @@ function listaDaEscala(escala, meuId) {
 }
 
 // --- Semanas (D43) -----------------------------------------------------------
+const EASE_IOS = 'cubic-bezier(0.32, 0.72, 0, 1)';
+const reduzirMovimento = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function semanaEmBlocos(semana, s, meuId, extras, proximoIndice, seletores, abrirPrimeiro) {
+    const painelId = `painel-semana-${semana.domingo}`;
+    const blocos = semana.cultos.map((culto) => blocoDoDia(culto, meuId, painelId));
+    const detalhes = semana.cultos.map((culto, j) => {
+        const cartao = cartaoCulto(culto, meuId, proximoIndice(), { ...extras, anterior: semana.cultos[j - 1] });
+        cartao.dataset.culto = culto.id;
+        cartao.inert = true;
+        return cartao;
+    });
+    const palco = h('div', { class: 'palco-semana' }, detalhes);
+    const painel = h('div', { class: 'painel-semana', id: painelId }, h('div', { class: 'painel-semana-dentro' }, palco));
+
+    let escolhido = null;
+    let ultimo = null; // continua no fluxo enquanto o painel fecha
+    function escolher(id, manter = false) {
+        const novo = escolhido === id && !manter ? null : id;
+        const alturaAntes = escolhido ? palco.offsetHeight : 0;
+        escolhido = novo;
+        if (novo) ultimo = novo;
+        for (const b of blocos) {
+            const on = b.dataset.culto === escolhido;
+            b.classList.toggle('sel', on);
+            b.setAttribute('aria-expanded', String(on));
+        }
+        for (const d of detalhes) {
+            const on = d.dataset.culto === escolhido;
+            d.classList.toggle('vis', on);
+            d.classList.toggle('no-fluxo', d.dataset.culto === ultimo);
+            d.inert = !on;
+        }
+        painel.classList.toggle('aberto', Boolean(escolhido));
+        // Trocar de dia com o painel aberto: a altura desliza em vez de pular
+        if (alturaAntes && escolhido && !reduzirMovimento()) {
+            const alturaDepois = palco.offsetHeight;
+            if (alturaAntes !== alturaDepois) {
+                palco.animate([{ height: `${alturaAntes}px` }, { height: `${alturaDepois}px` }], { duration: 480, easing: EASE_IOS });
+            }
+        }
+    }
+    blocos.forEach((b) => b.addEventListener('click', () => escolher(b.dataset.culto)));
+    for (const c of semana.cultos) seletores.set(c.id, () => escolher(c.id, true));
+    if (abrirPrimeiro) {
+        const proximo = semana.cultos.find((c) => c.estado !== 'cancelado') ?? semana.cultos[0];
+        escolher(proximo.id);
+    }
+
+    const grupo = grupoDaSemana(semana);
+    return h('section', { class: 'semana-escala', style: { '--i': Math.min(s, 6) }, 'aria-label': tituloDaSemana(semana) },
+        h('header', { class: 'semana-escala-topo' },
+            h('h2', { class: 'semana-escala-titulo' }, tituloDaSemana(semana)),
+            grupo && h('span', { class: 'semana-escala-grupo' }, grupo)),
+        h('div', { class: 'dias-semana' }, blocos),
+        painel,
+    );
+}
+
+// Um bloco por culto: dia, hora e quem toca. O detalhe fica no painel.
+function blocoDoDia(culto, meuId, painelId) {
+    const escala = escalaDo(culto);
+    const cancelado = culto.estado === 'cancelado';
+    const partes = partesDaData(culto.data);
+    const itens = escala?.escala_item ?? [];
+    const meu = itens.find((item) => item.pessoa_id === meuId);
+    const toco = Boolean(meu) && !naoVai(meu) && escala?.estado === 'publicada';
+    const rostos = itens.filter((item) => !naoVai(item)).slice(0, 3);
+    const estado = cancelado ? 'cancelado' : toco ? 'você toca' : escala?.estado === 'rascunho' ? 'rascunho' : null;
+    return h('button', {
+        type: 'button',
+        class: `bloco-dia${cancelado ? ' cancelado' : ''}${toco ? ' comigo' : ''}`,
+        'data-culto': culto.id,
+        'aria-expanded': 'false',
+        'aria-controls': painelId,
+        'aria-label': [culto.nome, rotuloDoDia(culto.data), formatarHorario(culto.horario), estado].filter(Boolean).join(', '),
+    },
+        h('span', { class: 'bloco-dia-semana' }, partes.semana),
+        h('span', { class: 'bloco-dia-num' }, partes.dia),
+        h('span', { class: 'bloco-dia-hora' }, cancelado ? 'Cancelado' : formatarHorario(culto.horario)),
+        !cancelado && rostos.length > 0 && h('span', { class: 'bloco-dia-rostos' }, rostos.map((item) => avatar(item.pessoa))),
+        toco && h('span', { class: 'bloco-dia-eu' }, 'Você'),
+    );
+}
+
 // A semana começa no domingo, como na planilha do líder e na tela Montar
 function semanasDe(cultos) {
     const semanas = [];
