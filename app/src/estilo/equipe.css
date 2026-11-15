@@ -595,7 +595,7 @@ fieldset.campo { border: none; padding: 0; margin: 0; min-width: 0; }
 .credenciais dt { font-size: 13px; color: var(--texto-2); }
 .credenciais dd { margin: 0 0 8px; font-weight: 600; word-break: break-all; }
 .credenciais dd:last-child { margin-bottom: 0; }
-.credenciais-senha { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 20px; letter-spacing: 0.03em; color: var(--principal); user-select: all; }
+.credenciais-senha { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 20px; letter-spacing: 0.03em; color: var(--principal); -webkit-user-select: all; user-select: all; }
 
 /* ---------------------------------------------------------------------------
    Toast

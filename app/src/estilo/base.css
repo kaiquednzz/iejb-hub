@@ -22,6 +22,17 @@ body {
     -webkit-tap-highlight-color: transparent;
 }
 
+/* Jeito de app (não de site): nada de selecionar texto da interface,
+   segurar um link/imagem não abre a pré-visualização do Safari, e o toque
+   duplo não dá zoom. O zoom de pinça continua de propósito: é ele que
+   socorre quem enxerga mal (WCAG 1.4.4), e o iOS o mantém de qualquer jeito. */
+html { touch-action: manipulation; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+body { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+input, textarea, [contenteditable], .selecionavel { -webkit-user-select: text; user-select: text; -webkit-touch-callout: default; }
+img { -webkit-user-drag: none; }
+/* iOS dá zoom sozinho ao focar um campo com letra menor que 16px */
+input, textarea, select { font-size: max(16px, 1em); }
+
 img { max-width: 100%; height: auto; display: block; }
 button, input { font: inherit; color: inherit; }
 a { color: var(--principal); }
