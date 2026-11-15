@@ -6,6 +6,7 @@
 
 const CHAVE_CONTA = 'iejb-hub:conta';
 const CHAVE_ESCALA = 'iejb-hub:escala';
+const CHAVE_CIFRAS = 'iejb-hub:cifras';
 
 function ler(chave) {
     try { return JSON.parse(localStorage.getItem(chave)); } catch { return null; }
@@ -28,10 +29,19 @@ export function escalaGuardada(idUsuario) {
     return copia?.idUsuario === idUsuario ? copia : null;
 }
 
+// Cifras dos repertórios que a pessoa vê (D38), para abrir no ensaio sem
+// sinal. Cada vez que a escala carrega, a lista é trocada inteira: cifra de
+// música que saiu do repertório não fica ocupando espaço.
+export function guardarCifras(cifras) {
+    gravar(CHAVE_CIFRAS, Object.fromEntries(cifras.map((c) => [c.id, c])));
+}
+export function cifrasGuardadas() { return ler(CHAVE_CIFRAS) ?? {}; }
+
 export function apagarCopiasLocais() {
     try {
         localStorage.removeItem(CHAVE_CONTA);
         localStorage.removeItem(CHAVE_ESCALA);
+        localStorage.removeItem(CHAVE_CIFRAS);
     } catch { /* nada a fazer */ }
 }
 

@@ -13,6 +13,7 @@ import './estilo/telas.css';
 import './estilo/equipe.css';
 import './estilo/montar.css';
 import './estilo/eventos.css';
+import './estilo/cifra.css';
 
 import { supabase } from './supabase.js';
 import { carregarConta } from './sessao.js';

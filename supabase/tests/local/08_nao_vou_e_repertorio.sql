@@ -66,9 +66,9 @@ reset role;
 select teste.ok((select resumo like 'Mem vai de novo: %' from public.aviso where tipo = 'presenca_alterada' order by criado_em desc limit 1),
   'D35: e os líderes ficam sabendo');
 
--- Culto que já começou: muda a hora do culto para agora - 1 min
-update public.culto set data = (now() at time zone 'America/Sao_Paulo')::date,
-  horario = ((now() at time zone 'America/Sao_Paulo') - interval '1 minute')::time where id = :'culto';
+-- Culto que já começou: joga o culto para uma data antiga (não "hoje": num
+-- domingo já existe um culto do mesmo tipo e a data é única por tipo)
+update public.culto set data = date '2000-01-02' where id = :'culto';
 set role authenticated;
 select teste.entrar('membro@teste');
 select teste.deve_falhar(format('select public.marcar_presenca(%L, false)', :'escala'), 'D35: depois que o culto começa, não dá mais');

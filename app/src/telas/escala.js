@@ -11,6 +11,7 @@ import { hojeEmBrasilia, somarDias, rotuloDoDia, partesDaData, formatarHorario }
 import { cabecalhoApp, barraAbas, avatar } from './moldura.js';
 import { FUNCAO_MESA, separarMesa, naoVai, cultoJaComecou } from '../util/escala.js';
 import { confirmar, avisar } from '../util/folha.js';
+import { guardarCifrasDosCultos } from './cifra.js';
 import { mensagemDoBanco } from '../util/erros.js';
 import { blocoRepertorio } from './repertorio.js';
 import { blocoAjustar } from './ajustar-escala.js';
@@ -27,7 +28,7 @@ const CONSULTA = `
         escala_item ( id, pessoa_id, instrumento_exibido, saiu_em, pessoa:pessoa_id ( nome, apelido, foto ) ),
         escala_grupo ( grupo:grupo_id ( nome, lider_pessoa_id ) )
     ),
-    repertorio_item ( id, posicao, tom, musica:musica_id ( id, titulo, artista, link, links_streaming ) )
+    repertorio_item ( id, posicao, tom, musica:musica_id ( id, titulo, artista, link, links_streaming, cifra_tom, atualizado_em ) )
 `;
 
 export function telaEscala(conta) {
@@ -81,6 +82,7 @@ export function telaEscala(conta) {
             return;
         }
         guardarEscala(conta.id, cultos);
+        guardarCifrasDosCultos(cultos);   // em segundo plano: a tela não espera
         desenhar(cultos);
     }
 
