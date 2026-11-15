@@ -9,8 +9,6 @@ import { supabase } from '../supabase.js';
 import { abrirFolha, avisar } from '../util/folha.js';
 import { mensagemDoBanco } from '../util/erros.js';
 import { rotuloDoDia, formatarHorario } from '../util/datas.js';
-import { abrirCifras } from './cifra.js';
-import { abrirEditorCifra } from './editor-cifra.js';
 import { linksDeBusca, buscarLinksDiretos, abrirComReserva, filaDoYoutube, idDoYoutube, linkSeguro, termoDeBusca, TONS } from '../util/musica.js';
 import { eLiderDeLouvor } from '../sessao.js';
 import { campo, caixaDeAviso } from './moldura.js';
@@ -43,21 +41,14 @@ export function blocoRepertorio(culto, conta, aoMudar, offline = false) {
         itens.length > 0 && h('ol', { class: 'lista-musicas' }, itens.map((item) => {
             const ouvir = h('button', { type: 'button', class: 'musica-ouvir', 'aria-label': `Ouvir ${item.musica.titulo}` }, icone('fone', 'icone icone-p'));
             ouvir.addEventListener('click', () => folhaOuvir(item.musica));
-            let cifra = null;
-            if (item.musica.cifra_tom) {
-                cifra = h('button', { type: 'button', class: 'musica-ouvir musica-cifra', 'aria-label': `Cifra de ${item.musica.titulo}` }, icone('cifra', 'icone icone-p'));
-                cifra.addEventListener('click', () => abrirCifrasDoCulto(culto, item));
-            }
             return h('li', null,
                 h('span', { class: 'musica-titulo' }, item.musica.titulo),
                 item.musica.artista && h('span', { class: 'musica-artista' }, item.musica.artista),
                 item.tom && h('span', { class: 'musica-tom', title: 'Tom' }, item.tom),
-                cifra,
                 ouvir,
             );
         })),
         itens.length > 0 && h('div', { class: 'repertorio-acoes' },
-            botaoCifras(culto),
             fila.url
                 ? h('a', { class: 'botao-youtube', href: fila.url, target: '_blank', rel: 'noopener noreferrer' },
                     icone('play', 'icone icone-p'), 'Tocar no YouTube',
@@ -68,24 +59,6 @@ export function blocoRepertorio(culto, conta, aoMudar, offline = false) {
         ),
         editar && h('div', { class: 'repertorio-editar' }, editar),
     );
-}
-
-// Cifras do culto (D38): na ordem do repertório, só as que têm cifra
-function cifrasDoCulto(culto) {
-    return (culto.repertorio_item ?? []).filter((i) => i.musica?.cifra_tom).map((i) => ({ musica: i.musica, tom: i.tom, id: i.id }));
-}
-function abrirCifrasDoCulto(culto, item = null) {
-    const lista = cifrasDoCulto(culto);
-    abrirCifras({ itens: lista, inicio: Math.max(0, lista.findIndex((x) => x.id === item?.id)), titulo: culto.nome });
-}
-function botaoCifras(culto) {
-    const lista = cifrasDoCulto(culto);
-    if (!lista.length) return null;
-    const total = culto.repertorio_item.length;
-    const b = h('button', { type: 'button', class: 'botao-principal botao-pequeno botao-cifras' },
-        icone('cifra', 'icone icone-p'), lista.length === total ? 'Abrir as cifras' : `Abrir as cifras (${lista.length} de ${total})`);
-    b.addEventListener('click', () => abrirCifrasDoCulto(culto));
-    return b;
 }
 
 // Ouvir uma música: abre a busca de cada plataforma (ou o vídeo cadastrado)
@@ -155,7 +128,7 @@ export async function abrirEditor(culto, aoMudar) {
     async function recarregar() {
         const [itens, musicas, ministerio] = await Promise.all([
             supabase.from('repertorio_item')
-                .select('id, posicao, tom, musica:musica_id ( id, titulo, artista, link, cifra_tom )')
+                .select('id, posicao, tom, musica:musica_id ( id, titulo, artista, link )')
                 .eq('culto_id', culto.id).order('posicao'),
             supabase.from('musica').select('id, titulo, artista, link').eq('ativa', true).order('titulo'),
             estado?.ministerioId ? Promise.resolve({ data: { id: estado.ministerioId } })
@@ -271,12 +244,6 @@ export async function abrirEditor(culto, aoMudar) {
         }));
         const editarMusica = h('button', { type: 'button', class: 'botao-secundario botao-largo' }, 'Editar música (nome, artista, link)');
         editarMusica.addEventListener('click', () => { sub.fechar(); folhaMusica(item.musica); });
-        const cifra = h('button', { type: 'button', class: 'botao-secundario botao-largo' }, icone('cifra', 'icone icone-p'),
-            item.musica.cifra_tom ? `Editar a cifra (escrita em ${item.musica.cifra_tom})` : 'Colar a cifra');
-        cifra.addEventListener('click', () => {
-            sub.fechar();
-            abrirEditorCifra(item.musica, () => { mudou = true; recarregar(); });
-        });
         const tirar = h('button', { type: 'button', class: 'botao-texto-perigo' }, 'Tirar do repertório');
         tirar.addEventListener('click', () => comCarregando(tirar, async () => {
             if (await fazer(() => supabase.from('repertorio_item').delete().eq('id', item.id), 'Tirada.')) sub.fechar();
@@ -285,7 +252,7 @@ export async function abrirEditor(culto, aoMudar) {
             titulo: item.musica.titulo,
             conteudo: h('div', { class: 'form' },
                 h('p', { class: 'folha-texto' }, 'Tom neste culto (pode ser diferente em outro culto).'),
-                tons, campoTom, aviso.elemento, salvar, cifra, editarMusica,
+                tons, campoTom, aviso.elemento, salvar, editarMusica,
                 h('div', { class: 'bloco bloco-final' }, tirar)),
         });
     }
