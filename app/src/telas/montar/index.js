@@ -16,7 +16,7 @@ import { partesDaData, formatarHorario, somarDias, hojeEmBrasilia } from '../../
 import { nomeCurto } from '../../sessao.js';
 import { cabecalhoApp, barraAbas } from '../moldura.js';
 import { carregarMontagem, somarMes, nomeDoMes, mesSugerido, nomesDosGrupos, textoDoMes } from './dados.js';
-import { abrirCulto, folhaMesa, folhaCultoEspecial } from './culto.js';
+import { abrirCulto, folhaMesa, folhaAdicionarCulto, grupoVazio, avisarGrupoVazio } from './culto.js';
 
 const LEMBRAR = 'iejb-hub-montar-mes';
 
@@ -99,8 +99,8 @@ export function telaMontar(conta) {
             semGrupo > 0 && h('span', { class: 'resumo-falta' }, ` · ${semGrupo} sem ninguém`),
         ].filter(Boolean)));
 
-        const especial = h('button', { type: 'button', class: 'botao-secundario botao-largo' }, icone('mais'), 'Culto especial');
-        especial.addEventListener('click', () => folhaCultoEspecial(dados, ctx));
+        const especial = h('button', { type: 'button', class: 'botao-secundario botao-largo' }, icone('mais'), 'Adicionar culto (jovens, especial)');
+        especial.addEventListener('click', () => folhaAdicionarCulto(dados, ctx));
 
         // Semanas que já acabaram sem nada para ver saem da lista: só poluem.
         // Semana passada com culto continua (o líder pode querer conferir).
@@ -138,7 +138,7 @@ export function telaMontar(conta) {
             dados.grupos.map((g) => {
                 const chip = h('button', {
                     type: 'button', class: 'chip-grupo', 'aria-pressed': String(g.id === daSemana),
-                }, g.nome);
+                }, g.nome, grupoVazio(g) && h('span', { class: 'chip-vazio' }, 'vazio'));
                 chip.addEventListener('click', () => escolherGrupoDaSemana(fixos, g, chip));
                 return chip;
             }));
@@ -160,8 +160,10 @@ export function telaMontar(conta) {
     }
 
     async function escolherGrupoDaSemana(cultos, grupo, chip) {
-        const mudar = cultos.filter((c) => !(c.gruposIds.length === 1 && c.gruposIds[0] === grupo.id));
-        if (mudar.length === 0) return;
+        // Tocar no grupo que já está escolhido recarrega: traz quem entrou no
+        // grupo depois (antes não acontecia nada e parecia defeito)
+        const diferentes = cultos.filter((c) => !(c.gruposIds.length === 1 && c.gruposIds[0] === grupo.id));
+        const mudar = diferentes.length ? diferentes : cultos;
         chip.classList.add('carregando-chip');
         // Cada culto separado (2 ou 3 por semana): se um falhar, os outros valem
         const resultados = await Promise.all(mudar.map((c) => supabase.rpc('definir_grupos_do_culto', {
@@ -169,6 +171,7 @@ export function telaMontar(conta) {
         })));
         const erro = resultados.find((r) => r.error)?.error;
         if (erro) avisar(mensagemDoBanco(erro));
+        else if (grupoVazio(grupo)) avisarGrupoVazio(grupo);
         else if (mudar.some((c) => c.escala?.estado === 'publicada')) avisar(`${grupo.nome} na semana. Quem mudou vai ser avisado.`);
         await carregar();
     }

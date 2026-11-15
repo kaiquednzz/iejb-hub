@@ -44,3 +44,4 @@ cenario 06_lider_de_grupo_edita.sql
 cenario 07_eventos_do_site.sql
 cenario 08_nao_vou_e_repertorio.sql
 cenario 09_historico.sql
+cenario 10_jovens_e_grupos.sql

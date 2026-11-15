@@ -23,10 +23,16 @@ export function podeEditarRepertorio(culto, conta) {
 // ---------------------------------------------------------------------------
 // Bloco dentro do cartão do culto (tela Escala)
 // ---------------------------------------------------------------------------
-export function blocoRepertorio(culto, conta, aoMudar, offline = false) {
+// anterior: o culto anterior da mesma semana (domingo, para a terça). O
+// repertório costuma se repetir; com o da terça vazio, quem edita tem
+// "Repetir o repertório de domingo" (copia músicas, ordem e tom). Depois
+// de copiado é um repertório normal: tira e põe música à vontade.
+export function blocoRepertorio(culto, conta, aoMudar, offline = false, anterior = null) {
     const itens = culto.repertorio_item ?? [];
     const pode = !offline && culto.estado === 'ativo' && podeEditarRepertorio(culto, conta);
     if (itens.length === 0 && !pode) return null;
+    const doAnterior = anterior?.estado === 'ativo' ? (anterior.repertorio_item ?? []) : [];
+    const repetir = pode && itens.length === 0 && doAnterior.length > 0 && botaoRepetir(culto, anterior, doAnterior, aoMudar);
 
     const musicas = itens.map((i) => i.musica);
     const fila = filaDoYoutube(musicas);
@@ -34,7 +40,7 @@ export function blocoRepertorio(culto, conta, aoMudar, offline = false) {
         icone('musica', 'icone icone-p'), itens.length ? 'Editar repertório' : 'Montar repertório');
     if (editar) editar.addEventListener('click', () => abrirEditor(culto, aoMudar));
 
-    return h('details', { class: 'repertorio' },
+    return h('details', { class: 'repertorio', open: Boolean(repetir) },
         h('summary', null,
             icone('musica', 'icone icone-p'),
             itens.length ? `Repertório · ${itens.length} ${itens.length === 1 ? 'música' : 'músicas'}` : 'Repertório · falta montar'),
@@ -55,8 +61,34 @@ export function blocoRepertorio(culto, conta, aoMudar, offline = false) {
             h('a', { class: 'botao-youtube', href: fila.url, target: '_blank', rel: 'noopener noreferrer' },
                 icone('play', 'icone icone-p'),
                 fila.ids.length === itens.length ? 'Ouvir tudo no YouTube' : `Ouvir ${fila.ids.length} de ${itens.length} no YouTube`)),
+        repetir,
         editar && h('div', { class: 'repertorio-editar' }, editar),
     );
+}
+
+const DIAS_REP = ['domingo', 'segunda', 'terça', 'quarta', 'quinta', 'sexta', 'sábado'];
+function botaoRepetir(culto, anterior, doAnterior, aoMudar) {
+    const dia = DIAS_REP[new Date(`${anterior.data}T12:00:00Z`).getUTCDay()];
+    const n = doAnterior.length;
+    const b = h('button', { type: 'button', class: 'repetir-repertorio' },
+        icone('copiar', 'icone'),
+        h('span', { class: 'linha-textos' },
+            h('span', { class: 'linha-nome' }, `Repetir o repertório de ${dia}`),
+            h('span', { class: 'linha-detalhe' },
+                doAnterior.slice(0, 3).map((i) => i.musica.titulo).join(', ') + (n > 3 ? ` e mais ${n - 3}` : ''))));
+    b.addEventListener('click', () => comCarregando(b, async () => {
+        const { data: ministerio, error: e1 } = await supabase.from('ministerio').select('id').eq('nome', 'Louvor').single();
+        if (e1) return avisar(mensagemDoBanco(e1));
+        // Uma inserção só, com a posição de cada música: mesma ordem e tom
+        const { error } = await supabase.from('repertorio_item').insert(
+            [...doAnterior].sort((a, c) => a.posicao - c.posicao).map((i, k) => ({
+                culto_id: culto.id, ministerio_id: ministerio.id, musica_id: i.musica.id, tom: i.tom, posicao: k + 1,
+            })));
+        if (error) return avisar(mensagemDoBanco(error));
+        avisar(`Repertório de ${dia} repetido. Dá para tirar ou pôr música em "Editar repertório".`);
+        await aoMudar?.();
+    }));
+    return b;
 }
 
 // Ouvir uma música: abre a busca de cada plataforma (ou o vídeo cadastrado)

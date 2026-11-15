@@ -630,3 +630,68 @@
 
 /* Número da música: rosa claro quase não aparecia */
 .lista-musicas li::before { color: var(--texto-2); }
+
+/* --- Cartão da semana (D43): domingo e terça juntos, num bloco só ------- */
+.lista-cultos { gap: 20px; }
+.semana-escala {
+    padding: 6px 4px 4px;
+    border-radius: calc(var(--raio-l) + 4px);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.86), rgba(255, 255, 255, 0.66));
+    border: 1px solid var(--vidro-borda);
+    box-shadow: var(--sombra-1), var(--brilho);
+    animation: subir 0.65s calc(0.1s + var(--i, 0) * 0.07s) var(--ease-out) backwards;
+}
+.semana-escala-topo {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px 14px 4px;
+}
+.semana-escala-titulo {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--texto-2);
+}
+.semana-escala-grupo {
+    padding: 4px 12px;
+    border-radius: var(--raio-capsula);
+    background: var(--principal);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+}
+/* Dentro da semana, o culto perde o cartão próprio e vira uma seção */
+.semana-escala .cartao-culto {
+    background: none;
+    border: 0;
+    box-shadow: none;
+    border-radius: var(--raio-l);
+    padding: 14px;
+    animation: none;
+}
+.semana-escala .cartao-culto + .cartao-culto { border-top: 1px solid rgba(58, 10, 9, 0.08); border-radius: 0; }
+.semana-escala .cartao-culto.comigo { box-shadow: inset 3px 0 0 var(--principal-brighter); border-radius: 0 var(--raio-m) var(--raio-m) 0; }
+.semana-escala .cartao-culto.comigo + .cartao-culto, .semana-escala .cartao-culto + .cartao-culto.comigo { border-radius: 0; }
+
+/* "Mesmas pessoas de domingo": uma linha que abre */
+.mesma-escala summary {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 44px;
+    padding: 0 14px;
+    margin-top: 4px;
+    border-radius: var(--raio-capsula);
+    background: rgba(31, 122, 77, 0.08);
+    color: var(--verde);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    list-style: none;
+}
+.mesma-escala summary::-webkit-details-marker { display: none; }
+.mesma-escala[open] summary { margin-bottom: 8px; }
+.mesma-escala[open] .cartao-escala { animation: surgir 0.35s var(--mola); }

@@ -101,7 +101,17 @@ export function telaEscala(conta) {
         }
         // Repertório: quem pode monta ali mesmo; ao fechar o editor, recarrega
         const extras = { conta, recarregar: carregar, offline: !!offlineDesde };
-        lista.replaceChildren(...cultos.map((culto, i) => cartaoCulto(culto, meuId, i, extras)));
+        // Cartão da semana: domingo e terça (e o sábado de jovens) andam
+        // juntos, com o mesmo grupo; ficam num bloco só (D43)
+        let i = 0;
+        lista.replaceChildren(...semanasDe(cultos).map((semana, s) => h('section', {
+            class: 'semana-escala', style: { '--i': Math.min(s, 6) }, 'aria-label': tituloDaSemana(semana),
+        },
+            h('header', { class: 'semana-escala-topo' },
+                h('h2', { class: 'semana-escala-titulo' }, tituloDaSemana(semana)),
+                grupoDaSemana(semana) && h('span', { class: 'semana-escala-grupo' }, grupoDaSemana(semana))),
+            semana.cultos.map((culto, j) => cartaoCulto(culto, meuId, i++, { ...extras, anterior: semana.cultos[j - 1] })),
+        )));
     }
 
     async function gerarCultos() {
@@ -177,17 +187,29 @@ function cartaoCulto(culto, meuId, indice, extras) {
                 selo,
             ),
         ),
-        !cancelado && corpoDaEscala(escala, meuId),
+        !cancelado && corpoDaEscala(escala, meuId, extras.anterior),
         !cancelado && !extras.offline && blocoPresenca(culto, escala, meuItem, extras.recarregar),
-        !cancelado && blocoRepertorio(culto, extras.conta, extras.recarregar, extras.offline),
+        !cancelado && blocoRepertorio(culto, extras.conta, extras.recarregar, extras.offline, extras.anterior),
         !cancelado && !extras.offline && blocoAjustar(culto, extras.conta, extras.recarregar),
     );
 }
 
-function corpoDaEscala(escala, meuId) {
+function corpoDaEscala(escala, meuId, anterior) {
     if (!escala || escala.escala_item.length === 0) {
         return h('p', { class: 'cartao-vazio' }, 'Escala ainda não publicada.');
     }
+    // Mesmas pessoas (e instrumentos) do culto anterior da semana: em vez de
+    // repetir a lista, uma linha que abre se a pessoa quiser conferir
+    const antes = anterior && escalaDo(anterior);
+    if (antes && antes.escala_item.length && anterior.estado !== 'cancelado' && mesmaEscala(antes, escala)) {
+        return h('details', { class: 'mesma-escala' },
+            h('summary', null, icone('certo', 'icone icone-p'), `Mesmas pessoas de ${diaDaSemana(anterior.data)}`),
+            listaDaEscala(escala, meuId));
+    }
+    return listaDaEscala(escala, meuId);
+}
+
+function listaDaEscala(escala, meuId) {
     const grupos = escala.escala_grupo.map((g) => g.grupo?.nome).filter(Boolean).sort();
     // Quem só está pela mesa de som vai numa linha à parte, como na planilha
     const { tocam, mesa } = separarMesa(escala.escala_item);
@@ -212,6 +234,46 @@ function corpoDaEscala(escala, meuId) {
             h('span', null, 'Mesa de som'),
             h('strong', null, mesa.map((item) => nomeCurto(item.pessoa, 'Pessoa')).join(', '))),
     );
+}
+
+// --- Semanas (D43) -----------------------------------------------------------
+// A semana começa no domingo, como na planilha do líder e na tela Montar
+function semanasDe(cultos) {
+    const semanas = [];
+    for (const c of cultos) {
+        const dia = new Date(`${c.data}T12:00:00Z`).getUTCDay();
+        const domingo = somarDias(c.data, -dia);
+        if (semanas.at(-1)?.domingo !== domingo) semanas.push({ domingo, cultos: [] });
+        semanas.at(-1).cultos.push(c);
+    }
+    return semanas;
+}
+const DIA_MES = new Intl.DateTimeFormat('pt-BR', { day: 'numeric', month: 'short', timeZone: 'UTC' });
+const diaMes = (d) => DIA_MES.format(new Date(`${d}T12:00:00Z`)).replace('.', '').replace(' de ', ' ');
+function tituloDaSemana(semana) {
+    const hoje = hojeEmBrasilia();
+    const fim = somarDias(semana.domingo, 6);
+    if (hoje >= semana.domingo && hoje <= fim) return 'Esta semana';
+    if (somarDias(hoje, 7) >= semana.domingo && somarDias(hoje, 7) <= fim) return 'Semana que vem';
+    return `Semana de ${diaMes(semana.domingo)} a ${diaMes(fim)}`;
+}
+// O grupo que aparece na maioria dos cultos da semana (o "grupo da semana")
+function grupoDaSemana(semana) {
+    const conta = new Map();
+    for (const c of semana.cultos) {
+        if (c.estado === 'cancelado') continue;
+        const e = escalaDo(c);
+        if (!e || e.estado !== 'publicada') continue;
+        for (const g of e.escala_grupo) if (g.grupo?.nome) conta.set(g.grupo.nome, (conta.get(g.grupo.nome) ?? 0) + 1);
+    }
+    const [nome] = [...conta.entries()].sort((a, b) => b[1] - a[1])[0] ?? [];
+    return nome ?? null;
+}
+const DIAS_SEMANA = ['domingo', 'segunda', 'terça', 'quarta', 'quinta', 'sexta', 'sábado'];
+const diaDaSemana = (d) => DIAS_SEMANA[new Date(`${d}T12:00:00Z`).getUTCDay()];
+function mesmaEscala(a, b) {
+    const chave = (e) => e.escala_item.map((i) => `${i.pessoa_id}:${[...i.instrumento_exibido].sort().join(',')}:${naoVai(i)}`).sort().join('|');
+    return chave(a) === chave(b);
 }
 
 // "Não vou poder ir" / "Vou sim" (D35): só para quem está na escala publicada,

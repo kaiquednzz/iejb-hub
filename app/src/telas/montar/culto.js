@@ -3,7 +3,7 @@ import { h, icone, comCarregando } from '../../util/dom.js';
 import { supabase } from '../../supabase.js';
 import { abrirFolha, confirmar, avisar } from '../../util/folha.js';
 import { mensagemDoBanco } from '../../util/erros.js';
-import { rotuloDoDia, formatarHorario, hojeEmBrasilia } from '../../util/datas.js';
+import { rotuloDoDia, formatarHorario, hojeEmBrasilia, somarDias, partesDaData } from '../../util/datas.js';
 import { FUNCAO_MESA, naoVai } from '../../util/escala.js';
 import { avatar } from '../../util/foto.js';
 import { nomeCurto } from '../../sessao.js';
@@ -63,13 +63,15 @@ export function abrirCulto(cultoId, ctx) {
             h('div', { class: 'chips-grupo chips-grupo-grande', role: 'group', 'aria-label': 'Grupos deste culto' },
                 dados.grupos.map((g) => {
                     const marcado = culto.gruposIds.includes(g.id);
-                    const chip = h('button', { type: 'button', class: 'chip-grupo', 'aria-pressed': String(marcado) }, g.nome);
-                    chip.addEventListener('click', () => {
+                    const chip = h('button', { type: 'button', class: 'chip-grupo', 'aria-pressed': String(marcado) },
+                        g.nome, grupoVazio(g) && h('span', { class: 'chip-vazio' }, 'vazio'));
+                    chip.addEventListener('click', async () => {
                         chip.classList.add('carregando-chip');
                         const novos = marcado ? culto.gruposIds.filter((id) => id !== g.id) : [...culto.gruposIds, g.id];
-                        fazer(() => supabase.rpc('definir_grupos_do_culto', {
+                        await fazer(() => supabase.rpc('definir_grupos_do_culto', {
                             p_culto: culto.id, p_ministerio: dados.ministerioId, p_grupos: novos,
                         }));
+                        if (!marcado && grupoVazio(g)) avisarGrupoVazio(g);
                     });
                     return chip;
                 })),
@@ -273,7 +275,7 @@ export function folhaCultoEspecial(dados, ctx) {
     const hoje = hojeEmBrasilia();
     const form = h('form', { class: 'form', novalidate: true },
         campo({ rotulo: 'Nome', nome: 'nome', autocomplete: 'off', autocapitalize: 'sentences', placeholder: 'Ex.: Culto de Jovens' }),
-        h('div', { class: 'fichas' }, ['Culto de Jovens', 'Culto Especial', 'Santa Ceia', 'Vigília'].map((n) => {
+        h('div', { class: 'fichas' }, ['Culto Especial', 'Santa Ceia', 'Vigília', 'Conferência'].map((n) => {
             const f = h('button', { type: 'button', class: 'ficha' }, n);
             f.addEventListener('click', () => { form.elements.nome.value = n; });
             return f;
@@ -309,6 +311,83 @@ export function folhaCultoEspecial(dados, ctx) {
         });
     });
     const folha = abrirFolha({ titulo: 'Culto especial', conteudo: form });
+}
+
+// Grupo sem ninguém cadastrado: escolher não traz pessoas, e o líder achava
+// que era defeito. Agora o chip diz "vazio" e escolher avisa onde cadastrar.
+export const grupoVazio = (g) => !(g.grupo_membro?.length);
+export function avisarGrupoVazio(g) {
+    avisar(`O ${g.nome} ainda não tem ninguém cadastrado. Cadastre os membros em Equipe › Grupos que eles entram na escala sozinhos.`);
+}
+
+// "Adicionar culto": os tipos "quando tiver" (Culto de Jovens, D41) primeiro,
+// com o grupo padrão já escalado; depois o culto especial de nome livre.
+const DIAS = ['domingo', 'segunda', 'terça', 'quarta', 'quinta', 'sexta', 'sábado'];
+export function folhaAdicionarCulto(dados, ctx) {
+    const opcoes = dados.tiposQuandoTiver.map((tipo) => {
+        const grupo = dados.grupoPorId.get(tipo.grupo_padrao_id);
+        const b = h('button', { type: 'button', class: 'opcao-culto' },
+            h('span', { class: 'opcao-culto-nome' }, tipo.nome),
+            h('span', { class: 'opcao-culto-detalhe' },
+                `${DIAS[tipo.dia_semana]}, ${formatarHorario(tipo.horario)}`, grupo ? ` · ${grupo.nome}` : ''),
+            icone('seta', 'icone icone-p'));
+        b.addEventListener('click', () => { folha.fechar(); folhaCultoDoTipo(tipo, dados, ctx); });
+        return b;
+    });
+    const especial = h('button', { type: 'button', class: 'opcao-culto' },
+        h('span', { class: 'opcao-culto-nome' }, 'Outro culto especial'),
+        h('span', { class: 'opcao-culto-detalhe' }, 'Ceia, vigília, conferência... com nome, dia e hora livres'),
+        icone('seta', 'icone icone-p'));
+    especial.addEventListener('click', () => { folha.fechar(); folhaCultoEspecial(dados, ctx); });
+    const folha = abrirFolha({ titulo: 'Adicionar culto', conteudo: h('div', { class: 'form' }, ...opcoes, especial) });
+}
+
+// Culto de Jovens: escolhe um dos próximos sábados (os que ainda não têm)
+function folhaCultoDoTipo(tipo, dados, ctx) {
+    const hoje = hojeEmBrasilia();
+    const aviso = caixaDeAviso();
+    const jaTem = new Set(dados.cultos.filter((c) => c.tipo_culto_id === tipo.id).map((c) => c.data));
+    const datas = [];
+    for (let d = dados.inicio; d <= dados.fim; d = somarDias(d, 1)) {
+        if (d >= hoje && new Date(`${d}T12:00:00Z`).getUTCDay() === tipo.dia_semana) datas.push(d);
+    }
+    let escolhida = datas.find((d) => !jaTem.has(d)) ?? null;
+    const fichas = h('div', { class: 'fichas fichas-datas', role: 'group', 'aria-label': 'Dia' });
+    const desenhar = () => fichas.replaceChildren(...datas.map((d) => {
+        const p = partesDaData(d);
+        const f = h('button', { type: 'button', class: 'ficha', 'aria-pressed': String(d === escolhida), disabled: jaTem.has(d) },
+            `${p.dia} ${p.mes}`, jaTem.has(d) && ' · já tem');
+        f.addEventListener('click', () => { escolhida = d; desenhar(); });
+        return f;
+    }));
+    desenhar();
+    const grupo = dados.grupoPorId.get(tipo.grupo_padrao_id);
+    const horario = campo({ rotulo: 'Horário', nome: 'horario', tipo: 'time', value: tipo.horario.slice(0, 5) });
+    const criar = h('button', { type: 'button', class: 'botao-principal botao-largo' }, `Criar ${tipo.nome}`);
+    criar.addEventListener('click', () => comCarregando(criar, async () => {
+        aviso.limpar();
+        if (!escolhida) return aviso.mostrar(`Escolha o dia.`);
+        const { data: id, error } = await supabase.rpc('criar_culto_do_tipo', {
+            p_tipo: tipo.id, p_data: escolhida, p_horario: horario.querySelector('input').value || null, p_ministerio: dados.ministerioId,
+        });
+        if (error) return aviso.mostrar(mensagemDoBanco(error));
+        folha.fechar();
+        await ctx.recarregar();
+        avisar(grupo ? `${tipo.nome} criado com o ${grupo.nome}. Toque nele para trocar o grupo.` : `${tipo.nome} criado.`);
+        if (grupo && grupoVazio(grupo)) avisarGrupoVazio(grupo);
+        abrirCulto(id, ctx);
+    }));
+    const folha = abrirFolha({
+        titulo: tipo.nome,
+        conteudo: h('div', { class: 'form' },
+            h('fieldset', { class: 'campo' }, h('legend', null, datas.length ? `Qual ${DIAS[tipo.dia_semana]}?` : 'Dia'),
+                datas.length ? fichas : h('p', { class: 'campo-dica' }, `Não sobrou nenhum ${DIAS[tipo.dia_semana]} neste mês. Troque o mês no topo.`)),
+            horario,
+            grupo && h('p', { class: 'folha-texto folha-texto-pequeno' }, `Já vem com o ${grupo.nome}${grupoVazio(grupo) ? ' (que ainda não tem ninguém cadastrado)' : ''}. Dá para trocar depois.`),
+            aviso.elemento,
+            criar,
+        ),
+    });
 }
 
 // RN-43: "Escala atualizada: Culto de Oração, ter 18/11, 19h30 / Tocam: G2 + Fulano"

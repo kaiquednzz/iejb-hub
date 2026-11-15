@@ -6,7 +6,7 @@
 | **Instituição** | IEJB, Igreja Evangélica do Jardim Brasil |
 | **Responsável pelo projeto e desenvolvimento** | Kaique |
 | **Status** | Em desenvolvimento (etapa 4): banco, login, escala, PWA gestão de pessoas e acessos, montagem da escala, repertório com botões de streaming, fotos de perfil, avisos por push e ajuste da escala pelo líder de grupo prontos (todas as regras do piloto têm tela); app publicado em `app.iejb.com.br`. Sem aprovação institucional definitiva. |
-| **Versão deste documento** | 2.7 (Início com módulos; histórico de repertórios) |
+| **Versão deste documento** | 2.8 (Culto de Jovens, semanas na escala, grupo sincronizado) |
 | **Última atualização** | 13/11/2026 |
 
 > Este documento registra a visão atual do IEJB Hub para que ela possa evoluir depois.
@@ -448,6 +448,10 @@ A mensalidade contemplaria: utilização, hospedagem, manutenção, correções,
 | D35 | **"Não vou poder ir".** Com a escala publicada e até o culto começar, o próprio integrante marca que não vai. Ele continua na escala, riscado ("Não vai"), e o líder do grupo do culto e o(s) líder(es) de louvor recebem aviso na hora; dá para voltar atrás, com novo aviso. Não é o fluxo de substituição (D16 continua): quem troca é o líder. Precisa ser confirmado com o líder de louvor (A12). |
 | D36 | **Repertório só de quem é do culto.** Veem o repertório de um culto: os escalados, os integrantes dos grupos do culto, o líder do grupo, o líder de louvor e o administrador (regra no banco). Revê a Q6 só para o repertório: a escala continua visível para todos. |
 | D37 | **Links que abrem a música** (ajusta a D26). No iPhone, os links de busca abrem o Spotify e o Apple Music sem a busca. Apple Music: uma função de servidor (`links-da-musica`) acha a faixa no catálogo público do iTunes (prefere título igual e a mesma versão, estúdio ou ao vivo) e guarda na música; o botão abre a faixa. Spotify: no celular usa o endereço do próprio app (`spotify:search:`), que abre já buscando, e cai na busca do navegador se o app não abrir. O song.link, que traduziria a faixa para o Spotify, fechou a API pública em 14/11/2026. Ícones oficiais dos quatro serviços em `public/marcas`. |
+| D41 | **Culto de Jovens.** É em alguns sábados, não todos; o G3 é o grupo oficial, mas pode mudar (Kaique, 15/11/2026). Vira um tipo de culto "quando tiver": não é criado sozinho; no Montar, "Adicionar culto" › Culto de Jovens escolhe o sábado e já escala o G3. Fica fora do "grupo da semana" (escolher o G2 da semana não troca o grupo do jovens). |
+| D42 | **Escala acompanha o grupo.** Entrar, sair ou mudar de instrumento num grupo atualiza as escalas em rascunho de cultos futuros com aquele grupo (ajuste feito à mão no culto não é desfeito; escala publicada não muda sozinha). Escolher de novo o mesmo grupo recarrega. Grupo sem ninguém aparece como "vazio" e avisa onde cadastrar. |
+| D43 | **Cartão da semana na escala.** Domingo, terça e o sábado de jovens ficam num bloco ("Esta semana", "Semana que vem"), com o grupo da semana no topo; se a terça tem as mesmas pessoas do domingo, aparece "Mesmas pessoas de domingo" em vez da lista repetida. |
+| D44 | **Repetir o repertório de domingo.** O repertório de domingo e terça costuma se repetir: com o da terça vazio, quem edita tem "Repetir o repertório de domingo" (copia músicas, ordem e tom). Depois de copiado, é um repertório normal, editável. |
 | D39 | **Histórico de repertórios.** Depois que o culto começa, o repertório dele é de todo o ministério (antes, só de quem é do culto, D36). Tela "Repertórios" no Louvor: por mês, busca por música ("tocada 3 vezes · última em ..."), filtro por grupo. Culto cancelado não entra. |
 | D40 | **Início e módulos.** O app abre no Início: saudação, próximo compromisso, pedidos de acesso (admin) e a grade de módulos. Cada módulo declara quem vê e para onde vai; Pregações, Kids e Financeiro aparecem como "Em breve" (decisão de Kaique: mostrar para onde o Hub vai). Dentro do Louvor ficam as abas Escala, Montar, Repertórios e Equipe; Eventos do site é módulo próprio do admin. O cabeçalho dos módulos tem "‹ Início". |
 | D38 | ~~Cifras integradas~~ **Revogada em 15/11/2026.** Foi feita (colar do Cifra Club, ChordPro, transpor para o tom do culto, offline), mas o Cifra Club não tem API e bloqueia leitura automática por servidor (403, testado), e colar a cifra pelo celular ficou trabalhoso para líderes leigos. Pela diretriz principal, saiu. O código está no git (commit bb2f9d6). |
@@ -676,6 +680,7 @@ Precisam ser respondidas, de preferência com o líder de louvor, antes de defin
 | 1.1 | 13/11/2026 | Sexta rodada (Q19 a Q22), vinda do modelo de dados da etapa 3. |
 | 1.2 | 13/11/2026 | Decisões técnicas: Supabase, planos gratuitos e front-end com Vite e JavaScript puro (D20 a D22). Registro de decisões técnicas criado. |
 | 1.3 | 13/11/2026 | Aprovadas as recomendações de login, hospedagem e push (D23 a D25). Stack do piloto fechada. |
+| 2.8 | 15/11/2026 | Culto de Jovens (D41), escala acompanha o grupo (D42), cartão da semana (D43), repetir repertório (D44). |
 | 2.7 | 15/11/2026 | Início com módulos (D40) e histórico de repertórios (D39). |
 | 2.6 | 15/11/2026 | Cifras revogadas (D38): sem fonte automática viável. |
 | 2.5 | 15/11/2026 | Cifras integradas em ChordPro (D38). |

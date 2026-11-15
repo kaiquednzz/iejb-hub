@@ -45,9 +45,10 @@ export async function carregarMontagem(mes) {
         await supabase.rpc('gerar_cultos', { p_ate: fim });
     }
 
-    const [cultos, grupos, pessoas, ministerio] = await Promise.all([
+    const [cultos, grupos, pessoas, ministerio, tipos] = await Promise.all([
         supabase.from('culto')
             .select(`id, nome, rotulo, data, horario, estado, tipo_culto_id,
+                     tipo:tipo_culto_id ( gerar_sozinho, grupo_padrao_id ),
                      escala ( id, estado, escala_item ( id, pessoa_id, instrumento_exibido, origem_grupo_id, saiu_em ),
                               escala_grupo ( grupo_id ) )`)
             .eq('tem_louvor', true)
@@ -60,8 +61,9 @@ export async function carregarMontagem(mes) {
             .select('id, nome, apelido, instrumentos, foto, ativa, membro_ministerio ( ministerio_id, ativo )')
             .order('nome'),
         supabase.from('ministerio').select('id').eq('nome', 'Louvor').maybeSingle(),
+        supabase.from('tipo_culto').select('id, nome, dia_semana, horario, gerar_sozinho, grupo_padrao_id, tem_louvor').eq('ativo', true),
     ]);
-    const erro = cultos.error || grupos.error || pessoas.error || ministerio.error;
+    const erro = cultos.error || grupos.error || pessoas.error || ministerio.error || tipos.error;
     if (erro) return { erro };
 
     const ministerioId = ministerio.data?.id;
@@ -81,7 +83,10 @@ export async function carregarMontagem(mes) {
             gruposIds: (escala?.escala_grupo ?? []).map((g) => g.grupo_id)
                 .sort((a, b) => grupoPorId.get(a)?.nome.localeCompare(grupoPorId.get(b)?.nome)),
             mesa: mesa.map((i) => porId.get(i.pessoa_id)).filter(Boolean),
-            fixo: c.tipo_culto_id !== null,
+            // "fixo" = semanal (domingo, terça): é o que o grupo da semana
+            // preenche. O Culto de Jovens tem tipo, mas é "quando tiver" e
+            // tem grupo próprio (D41): fica fora do grupo da semana.
+            fixo: c.tipo?.gerar_sozinho === true,
             ativo: c.estado === 'ativo',
             passou: c.data < hoje,
         };
@@ -93,6 +98,8 @@ export async function carregarMontagem(mes) {
             cultos: lista,
             semanas: agruparPorSemana(lista, inicio, fim),
             grupos: grupos.data,
+            // Tipos "quando tiver" (Culto de Jovens): o líder cria no dia que quiser
+            tiposQuandoTiver: tipos.data.filter((t) => !t.gerar_sozinho && t.tem_louvor),
             grupoPorId,
             porId,
             doLouvor,
