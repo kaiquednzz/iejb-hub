@@ -247,3 +247,12 @@
 }
 .cabecalho-nome span { font-style: italic; font-weight: 600; }
 .cabecalho-acoes { display: flex; align-items: center; gap: 8px; }
+
+/* ==========================================================================
+   Revisão de interface (15/11/2026)
+   ========================================================================== */
+
+/* Alvo de toque: no mínimo 44 px (Apple e WCAG 2.5.5). Botões pequenos e links
+   de texto continuam com cara de pequenos, mas a área tocável cresce. */
+.botao-pequeno { min-height: 44px; }
+.link-discreto { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; }

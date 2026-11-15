@@ -12,7 +12,7 @@ import { h, icone, comCarregando } from '../../util/dom.js';
 import { supabase } from '../../supabase.js';
 import { abrirFolha, avisar } from '../../util/folha.js';
 import { mensagemDoBanco } from '../../util/erros.js';
-import { partesDaData, formatarHorario, somarDias } from '../../util/datas.js';
+import { partesDaData, formatarHorario, somarDias, hojeEmBrasilia } from '../../util/datas.js';
 import { nomeCurto } from '../../sessao.js';
 import { cabecalhoApp, barraAbas } from '../moldura.js';
 import { carregarMontagem, somarMes, nomeDoMes, mesSugerido, nomesDosGrupos, textoDoMes } from './dados.js';
@@ -93,8 +93,8 @@ export function telaMontar(conta) {
 
         // replaceChildren não achata listas nem ignora false: filtra antes
         resumo.replaceChildren(...(ativos.length === 0 ? ['Nenhum culto com louvor neste mês.'] : [
-            `${ativos.length} cultos`,
-            publicadas > 0 && h('span', { class: 'resumo-ok' }, ` · ${publicadas} publicados`),
+            `${ativos.length} ${ativos.length === 1 ? 'culto' : 'cultos'}`,
+            publicadas > 0 && h('span', { class: 'resumo-ok' }, ` · ${publicadas} ${publicadas === 1 ? 'publicado' : 'publicados'}`),
             rascunhos.length > 0 && h('span', { class: 'resumo-rascunho' }, ` · ${rascunhos.length} em rascunho`),
             semGrupo > 0 && h('span', { class: 'resumo-falta' }, ` · ${semGrupo} sem ninguém`),
         ].filter(Boolean)));
@@ -102,8 +102,12 @@ export function telaMontar(conta) {
         const especial = h('button', { type: 'button', class: 'botao-secundario botao-largo' }, icone('mais'), 'Culto especial');
         especial.addEventListener('click', () => folhaCultoEspecial(dados, ctx));
 
+        // Semanas que já acabaram sem nada para ver saem da lista: só poluem.
+        // Semana passada com culto continua (o líder pode querer conferir).
+        const hoje = hojeEmBrasilia();
+        const semanas = dados.semanas.filter((s) => s.cultos.length > 0 || somarDias(s.domingo, 6) >= hoje);
         area.replaceChildren(h('div', { class: 'lista-semanas' },
-            dados.semanas.map((s, i) => cartaoSemana(s, i)),
+            semanas.map((s, i) => cartaoSemana(s, i)),
             especial,
             h('p', { class: 'montar-dica' }, 'Depois de publicar, mudar alguém avisa só quem entrou, saiu ou mudou de instrumento.'),
         ));
@@ -140,14 +144,18 @@ export function telaMontar(conta) {
             }));
 
         const fim = somarDias(semana.domingo, 6);
+        // Semana sem culto: uma linha só, sem cartão (antes era um cartão
+        // inteiro com caixa tracejada, que pesava mais que as semanas com culto)
+        if (semana.cultos.length === 0) {
+            return h('p', { class: 'semana-vazia', style: { '--i': Math.min(indice, 6) } },
+                h('span', { class: 'semana-titulo' }, `${diaMes(semana.domingo)} a ${diaMes(fim)}`), ' · sem culto com louvor');
+        }
         return h('section', { class: 'cartao-semana', style: { '--i': Math.min(indice, 6) } },
             h('header', { class: 'semana-topo' },
                 h('h3', { class: 'semana-titulo' }, `${diaMes(semana.domingo)} a ${diaMes(fim)}`),
                 chips,
             ),
-            semana.cultos.length === 0
-                ? h('p', { class: 'cartao-vazio' }, 'Nenhum culto com louvor nesta semana.')
-                : h('ul', { class: 'lista-cultos-montar' }, semana.cultos.map(linhaCulto)),
+            h('ul', { class: 'lista-cultos-montar' }, semana.cultos.map(linhaCulto)),
         );
     }
 
@@ -181,7 +189,7 @@ export function telaMontar(conta) {
                     culto.rotulo && h('span', { class: 'rotulo-culto' }, culto.rotulo)),
                 h('span', { class: 'culto-montar-detalhe' },
                     `${formatarHorario(culto.horario)} · `,
-                    grupos.length ? h('strong', null, grupos.join(' + ')) : (tocam ? `${tocam} pessoas` : 'ninguém ainda')),
+                    grupos.length ? h('strong', null, grupos.join(' + ')) : (tocam ? `${tocam} ${tocam === 1 ? 'pessoa' : 'pessoas'}` : 'ninguém ainda')),
             ),
             h('span', { class: `estado-pill estado-${estado[0]}` }, estado[1]),
         );

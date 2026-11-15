@@ -607,3 +607,26 @@
 }
 .presenca-saiu { justify-content: space-between; padding: 8px 8px 8px 12px; border-radius: 14px; background: rgba(191, 38, 43, 0.07); }
 .presenca-texto { font-size: 14px; font-weight: 600; color: var(--principal); }
+
+/* --- Revisão de interface (15/11/2026) ---------------------------------- */
+
+/* Celular de 320 px (iPhone SE 1ª geração, Androids pequenos): o cartão do
+   login vazava pela direita. Item de grid tem min-width: auto; aqui vira 0. */
+.entrada-palco, .entrada-cartao { min-width: 0; }
+@media (max-width: 359px) {
+    .tela-entrada { padding-inline: 12px; }
+    .entrada-cartao { padding: 22px 16px 18px; }
+    .entrada-marca-nome { font-size: 26px; }
+}
+/* "Pedir acesso" / "Entrar" no rodapé: 19 px de altura era fácil de errar */
+.entrada-rodape a { display: inline-flex; align-items: center; min-height: 44px; padding-inline: 4px; }
+
+/* Culto cancelado: em vez de apagar o cartão inteiro com opacidade (o texto
+   ficava abaixo do contraste mínimo), só as cores ficam neutras */
+.cartao-culto.cancelado { opacity: 1; background: rgba(255, 255, 255, 0.55); }
+.cartao-culto.cancelado h3, .cartao-culto.cancelado .cartao-quando { color: var(--texto-2); }
+.cartao-culto.cancelado .cartao-data { background: rgba(58, 10, 9, 0.05); }
+.cartao-culto.cancelado .cartao-data :is(.cartao-data-semana, .cartao-data-mes, .cartao-data-dia) { color: var(--texto-2); }
+
+/* Número da música: rosa claro quase não aparecia */
+.lista-musicas li::before { color: var(--texto-2); }

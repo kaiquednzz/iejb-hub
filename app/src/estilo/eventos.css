@@ -109,3 +109,9 @@
 /* Item de grid tem min-width: auto: o campo de hora (com AM/PM em alguns
    aparelhos) empurrava a coluna para fora da folha */
 .campos-lado > .campo { min-width: 0; }
+
+/* --- Revisão de interface (15/11/2026) ---------------------------------- */
+.tela-eventos .botao-largo { margin-top: 18px; }
+.evento-linha .mini-data { width: 52px; padding-inline: 4px; }
+/* Data de evento de vários dias cabia cortada ("25 de de..."): duas linhas */
+.evento-linha-detalhe { white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }

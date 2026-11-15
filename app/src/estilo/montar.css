@@ -548,3 +548,14 @@
 .pedido-botoes { display: grid; grid-template-columns: 1fr 1fr 1.2fr; gap: 6px; }
 .pedido-botoes > * { padding-inline: 8px; }
 .linha-nao-vai { color: var(--principal); font-weight: 600; }
+
+/* --- Revisão de interface (15/11/2026) ---------------------------------- */
+/* Semana sem culto: uma linha discreta no lugar do cartão com caixa tracejada */
+.semana-vazia {
+    padding: 4px 6px;
+    font-size: 14px;
+    color: var(--texto-2);
+    animation: subir 0.5s calc(var(--i, 0) * 0.05s) var(--ease-out) backwards;
+}
+.semana-vazia .semana-titulo { display: inline; }
+.chip-mesa { min-height: 44px; }

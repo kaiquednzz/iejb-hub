@@ -48,15 +48,13 @@ export function blocoRepertorio(culto, conta, aoMudar, offline = false) {
                 ouvir,
             );
         })),
-        itens.length > 0 && h('div', { class: 'repertorio-acoes' },
-            fila.url
-                ? h('a', { class: 'botao-youtube', href: fila.url, target: '_blank', rel: 'noopener noreferrer' },
-                    icone('play', 'icone icone-p'), 'Tocar no YouTube',
-                    h('span', { class: 'botao-youtube-conta' }, `${fila.ids.length} de ${itens.length}`))
-                : h('p', { class: 'repertorio-nota' }, 'Nenhuma música com link do YouTube ainda.'),
-            fila.url && fila.ids.length < itens.length && h('p', { class: 'repertorio-nota' },
-                `${itens.length - fila.ids.length} sem link do YouTube ${itens.length - fila.ids.length === 1 ? 'fica' : 'ficam'} fora da fila.`),
-        ),
+        // Sem nenhum link do YouTube, o botão simplesmente não aparece (cada
+        // música tem o fone para ouvir). As notas sobre "fila" eram detalhe
+        // técnico demais para quem só quer ouvir; o líder vê isso no editor.
+        fila.url && h('div', { class: 'repertorio-acoes' },
+            h('a', { class: 'botao-youtube', href: fila.url, target: '_blank', rel: 'noopener noreferrer' },
+                icone('play', 'icone icone-p'),
+                fila.ids.length === itens.length ? 'Ouvir tudo no YouTube' : `Ouvir ${fila.ids.length} de ${itens.length} no YouTube`)),
         editar && h('div', { class: 'repertorio-editar' }, editar),
     );
 }
