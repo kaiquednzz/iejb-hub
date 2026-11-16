@@ -8,6 +8,7 @@ import { abrirFolha, avisar } from '../../util/folha.js';
 import { mensagemDoBanco } from '../../util/erros.js';
 import { caixaDeAviso } from '../moldura.js';
 import { reais, dataCurta, nomeDe } from './util.js';
+import { comemorar } from '../../util/comemorar.js';
 
 export function blocoConferir(conta) {
     const lugar = h('div', { class: 'inicio-conferir', 'aria-live': 'polite' });
@@ -31,7 +32,7 @@ export function blocoConferir(conta) {
         confere.addEventListener('click', () => comCarregando(confere, async () => {
             const { error } = await supabase.rpc('decidir_contagem', { p_contagem: c.id, p_confere: true });
             if (error) return avisar(mensagemDoBanco(error));
-            avisar('Conferida. Já entrou no caixa.');
+            comemorar('Contagem conferida!', 'O valor já entrou no caixa da igreja.');
             carregar();
         }));
         naoBateu.addEventListener('click', () => folhaNaoBateu(c, carregar));

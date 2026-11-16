@@ -14,6 +14,7 @@ import { h, icone, marcarCopiado } from './dom.js';
 import { supabase } from '../supabase.js';
 import { abrirFolha, avisar, anunciar } from './folha.js';
 import { caixaDeAviso } from '../telas/moldura.js';
+import { comemorar } from './comemorar.js';
 
 const ERRO_CODIGO = 'Código errado ou vencido. Confira no app e tente de novo.';
 let pedindo = null; // uma folha por vez, mesmo que duas telas peçam juntas
@@ -142,7 +143,7 @@ async function cadastrar(fatores, para) {
         const { form } = formularioDoCodigo(id, () => {
             ok = true;
             folha.fechar();
-            avisar('Pronto! Agora o Hub pede o código nas partes sensíveis.');
+            comemorar('Conta protegida!', 'Daqui pra frente, o Hub pede o código nas partes sensíveis.');
         });
 
         const folha = abrirFolha({

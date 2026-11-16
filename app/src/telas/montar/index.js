@@ -11,6 +11,7 @@
 import { h, icone, comCarregando, marcarCopiado } from '../../util/dom.js';
 import { supabase } from '../../supabase.js';
 import { abrirFolha, avisar, anunciar } from '../../util/folha.js';
+import { comemorar } from '../../util/comemorar.js';
 import { mensagemDoBanco } from '../../util/erros.js';
 import { partesDaData, formatarHorario, somarDias, hojeEmBrasilia } from '../../util/datas.js';
 import { nomeCurto } from '../../sessao.js';
@@ -120,7 +121,7 @@ export function telaMontar(conta) {
             const { error } = await supabase.from('escala').update({ estado: 'publicada' })
                 .in('id', rascunhos.map((c) => c.escala.id));
             if (error) return avisar(mensagemDoBanco(error));
-            avisar('Publicado! Todo o Louvor já vê a escala.');
+            comemorar('Escala publicada!', 'Todo o Louvor já vê a escala, e quem foi escalado recebe o aviso.');
             await carregar();
         }));
         const whatsapp = h('button', { type: 'button', class: 'botao-secundario', 'aria-label': 'Mandar a escala do mês no WhatsApp' }, icone('whatsapp'));

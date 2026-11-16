@@ -10,6 +10,7 @@ import { nomeCurto } from '../../sessao.js';
 import { campo, caixaDeAviso } from '../moldura.js';
 import { seletorInstrumentos, interruptor } from '../equipe/pecas.js';
 import { candidatosAMesa, nomesDosGrupos } from './dados.js';
+import { comemorar } from '../../util/comemorar.js';
 
 const ROTULO_CEIA = 'Ceia';
 const SUGESTOES = ['Voz', 'Violão', 'Guitarra', 'Baixo', 'Teclado', 'Bateria', 'Cajón', FUNCAO_MESA];
@@ -135,7 +136,8 @@ export function abrirCulto(cultoId, ctx) {
         if (!publicada && culto.itens.length > 0) {
             const publicar = h('button', { type: 'button', class: 'botao-principal botao-largo' }, 'Publicar só este culto');
             publicar.addEventListener('click', () => comCarregando(publicar, () =>
-                fazer(() => supabase.from('escala').update({ estado: 'publicada' }).eq('id', culto.escala.id), 'Publicado.')));
+                fazer(() => supabase.from('escala').update({ estado: 'publicada' }).eq('id', culto.escala.id))
+                    .then((ok) => ok && comemorar('Culto publicado!', 'Quem foi escalado já recebe o aviso.'))));
             finais.push(publicar);
         }
         const cancelar = h('button', { type: 'button', class: 'botao-texto-perigo' }, 'Cancelar este culto');
