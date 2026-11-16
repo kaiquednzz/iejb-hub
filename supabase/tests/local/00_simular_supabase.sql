@@ -30,6 +30,14 @@ as $$
 $$;
 grant execute on function auth.uid() to anon, authenticated, service_role;
 
+-- auth.jwt(): o JWT inteiro (o "aal" diz se a sessão foi confirmada com código)
+create function auth.jwt() returns jsonb
+language sql stable
+as $$
+  select coalesce(nullif(current_setting('request.jwt.claims', true), '')::jsonb, '{}'::jsonb);
+$$;
+grant execute on function auth.jwt() to anon, authenticated, service_role;
+
 -- O Supabase dá privilégios amplos por padrão a TODO objeto novo do esquema
 -- public: tabelas (inclusive TRUNCATE) e funções ficam liberadas para anon e
 -- authenticated. Imitar isso aqui é o que permite aos testes pegar uma função

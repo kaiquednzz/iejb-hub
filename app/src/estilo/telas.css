@@ -812,3 +812,35 @@
 .agenda-folha a.botao-largo { display: inline-flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; }
 .agenda-mais { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; }
 .agenda-mais .botao-texto { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; }
+
+/* ==========================================================================
+   Código do app autenticador (D57)
+   ========================================================================== */
+.codigo-folha { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; }
+.codigo-passos { display: grid; gap: 18px; margin: 0; padding: 0; list-style: none; counter-reset: passo; }
+.codigo-passos > li { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; padding-left: 38px; position: relative; counter-increment: passo; }
+.codigo-passos > li::before {
+    content: counter(passo) / '';
+    position: absolute; left: 0; top: -2px;
+    width: 26px; height: 26px; border-radius: 50%;
+    display: grid; place-items: center;
+    background: var(--principal); color: #fff; font-size: 14px; font-weight: 700;
+}
+.codigo-passos a.botao-largo { display: inline-flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; }
+.codigo-qr { display: none; width: 180px; height: 180px; padding: 10px; border-radius: var(--raio-s); background: #fff; box-shadow: var(--sombra-1); }
+/* QR só faz sentido quando a tela não é o próprio celular que vai ler */
+@media (min-width: 700px) and (pointer: fine) { .codigo-qr { display: block; } }
+.codigo-ajuda { display: flex; gap: 6px; align-items: flex-start; color: var(--texto-2); font-size: 14px; line-height: 1.45; }
+.codigo-ajuda .icone { flex: none; margin-top: 2px; }
+.codigo-chave { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 12px; }
+.codigo-chave code {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 15px; letter-spacing: 0.04em;
+    color: var(--texto-vinho); overflow-wrap: anywhere; -webkit-user-select: all; user-select: all;
+}
+.codigo-chave .botao-texto { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; }
+.codigo-form { gap: 12px; }
+.codigo-entrada {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    width: 100%; min-width: 0;
+    font-size: 28px !important; letter-spacing: 0.18em; text-align: center; font-variant-numeric: tabular-nums;
+}

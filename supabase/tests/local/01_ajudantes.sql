@@ -34,7 +34,20 @@ declare v uuid;
 begin
   select id into v from auth.users where email = p_email;
   if v is null then raise exception 'Usuário de teste % não existe', p_email; end if;
-  perform set_config('request.jwt.claims', json_build_object('sub', v, 'role', 'authenticated')::text, false);
+  -- aal2: como quem confirmou com o código do app autenticador (D57).
+  -- Os cenários antigos são de antes do código existir e assumem acesso cheio.
+  perform set_config('request.jwt.claims', json_build_object('sub', v, 'role', 'authenticated', 'aal', 'aal2')::text, false);
+end;
+$$;
+
+-- O mesmo, mas a pessoa só digitou a senha (sem o código)
+create function teste.entrar_so_com_senha(p_email text)
+returns void language plpgsql security definer as $$
+declare v uuid;
+begin
+  select id into v from auth.users where email = p_email;
+  if v is null then raise exception 'Usuário de teste % não existe', p_email; end if;
+  perform set_config('request.jwt.claims', json_build_object('sub', v, 'role', 'authenticated', 'aal', 'aal1')::text, false);
 end;
 $$;
 
