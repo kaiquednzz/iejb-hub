@@ -21,6 +21,7 @@ import './estilo/financeiro.css';
 
 import { supabase } from './supabase.js';
 import { carregarConta } from './sessao.js';
+import { fecharAbertura } from './util/abertura.js';
 import { telaEntrar } from './telas/entrar.js';
 import { telaPedirAcesso } from './telas/pedir-acesso.js';
 import { telaAguardando } from './telas/aguardando.js';
@@ -112,6 +113,7 @@ function mostrar(tela) {
     } else {
         trocar();
     }
+    fecharAbertura(); // a primeira tela entrou: a logo pode sair (D51)
 }
 
 // Reage a login, logout e troca de senha.

@@ -2,6 +2,7 @@ import { h, comCarregando } from '../util/dom.js';
 import { supabase } from '../supabase.js';
 import { mensagemDeErro } from '../sessao.js';
 import { molduraEntrada, campo, caixaDeAviso, blocoGoogle } from './moldura.js';
+import { prepararSom, tocarEntrada } from '../util/som.js';
 import { erroDoGoogle } from '../util/google.js';
 
 export function telaEntrar() {
@@ -14,6 +15,7 @@ export function telaEntrar() {
         class: 'form', novalidate: true,
         onsubmit: async (evento) => {
             evento.preventDefault();
+            prepararSom(); // tem que ser aqui, ainda dentro do toque
             aviso.limpar();
             const dados = new FormData(form);
             const email = String(dados.get('email')).trim();
@@ -24,6 +26,7 @@ export function telaEntrar() {
                 const { error } = await supabase.auth.signInWithPassword({ email, password: senha });
                 // Deu certo: o main.js percebe o login e troca a tela sozinho
                 if (error) aviso.mostrar(mensagemDeErro(error));
+                else tocarEntrada();
             });
         },
     },
