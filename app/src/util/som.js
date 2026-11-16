@@ -1,10 +1,12 @@
 // Som de entrada (D51): um "plim" curto e baixo, feito na hora pelo Web Audio
 // (sem arquivo para baixar). Duas notas em quinta, com cauda de sino.
 //
-// Por que só ao ENTRAR (tocar em "Entrar") e não ao abrir o app: navegador
-// nenhum deixa uma página tocar som sem um toque da pessoa antes. No iPhone o
-// som também respeita a chave do silencioso: no culto, com o celular no
-// silencioso, não toca.
+// Quando toca:
+//   - ao abrir o app, junto da chama acendendo, SE o celular deixar. O Chrome
+//     do Android deixa site instalado na tela de início tocar som sozinho; o
+//     iPhone não deixa (nenhuma página toca som sem um toque antes);
+//   - ao entrar com e-mail e senha (aí tem o toque no botão).
+// No iPhone respeita a chave do silencioso: no culto, não toca.
 let contexto = null;
 
 // Chamar DENTRO do toque (antes de qualquer await): é o que libera o áudio
@@ -16,6 +18,18 @@ export function prepararSom() {
         if (contexto.state === 'suspended') contexto.resume();
         if ('audioSession' in navigator) navigator.audioSession.type = 'ambient';
     } catch { /* sem som, sem problema */ }
+}
+
+// Na abertura: tenta tocar em `quandoMs` (relógio da página). Se o celular
+// não liberou o áudio, fica quieto, sem erro e sem pedir nada.
+export function tocarNaAbertura(quandoMs) {
+    try {
+        const Ctx = window.AudioContext || window.webkitAudioContext;
+        if (!Ctx) return;
+        contexto ??= new Ctx();
+        if ('audioSession' in navigator) navigator.audioSession.type = 'ambient';
+        setTimeout(() => { if (contexto.state === 'running') tocarEntrada(); }, Math.max(0, quandoMs - performance.now()));
+    } catch { /* sem som */ }
 }
 
 export function tocarEntrada() {
