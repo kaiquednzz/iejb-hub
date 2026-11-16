@@ -8,6 +8,33 @@ import { h, icone } from './dom.js';
 
 let contador = 0;
 
+// Trava a rolagem da página atrás da folha.
+// Não dá pra usar só overflow:hidden no <html>: no Safari do iPhone, com a
+// página já rolada, o <dialog> fica deslocado (aparece no meio da tela,
+// cortado). Prender o <body> no lugar (position:fixed + top negativo) zera a
+// rolagem de verdade sem a página "pular", e na hora de fechar devolvemos a
+// posição. Conta quantas folhas estão abertas (uma pode abrir outra).
+let folhasAbertas = 0;
+let rolagemGuardada = 0;
+function travarRolagem() {
+    if (folhasAbertas++ > 0) return;
+    rolagemGuardada = window.scrollY;
+    const corpo = document.body.style;
+    corpo.position = 'fixed';
+    corpo.top = `-${rolagemGuardada}px`;
+    corpo.left = '0';
+    corpo.right = '0';
+    document.documentElement.classList.add('com-folha');
+}
+function destravarRolagem() {
+    if (--folhasAbertas > 0) return;
+    folhasAbertas = 0;
+    const corpo = document.body.style;
+    corpo.position = corpo.top = corpo.left = corpo.right = '';
+    document.documentElement.classList.remove('com-folha');
+    window.scrollTo({ top: rolagemGuardada, behavior: 'instant' });
+}
+
 export function abrirFolha({ titulo, conteudo, aoFechar }) {
     const idTitulo = `folha-titulo-${++contador}`;
     const fecharBotao = h('button', { type: 'button', class: 'folha-fechar', 'aria-label': 'Fechar' }, icone('fechar'));
@@ -27,10 +54,13 @@ export function abrirFolha({ titulo, conteudo, aoFechar }) {
     function fechar() {
         if (fechando) return;
         fechando = true;
+        let terminou = false;
         const terminar = () => {
+            if (terminou) return; // animationend e o setTimeout de garantia podem chegar os dois
+            terminou = true;
             dialogo.close();
             dialogo.remove();
-            document.documentElement.classList.remove('com-folha');
+            destravarRolagem();
             aoFechar?.();
         };
         if (matchMedia('(prefers-reduced-motion: reduce)').matches) return terminar();
@@ -46,7 +76,7 @@ export function abrirFolha({ titulo, conteudo, aoFechar }) {
     dialogo.addEventListener('click', (evento) => { if (evento.target === dialogo) fechar(); });
 
     document.body.append(dialogo);
-    document.documentElement.classList.add('com-folha'); // trava a rolagem da página atrás
+    travarRolagem();
     dialogo.showModal();
     // Não abrir o teclado do celular sozinho: foca o título, não o 1º campo.
     // preventScroll: a folha ainda está lá embaixo (subindo); sem isso o
