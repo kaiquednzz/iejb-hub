@@ -16,6 +16,7 @@ import { naoVai, FUNCAO_MESA } from '../util/escala.js';
 import { cabecalhoApp } from './moldura.js';
 import { veFinanceiro, cuidaDosEventos } from '../sessao.js';
 import { blocoConferir } from './financeiro/conferir.js';
+import { blocoEventos } from './inicio-eventos.js';
 
 const MODULOS = [
     { id: 'louvor', nome: 'Louvor', texto: 'Escala, repertórios e equipe', icone: 'musica', rota: '#/escala', pode: () => true },
@@ -51,6 +52,7 @@ export function telaInicio(conta) {
             destaque,
             conferir,
             avisosAdmin,
+            blocoEventos(),
             h('h2', { class: 'inicio-secao' }, 'Ministérios e áreas'),
             h('ul', { class: 'grade-modulos' }, MODULOS.filter((m) => m.emBreve || m.pode(conta)).map(cartaoModulo)),
             h('p', { class: 'inicio-rodape' }, 'IEJB · Igreja Evangélica do Jardim Brasil'),

@@ -18,8 +18,8 @@ import { hojeEmBrasilia, formatarHorario, rotuloDoDia } from '../util/datas.js';
 import { reduzirImagem } from '../util/foto.js';
 import { cabecalhoApp, campo, caixaDeAviso } from './moldura.js';
 import { interruptor } from './equipe/pecas.js';
+import { situacaoDoEvento, urlDaImagem, enderecoNoSite } from '../util/eventos.js';
 
-const SITE = 'https://iejb.com.br';
 const CATEGORIAS = ['Culto especial', 'Culto de Jovens', 'Conferência', 'Retiro', 'Fim de ano'];
 const UM_ANO = String(60 * 60 * 24 * 365);
 const MESES = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
@@ -55,8 +55,8 @@ export function telaEventos(conta) {
                 h('p', { class: 'estado-vazio-texto' }, mensagemDoBanco(error)), botao));
             return;
         }
-        const hoje = hojeEmBrasilia();
-        const passou = (e) => (e.data_fim || e.data) < hoje;
+        // Mesma regra do site: sai 3h depois do início (ou no fim do último dia)
+        const passou = (e) => situacaoDoEvento(e) === 'passou';
         const proximos = data.filter((e) => !passou(e));
         const antigos = data.filter(passou).reverse().slice(0, 12);
 
@@ -345,17 +345,8 @@ function tituloComDestaque(titulo, destaque) {
     return [titulo.slice(0, pos), h('strong', null, destaque), titulo.slice(pos + destaque.length)];
 }
 
-function urlDaImagem(imagem) {
-    if (!imagem) return null;
-    if (imagem.startsWith('images/')) return `${SITE}/${imagem}`;
-    return supabase.storage.from('eventos').getPublicUrl(imagem).data.publicUrl;
-}
-
-// Mesmo id que o site dá ao cartão (visita.js): evento-AAAA-MM-DD-<título>
 function linkDoSite(evento) {
-    const slug = evento.titulo.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
-        .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-    return h('a', { class: 'link-site', href: `${SITE}/#evento-${evento.data}-${slug}`, target: '_blank', rel: 'noopener' },
+    return h('a', { class: 'link-site', href: enderecoNoSite(evento), target: '_blank', rel: 'noopener' },
         icone('externo', 'icone icone-p'), 'Ver no site');
 }
 
