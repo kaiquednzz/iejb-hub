@@ -1,9 +1,9 @@
 // Pessoas do Louvor. Admin e líder de louvor cadastram e editam (RN-14);
 // o admin também cuida do acesso ao Hub de cada um (RN-10, RN-65).
 // Os demais veem a lista com o contato (Q22).
-import { h, icone, comCarregando } from '../../util/dom.js';
+import { h, icone, comCarregando, marcarCopiado } from '../../util/dom.js';
 import { supabase } from '../../supabase.js';
-import { abrirFolha, confirmar, avisar } from '../../util/folha.js';
+import { abrirFolha, confirmar, avisar, anunciar } from '../../util/folha.js';
 import { mensagemDoBanco, mensagemDaFuncao } from '../../util/erros.js';
 import { campo, caixaDeAviso } from '../moldura.js';
 import { sugestoesDeInstrumento, eLiderDeLouvor } from './dados.js';
@@ -355,7 +355,7 @@ function resultadoDoAcesso(email, senha, titulo, folha) {
     copiar.addEventListener('click', async () => {
         try {
             await navigator.clipboard.writeText(texto);
-            avisar('Mensagem copiada.');
+            marcarCopiado(copiar); anunciar('Mensagem copiada.');
         } catch {
             avisar('Não deu para copiar. Selecione o texto acima.');
         }

@@ -4,7 +4,7 @@
 //   - iPhone/iPad: não existe botão "instalar" no iOS, então ensinamos o caminho
 //   - Android: botão "Instalar" de verdade quando o navegador oferece;
 //     senão, o caminho pelo menu
-import { h, icone, comCarregando } from '../util/dom.js';
+import { h, icone, comCarregando, marcarCopiado } from '../util/dom.js';
 import { aparelho, podeInstalarDireto, pedirInstalacao, aoMudarInstalacao } from '../pwa.js';
 
 export function telaInstalar() {
@@ -80,7 +80,7 @@ function abrirNoNavegador() {
     botaoCopiar.addEventListener('click', async () => {
         try {
             await navigator.clipboard.writeText(location.origin);
-            botaoCopiar.replaceChildren(icone('certo'), 'Link copiado');
+            marcarCopiado(botaoCopiar, 'Link copiado');
         } catch {
             botaoCopiar.replaceChildren(location.host);
         }

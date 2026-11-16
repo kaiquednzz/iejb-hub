@@ -11,9 +11,9 @@
 //
 // O endereço leva um segredo da pessoa (meu_link_da_agenda). "Trocar o link"
 // gera outro e a assinatura antiga para de receber cultos.
-import { h, icone, comCarregando } from './dom.js';
+import { h, icone, comCarregando, marcarCopiado } from './dom.js';
 import { supabase } from '../supabase.js';
-import { abrirFolha, avisar, confirmar } from './folha.js';
+import { abrirFolha, avisar, confirmar, anunciar } from './folha.js';
 
 const BASE = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/agenda`;
 const eApple = /iPhone|iPad|iPod|Macintosh/.test(navigator.userAgent);
@@ -63,7 +63,7 @@ async function abrir(aoAssinar) {
     copiar.addEventListener('click', async () => {
         try {
             await navigator.clipboard.writeText(link.https);
-            avisar('Link copiado');
+            marcarCopiado(copiar); anunciar('Link copiado.');
         } catch {
             avisar('Não deu para copiar neste aparelho.');
         }

@@ -97,3 +97,14 @@ export function avisar(texto) {
         if (comPopover) setTimeout(() => caixaToast.matches(':popover-open') && caixaToast.hidePopover(), 400);
     }, 2600);
 }
+
+// Fala algo só para o leitor de tela (sem aviso na tela).
+let caixaAnuncio;
+export function anunciar(texto) {
+    if (!caixaAnuncio) {
+        caixaAnuncio = h('div', { class: 'sr-only', role: 'status' });
+        document.body.append(caixaAnuncio);
+    }
+    caixaAnuncio.textContent = '';
+    setTimeout(() => { caixaAnuncio.textContent = texto; }, 60); // a região tem que existir antes do texto
+}

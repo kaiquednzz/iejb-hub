@@ -10,9 +10,9 @@
 //
 // Padrão TOTP: funciona com o app Senhas do iPhone, Google Authenticator,
 // Microsoft Authenticator etc. Nada de SMS (custa e é fácil de interceptar).
-import { h, icone } from './dom.js';
+import { h, icone, marcarCopiado } from './dom.js';
 import { supabase } from '../supabase.js';
-import { abrirFolha, avisar } from './folha.js';
+import { abrirFolha, avisar, anunciar } from './folha.js';
 import { caixaDeAviso } from '../telas/moldura.js';
 
 const ERRO_CODIGO = 'Código errado ou vencido. Confira no app e tente de novo.';
@@ -136,7 +136,7 @@ async function cadastrar(fatores, para) {
         const chave = totp.secret.replace(/(.{4})(?=.)/g, '$1 ');
         const copiar = h('button', { type: 'button', class: 'botao-texto' }, icone('copiar', 'icone icone-p'), 'Copiar a chave');
         copiar.addEventListener('click', async () => {
-            try { await navigator.clipboard.writeText(totp.secret); avisar('Chave copiada.'); }
+            try { await navigator.clipboard.writeText(totp.secret); marcarCopiado(copiar); anunciar('Chave copiada.'); }
             catch { avisar('Não deu para copiar neste aparelho.'); }
         });
         const { form } = formularioDoCodigo(id, () => {

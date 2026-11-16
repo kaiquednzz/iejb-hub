@@ -79,8 +79,10 @@ export function icone(nome, classe = 'icone') {
     svg.setAttribute('class', classe);
     svg.setAttribute('aria-hidden', 'true');
     svg.setAttribute('focusable', 'false');
+    svg.dataset.icone = nome; // cada ícone reage ao toque do seu jeito (util/toques.js)
     const caminho = document.createElementNS(ns, 'path');
     caminho.setAttribute('d', ICONES[nome]);
+    caminho.setAttribute('pathLength', '1'); // deixa o traço "se desenhar" (ver .desenha)
     svg.append(caminho);
     return svg;
 }
@@ -98,4 +100,15 @@ export async function comCarregando(botao, acao) {
         botao.removeAttribute('aria-busy');
         botao.classList.remove('carregando');
     }
+}
+
+// Botão de copiar vira "✓ Copiado!" por um instante e depois volta.
+// O ✓ se desenha (traço animado); o leitor de tela ouve pelo anunciar().
+export function marcarCopiado(botao, texto = 'Copiado!') {
+    const original = botao.__original ??= [...botao.childNodes];
+    const classe = original.find((n) => n.dataset?.icone)?.getAttribute('class') ?? 'icone';
+    botao.replaceChildren(icone('certo', `${classe} desenha`), texto);
+    botao.classList.add('copiado');
+    clearTimeout(botao.__volta);
+    botao.__volta = setTimeout(() => { botao.replaceChildren(...original); botao.classList.remove('copiado'); }, 1800);
 }

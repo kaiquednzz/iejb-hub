@@ -8,9 +8,9 @@
 //
 // Nada aparece para os outros até "Publicar". Depois de publicada, cada
 // mudança avisa só quem foi afetado (os gatilhos do banco cuidam disso).
-import { h, icone, comCarregando } from '../../util/dom.js';
+import { h, icone, comCarregando, marcarCopiado } from '../../util/dom.js';
 import { supabase } from '../../supabase.js';
-import { abrirFolha, avisar } from '../../util/folha.js';
+import { abrirFolha, avisar, anunciar } from '../../util/folha.js';
 import { mensagemDoBanco } from '../../util/erros.js';
 import { partesDaData, formatarHorario, somarDias, hojeEmBrasilia } from '../../util/datas.js';
 import { nomeCurto } from '../../sessao.js';
@@ -211,7 +211,7 @@ function folhaWhatsApp(dados, emRascunho) {
     const texto = textoDoMes(dados);
     const copiar = h('button', { type: 'button', class: 'botao-secundario botao-largo' }, icone('copiar'), 'Copiar');
     copiar.addEventListener('click', async () => {
-        try { await navigator.clipboard.writeText(texto); avisar('Escala copiada.'); } catch { avisar('Não deu para copiar.'); }
+        try { await navigator.clipboard.writeText(texto); marcarCopiado(copiar); anunciar('Escala copiada.'); } catch { avisar('Não deu para copiar.'); }
     });
     abrirFolha({
         titulo: 'Mandar a escala',

@@ -1,0 +1,60 @@
+/* ==========================================================================
+   Ícones que reagem ao toque (D59) — quem liga é util/toques.js
+   Só translate/rotate/scale (propriedades individuais): não brigam com o
+   transform dos botões nem com o rotate(180°) das setas viradas.
+   ========================================================================== */
+svg[data-icone].reage { animation: icPop 0.45s var(--mola); transform-box: fill-box; transform-origin: center; }
+
+svg[data-icone="sino"].reage        { animation: icSino 0.7s var(--ease-out); transform-origin: 50% 8%; }
+svg[data-icone="moeda"].reage       { animation: icMoeda 0.7s var(--ease-ios); }
+svg[data-icone="relogio"].reage,
+svg[data-icone="historico"].reage   { animation: icVolta 0.7s var(--ease-ios); }
+svg[data-icone="historico"].reage   { animation-direction: reverse; }
+svg[data-icone="olho"].reage        { animation: icPisca 0.4s ease-in-out; }
+svg[data-icone="local"].reage       { animation: icQuica 0.6s var(--mola); transform-origin: 50% 100%; }
+svg[data-icone="mais"].reage,
+svg[data-icone="adicionar"].reage   { animation: icGira90 0.5s var(--mola); }
+svg[data-icone="fechar"].reage      { animation: icGira90 0.4s var(--ease-out); }
+svg[data-icone="estrela"].reage     { animation: icEstrela 0.6s var(--mola); }
+svg[data-icone="compartilhar"].reage,
+svg[data-icone="externo"].reage     { animation: icSobe 0.5s var(--mola); }
+svg[data-icone="baixar"].reage      { animation: icDesce 0.5s var(--mola); }
+svg[data-icone="sair"].reage,
+svg[data-icone="seta"].reage        { animation: icDireita 0.45s var(--mola); }
+.gira-180[data-icone="seta"].reage  { animation-name: icEsquerda; }
+svg[data-icone="lixeira"].reage,
+svg[data-icone="celular"].reage,
+svg[data-icone="whatsapp"].reage    { animation: icTreme 0.45s var(--ease-out); }
+svg[data-icone="chave"].reage       { animation: icChave 0.55s var(--mola); }
+svg[data-icone="lupa"].reage        { animation: icLupa 0.6s var(--mola); }
+svg[data-icone="megafone"].reage,
+svg[data-icone="play"].reage        { animation: icBate 0.5s var(--mola); }
+svg[data-icone="calendario"].reage  { animation: icCalendario 0.5s var(--mola); transform-origin: 50% 100%; }
+
+@keyframes icPop       { 35% { scale: 0.78; } }
+@keyframes icSino      { 15% { rotate: -16deg; } 35% { rotate: 13deg; } 55% { rotate: -8deg; } 75% { rotate: 4deg; } }
+@keyframes icMoeda     { to { rotate: y 360deg; } }
+@keyframes icVolta     { to { rotate: 360deg; } }
+@keyframes icPisca     { 45%, 55% { scale: 1 0.1; } }
+@keyframes icQuica     { 30% { translate: 0 -5px; } 60% { translate: 0 0; scale: 1.08 0.9; } }
+@keyframes icGira90    { to { rotate: 90deg; } }
+@keyframes icEstrela   { 40% { rotate: 36deg; scale: 1.25; } }
+@keyframes icSobe      { 35% { translate: 2px -4px; } }
+@keyframes icDesce     { 35% { translate: 0 4px; } }
+@keyframes icDireita   { 35% { translate: 4px 0; } }
+@keyframes icEsquerda  { 35% { translate: -4px 0; } }
+@keyframes icTreme     { 20% { rotate: -10deg; } 40% { rotate: 9deg; } 60% { rotate: -5deg; } 80% { rotate: 3deg; } }
+@keyframes icChave     { 40% { rotate: 35deg; } }
+@keyframes icLupa      { 40% { rotate: -18deg; scale: 1.15; } }
+@keyframes icBate      { 30% { scale: 1.22; } 55% { scale: 0.94; } }
+@keyframes icCalendario { 30% { scale: 1 0.85; } 60% { translate: 0 -3px; scale: 1 1.05; } }
+
+/* O ✓ do "Copiado!" se desenha (pathLength=1 no caminho, ver util/dom.js) */
+svg.desenha path { stroke-dasharray: 1; animation: icDesenha 0.45s 0.05s var(--ease-out) backwards; }
+svg.desenha { animation: icPop 0.45s var(--mola); }
+@keyframes icDesenha { from { stroke-dashoffset: 1; } }
+.copiado { color: var(--verde) !important; }
+
+@media (prefers-reduced-motion: reduce) {
+    svg[data-icone].reage, svg.desenha, svg.desenha path { animation: none !important; }
+}
