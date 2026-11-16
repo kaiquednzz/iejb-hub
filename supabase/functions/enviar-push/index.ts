@@ -31,6 +31,16 @@ const TITULOS: Record<string, string> = {
     culto_cancelado: 'Culto cancelado',
     solicitacao_nova: 'Pedido de alteração',
     solicitacao_decidida: 'Seu pedido de alteração',
+    presenca_alterada: 'Escala do Louvor',
+    contagem_para_conferir: 'Conferir contagem',
+    contagem_decidida: 'Contagem do culto',
+};
+
+// Para onde o toque na notificação leva
+const DESTINO: Record<string, string> = {
+    solicitacao_nova: '/#/montar',
+    contagem_para_conferir: '/#/inicio',
+    contagem_decidida: '/#/financeiro',
 };
 
 // Lê o par de chaves; se ainda não existe, cria e guarda (uma vez na vida)
@@ -69,8 +79,9 @@ Deno.serve(async (req) => {
             const mensagem = JSON.stringify({
                 titulo: TITULOS[e.tipo] ?? 'IEJB Hub',
                 corpo: e.resumo,
-                // Pedido novo vai para quem monta a escala; o resto, para a escala
-                url: e.tipo === 'solicitacao_nova' ? '/#/montar' : '/#/escala',
+                // Pedido novo vai para quem monta a escala; contagem, para o
+                // início ou o financeiro; o resto, para a escala
+                url: DESTINO[e.tipo] ?? '/#/escala',
                 // Mesma escala = mesma notificação: a mais nova substitui a antiga
                 tag: e.escala_id ? `escala-${e.escala_id}` : e.tipo,
             });

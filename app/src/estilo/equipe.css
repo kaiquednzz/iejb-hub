@@ -482,7 +482,8 @@ fieldset.campo { border: none; padding: 0; margin: 0; min-width: 0; }
     transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease, transform 0.5s var(--mola);
 }
 .ficha:active { transform: scale(0.93); transition-duration: 0.12s; }
-.ficha[aria-pressed="true"] {
+.ficha[aria-pressed="true"],
+.ficha[aria-checked="true"] {
     background: var(--principal);
     border-color: var(--principal);
     color: #fff;
@@ -665,3 +666,13 @@ fieldset.campo { border: none; padding: 0; margin: 0; min-width: 0; }
 .recorte-zoom { flex: 1; accent-color: var(--principal); }
 .recorte-icone-menor { opacity: 0.6; }
 .recorte-dica { text-align: center; }
+
+/* Cargos (D45) dentro do bloco de acesso */
+.bloco-subtitulo {
+    margin: 14px 0 2px;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--texto-2);
+}

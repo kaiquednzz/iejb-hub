@@ -13,6 +13,13 @@ import {
 } from './pecas.js';
 import { avatar } from '../../util/foto.js';
 
+const NOME_CARGO = { tesouraria: 'Tesouraria', pastor: 'Pastor', comunicacao: 'Comunicação' };
+const DESCRICAO_CARGO = {
+    tesouraria: 'Lança e edita o financeiro.',
+    pastor: 'Vê o financeiro, sem editar.',
+    comunicacao: 'Cuida dos eventos do site.',
+};
+
 export function secaoPessoas(dados, ctx) {
     const { papeis } = dados;
     const ativas = dados.pessoas.filter((p) => p.ativa);
@@ -52,6 +59,7 @@ function selosDaPessoa(pessoa, dados) {
     if (eLiderDeLouvor(pessoa, dados.ministerioId)) selos.push(selo('Líder de louvor'));
     // A conta só chega para o admin (RLS); para os outros, isto fica em branco
     if (pessoa.conta?.e_administrador) selos.push(selo('Admin', 'admin'));
+    for (const c of pessoa.cargo_pessoa ?? []) selos.push(selo(NOME_CARGO[c.cargo]));
     if (dados.papeis.admin && pessoa.ativa) {
         if (!pessoa.conta) selos.push(selo('Sem acesso', 'neutro'));
         else if (pessoa.conta.estado === 'desativada') selos.push(selo('Acesso desligado', 'neutro'));
@@ -223,6 +231,26 @@ function blocoAcesso(pessoa, dados, ctx, pegarFolha) {
             return true;
         },
     }));
+
+    // Cargos (D45). O admin dá e tira; tudo fica no rastro de auditoria.
+    caixa.append(h('p', { class: 'bloco-subtitulo' }, 'Cargos'),
+        ...Object.entries(NOME_CARGO).map(([cargo, nome]) => {
+            const atual = () => pessoa.cargo_pessoa?.find((c) => c.cargo === cargo);
+            return interruptor({
+                rotulo: nome,
+                descricao: DESCRICAO_CARGO[cargo],
+                ligado: !!atual(),
+                aoMudar: async (valor) => {
+                    const { error } = valor
+                        ? await supabase.from('cargo_pessoa').insert({ pessoa_id: pessoa.id, cargo })
+                        : await supabase.from('cargo_pessoa').delete().eq('id', atual().id);
+                    if (error) { avisar(mensagemDoBanco(error)); return false; }
+                    avisar(valor ? `Agora é da ${nome.toLowerCase()}.` : `Saiu da ${nome.toLowerCase()}.`);
+                    ctx.recarregar();
+                    return true;
+                },
+            });
+        }));
 
     if (!souEu) {
         const senha = h('button', { type: 'button', class: 'botao-secundario botao-largo' }, 'Redefinir senha');

@@ -14,13 +14,15 @@ import { hojeEmBrasilia, rotuloDoDia, formatarHorario, partesDaData } from '../u
 import { escalaGuardada } from '../offline.js';
 import { naoVai, FUNCAO_MESA } from '../util/escala.js';
 import { cabecalhoApp } from './moldura.js';
+import { veFinanceiro, cuidaDosEventos } from '../sessao.js';
+import { blocoConferir } from './financeiro/conferir.js';
 
 const MODULOS = [
     { id: 'louvor', nome: 'Louvor', texto: 'Escala, repertórios e equipe', icone: 'musica', rota: '#/escala', pode: () => true },
-    { id: 'eventos', nome: 'Eventos do site', texto: 'Agenda de iejb.com.br', icone: 'megafone', rota: '#/eventos', pode: (c) => c.e_administrador },
+    { id: 'eventos', nome: 'Eventos do site', texto: 'Agenda de iejb.com.br', icone: 'megafone', rota: '#/eventos', pode: cuidaDosEventos },
     { id: 'pregacoes', nome: 'Pregações', texto: 'Mensagens e acervo', icone: 'livro', emBreve: true },
     { id: 'kids', nome: 'Kids', texto: 'Turmas e escalas', icone: 'crianca', emBreve: true },
-    { id: 'financeiro', nome: 'Financeiro', texto: 'Tesouraria', icone: 'moeda', emBreve: true },
+    { id: 'financeiro', nome: 'Financeiro', texto: 'Caixa da igreja', icone: 'moeda', rota: '#/financeiro', pode: veFinanceiro },
 ];
 
 function saudacao() {
@@ -37,6 +39,8 @@ export function telaInicio(conta) {
     const primeiroNome = (conta.pessoa?.apelido || conta.pessoa?.nome || conta.nome_informado || '').split(' ')[0];
     const destaque = h('div', { class: 'inicio-destaque', 'aria-live': 'polite' }, h('div', { class: 'inicio-compromisso esqueleto' }));
     const avisosAdmin = h('div', { class: 'inicio-avisos' });
+    // Contagem do culto esperando a conferência desta pessoa (D48)
+    const conferir = blocoConferir(conta);
 
     const tela = h('div', { class: 'tela tela-app tela-inicio' },
         cabecalhoApp(conta),
@@ -45,6 +49,7 @@ export function telaInicio(conta) {
             h('p', { class: 'inicio-data' }, dataDeHoje()),
             h('h1', { tabindex: -1, class: 'titulo-tela inicio-ola' }, `${saudacao()}${primeiroNome ? `, ${primeiroNome}` : ''}!`),
             destaque,
+            conferir,
             avisosAdmin,
             h('h2', { class: 'inicio-secao' }, 'Ministérios e áreas'),
             h('ul', { class: 'grade-modulos' }, MODULOS.filter((m) => m.emBreve || m.pode(conta)).map(cartaoModulo)),

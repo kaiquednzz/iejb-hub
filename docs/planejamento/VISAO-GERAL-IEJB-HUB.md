@@ -6,7 +6,7 @@
 | **Instituição** | IEJB, Igreja Evangélica do Jardim Brasil |
 | **Responsável pelo projeto e desenvolvimento** | Kaique |
 | **Status** | Em desenvolvimento (etapa 4): banco, login, escala, PWA gestão de pessoas e acessos, montagem da escala, repertório com botões de streaming, fotos de perfil, avisos por push e ajuste da escala pelo líder de grupo prontos (todas as regras do piloto têm tela); app publicado em `app.iejb.com.br`. Sem aprovação institucional definitiva. |
-| **Versão deste documento** | 2.8 (Culto de Jovens, semanas na escala, grupo sincronizado) |
+| **Versão deste documento** | 2.9 (Cargos e módulo Financeiro) |
 | **Última atualização** | 13/11/2026 |
 
 > Este documento registra a visão atual do IEJB Hub para que ela possa evoluir depois.
@@ -452,6 +452,11 @@ A mensalidade contemplaria: utilização, hospedagem, manutenção, correções,
 | D42 | **Escala acompanha o grupo.** Entrar, sair ou mudar de instrumento num grupo atualiza as escalas em rascunho de cultos futuros com aquele grupo (ajuste feito à mão no culto não é desfeito; escala publicada não muda sozinha). Escolher de novo o mesmo grupo recarrega. Grupo sem ninguém aparece como "vazio" e avisa onde cadastrar. |
 | D43 | **Semana em blocos na escala.** Cada semana é um cartão ("Esta semana", "Semana que vem") com o grupo no topo e um bloco por culto (DOM 15 · TER 17 · SÁB 21, hora e rostos de quem toca, ponto "Você"). Tocar num bloco abre os detalhes embaixo; trocar de dia desliza sem fechar; tocar de novo fecha. A semana atual já abre no próximo culto. Escolhida pelo Kaique entre 3 propostas (calendário, pilha, blocos) em 15/11/2026. Se a terça tem as mesmas pessoas do domingo, aparece "Mesmas pessoas de domingo". |
 | D44 | **Repetir o repertório de domingo.** O repertório de domingo e terça costuma se repetir: com o da terça vazio, quem edita tem "Repetir o repertório de domingo" (copia músicas, ordem e tom). Depois de copiado, é um repertório normal, editável. |
+| D45 | **Cargos fora dos ministérios** (Kaique, 15/11/2026): Tesouraria (lança e edita o financeiro), Pastor (vê o financeiro, sem editar) e Comunicação (cuida dos eventos do site junto com o admin). Só o admin dá e tira cargo, na tela Equipe, e fica no registro de auditoria. O admin **não** vê o financeiro por ser admin. |
+| D46 | **Financeiro manual.** A igreja usa PagBank, sem API de extrato utilizável; Open Finance via agregador é caro e burocrático para conta PJ com vários assinantes. Lançamentos à mão, em centavos, com duas contas (Caixa em dinheiro e PagBank), saldo inicial por conta e transferências entre elas. Nada se apaga: lançamento errado é cancelado com motivo, e toda criação, edição e cancelamento fica no histórico. Próximo passo: importar o CSV que o PagBank exporta. |
+| D47 | **Dízimo por total, sem nome de dizimista** (LGPD: dízimo com nome revela religião, dado sensível). |
+| D48 | **Contagem do dinheiro com dupla conferência.** A tesouraria registra dízimos e ofertas do culto e escolhe quem confere (qualquer pessoa com acesso ao app); essa pessoa recebe aviso e confirma ou diz o que não bateu na tela Início. Só a contagem conferida vira lançamento no Caixa, e esse lançamento não se edita (só se cancela). |
+| D49 | **Relatórios ficam dentro do módulo** (tesouraria e pastor): resumo do mês por categoria e planilha do mês para baixar. |
 | D39 | **Histórico de repertórios.** Depois que o culto começa, o repertório dele é de todo o ministério (antes, só de quem é do culto, D36). Tela "Repertórios" no Louvor: por mês, busca por música ("tocada 3 vezes · última em ..."), filtro por grupo. Culto cancelado não entra. |
 | D40 | **Início e módulos.** O app abre no Início: saudação, próximo compromisso, pedidos de acesso (admin) e a grade de módulos. Cada módulo declara quem vê e para onde vai; Pregações, Kids e Financeiro aparecem como "Em breve" (decisão de Kaique: mostrar para onde o Hub vai). Dentro do Louvor ficam as abas Escala, Montar, Repertórios e Equipe; Eventos do site é módulo próprio do admin. O cabeçalho dos módulos tem "‹ Início". |
 | D38 | ~~Cifras integradas~~ **Revogada em 15/11/2026.** Foi feita (colar do Cifra Club, ChordPro, transpor para o tom do culto, offline), mas o Cifra Club não tem API e bloqueia leitura automática por servidor (403, testado), e colar a cifra pelo celular ficou trabalhoso para líderes leigos. Pela diretriz principal, saiu. O código está no git (commit bb2f9d6). |
@@ -680,6 +685,7 @@ Precisam ser respondidas, de preferência com o líder de louvor, antes de defin
 | 1.1 | 13/11/2026 | Sexta rodada (Q19 a Q22), vinda do modelo de dados da etapa 3. |
 | 1.2 | 13/11/2026 | Decisões técnicas: Supabase, planos gratuitos e front-end com Vite e JavaScript puro (D20 a D22). Registro de decisões técnicas criado. |
 | 1.3 | 13/11/2026 | Aprovadas as recomendações de login, hospedagem e push (D23 a D25). Stack do piloto fechada. |
+| 2.9 | 16/11/2026 | Cargos (D45) e Financeiro (D46 a D49). |
 | 2.8 | 15/11/2026 | Culto de Jovens (D41), escala acompanha o grupo (D42), cartão da semana (D43), repetir repertório (D44). |
 | 2.7 | 15/11/2026 | Início com módulos (D40) e histórico de repertórios (D39). |
 | 2.6 | 15/11/2026 | Cifras revogadas (D38): sem fonte automática viável. |

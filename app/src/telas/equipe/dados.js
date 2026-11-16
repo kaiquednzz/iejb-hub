@@ -12,6 +12,7 @@ export async function carregarEquipe(conta) {
         supabase.from('pessoa')
             .select(`id, nome, apelido, contato, instrumentos, ativa, foto,
                      membro_ministerio ( ministerio_id, e_lider, ativo ),
+                     cargo_pessoa ( id, cargo ),
                      conta ( id, login, estado, e_administrador, senha_temporaria )`)
             .order('nome'),
         // "!grupo_membro_grupo_id_fkey": grupo e grupo_membro se ligam por DUAS

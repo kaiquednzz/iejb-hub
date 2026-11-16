@@ -22,7 +22,7 @@ async function buscarConta(idUsuario) {
     const { data, error } = await supabase
         .from('conta')
         .select(`id, login, estado, e_administrador, senha_temporaria, nome_informado,
-                 pessoa:pessoa_id ( id, nome, apelido, foto, membro_ministerio ( e_lider, ativo ) )`)
+                 pessoa:pessoa_id ( id, nome, apelido, foto, membro_ministerio ( e_lider, ativo ), cargo_pessoa ( cargo ) )`)
         .eq('id', idUsuario)
         .maybeSingle()
         // O supabase-js tenta de novo sozinho em erro de rede (espera 1s, 2s, 4s).
@@ -41,6 +41,14 @@ async function buscarConta(idUsuario) {
 export function eLiderDeLouvor(conta) {
     return !!conta?.pessoa?.membro_ministerio?.some((m) => m.e_lider && m.ativo);
 }
+
+// Cargos fora dos ministérios (D45): tesouraria, pastor, comunicacao.
+// A tela só esconde o que não é da pessoa; quem barra de verdade é o banco.
+export function temCargo(conta, cargo) {
+    return !!conta?.pessoa?.cargo_pessoa?.some((c) => c.cargo === cargo);
+}
+export const veFinanceiro = (conta) => temCargo(conta, 'tesouraria') || temCargo(conta, 'pastor');
+export const cuidaDosEventos = (conta) => !!conta?.e_administrador || temCargo(conta, 'comunicacao');
 
 // Como a pessoa quer ser chamada: apelido, senão o primeiro nome
 export function nomeCurto(pessoa, reserva = '') {

@@ -66,6 +66,25 @@
 .botao-texto-perigo:active:not(:disabled) { transform: scale(0.95); transition-duration: 0.12s; background: rgba(191, 38, 43, 0.08); }
 .botao-texto-perigo.carregando::after { border-color: rgba(191, 38, 43, 0.2); border-top-color: var(--principal-brighter); }
 
+/* Botão só de texto, discreto (ação secundária: "Desistir", "Baixar") */
+.botao-texto {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 44px;
+    padding: 10px 14px;
+    border: none;
+    border-radius: var(--raio-capsula);
+    background: none;
+    color: var(--principal);
+    font: inherit;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.45s var(--mola), background-color 0.2s;
+}
+.botao-texto:active:not(:disabled) { transform: scale(0.95); transition-duration: 0.12s; background: rgba(143, 13, 11, 0.08); }
+
 .botao-pequeno { min-height: 38px; padding: 8px 14px; font-size: 15px; }
 
 .botao-icone {
