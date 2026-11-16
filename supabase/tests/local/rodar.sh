@@ -49,3 +49,4 @@ cenario 11_cargos_e_financeiro.sql
 cenario 12_agenda.sql
 cenario 13_codigo_de_verificacao.sql
 cenario 14_testemunha_da_contagem.sql
+cenario 15_primeiro_acesso.sql

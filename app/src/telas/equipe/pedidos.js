@@ -7,6 +7,7 @@ import { mensagemDoBanco } from '../../util/erros.js';
 import { campo, caixaDeAviso } from '../moldura.js';
 import { vazio } from './pecas.js';
 import { chave } from './dados.js';
+import { avatar } from '../../util/foto.js';
 
 export function secaoPedidos(dados, ctx) {
     const pendentes = dados.pedidos.filter((p) => p.estado === 'pendente');
@@ -46,7 +47,7 @@ function cartaoPedido(pedido, indice, dados, ctx) {
 
     return h('li', { class: `cartao-pedido${recusado ? ' recusado' : ''}`, style: { '--i': Math.min(indice, 8) } },
         h('div', { class: 'pedido-quem' },
-            h('span', { class: 'pessoa-avatar', 'aria-hidden': 'true' }, icone('pessoas', 'icone icone-p')),
+            avatar({ nome: pedido.nome_informado || pedido.login, foto: pedido.foto_informada }),
             h('div', null,
                 h('p', { class: 'pedido-nome' }, pedido.nome_informado || 'Sem nome'),
                 h('p', { class: 'pedido-login' }, pedido.login),

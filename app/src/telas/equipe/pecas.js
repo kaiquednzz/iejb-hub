@@ -137,7 +137,7 @@ export function mensagemDeAcesso(email, senha) {
 
 // Foto de perfil dentro da folha: o círculo grande + escolher/tirar.
 // A compressão acontece no aparelho (util/foto.js) antes de subir.
-export function blocoFoto(pessoa, aoMudar) {
+export function blocoFoto(pessoa, aoMudar, destino = null) {
     let atual = pessoa;
     const lugar = h('div', { class: 'foto-lugar' }, avatar(pessoa, 'pessoa-avatar avatar-grande'));
     const entrada = h('input', { type: 'file', accept: 'image/*', class: 'sr-only', tabindex: -1, 'aria-hidden': 'true' });
@@ -170,7 +170,7 @@ export function blocoFoto(pessoa, aoMudar) {
         const botao = arquivo ? escolher : tirar;
         await comCarregando(botao, async () => {
             try {
-                const caminho = await trocarFoto(atual, arquivo, recorte, imagem);
+                const caminho = await trocarFoto(atual, arquivo, recorte, imagem, destino);
                 atual = { ...atual, foto: caminho };
                 lugar.replaceChildren(avatar(atual, 'pessoa-avatar avatar-grande'));
                 lugar.firstChild.classList.add('foto-nova');

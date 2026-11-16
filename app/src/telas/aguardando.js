@@ -1,12 +1,14 @@
 // Conta que existe mas não está ativa. Não mostra nenhum dado da igreja.
 import { h, comCarregando } from '../util/dom.js';
 import { supabase } from '../supabase.js';
-import { molduraEntrada } from './moldura.js';
+import { molduraEntrada, campo, caixaDeAviso } from './moldura.js';
+import { blocoFoto } from './equipe/pecas.js';
+import { avisar } from '../util/folha.js';
 
 const TEXTOS = {
     pendente: {
-        titulo: 'Pedido recebido',
-        corpo: 'Um administrador precisa liberar sua conta. Quando ele aprovar, é só abrir o Hub de novo.',
+        titulo: 'Pedido enviado',
+        corpo: 'Agora é só esperar a liberação. Depois, abra o Hub de novo.',
     },
     recusada: {
         titulo: 'Acesso não liberado',
@@ -19,6 +21,7 @@ const TEXTOS = {
 };
 
 export function telaAguardando(conta, conferirDeNovo) {
+    if (conta.estado === 'pendente' && !conta.apresentou_em) return telaApresentar(conta, conferirDeNovo);
     const texto = TEXTOS[conta.estado] ?? TEXTOS.pendente;
     const botaoConferir = h('button', { type: 'button', class: 'botao-principal botao-largo' }, 'Conferir de novo');
     botaoConferir.addEventListener('click', () => comCarregando(botaoConferir, conferirDeNovo));
@@ -32,4 +35,32 @@ export function telaAguardando(conta, conferirDeNovo) {
             h('button', { type: 'button', class: 'botao-secundario botao-largo', onclick: () => supabase.auth.signOut() }, 'Sair'),
         ),
     });
+}
+
+// Primeiro acesso (D62): como quer ser chamado e, se quiser, uma foto.
+// Assim o admin reconhece quem pediu. Curto de propósito: um campo e um botão.
+function telaApresentar(conta, depois) {
+    let foto = conta.foto_informada ?? null;
+    const aviso = caixaDeAviso();
+    const nome = campo({ rotulo: 'Como quer ser chamado?', nome: 'nome', autocomplete: 'name', maxlength: 60, value: conta.nome_informado ?? '' });
+    const destino = { pasta: `contas/${conta.id}`, definir: async (caminho) => { foto = caminho; return { error: null }; } };
+    const continuar = h('button', { type: 'submit', class: 'botao-principal botao-largo' }, 'Continuar');
+
+    const form = h('form', { class: 'form', novalidate: true },
+        blocoFoto({ id: conta.id, nome: conta.nome_informado || conta.login, foto }, null, destino),
+        h('p', { class: 'campo-dica apresentar-dica' }, 'A foto é opcional.'),
+        nome, aviso.elemento, continuar);
+    form.addEventListener('submit', (evento) => {
+        evento.preventDefault();
+        aviso.limpar();
+        const n = form.querySelector('[name=nome]').value.trim();
+        if (n.length < 2) return aviso.mostrar('Escreva seu nome.');
+        comCarregando(continuar, async () => {
+            const { error } = await supabase.rpc('apresentar_me', { p_nome: n, p_foto: foto });
+            if (error) return avisar('Não deu para salvar. Tente de novo.');
+            await depois();
+        });
+    });
+
+    return molduraEntrada({ titulo: 'Quase lá!', conteudo: form });
 }

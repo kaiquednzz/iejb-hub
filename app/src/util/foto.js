@@ -82,18 +82,22 @@ const paraBlob = (tela, tipo, qualidade) => new Promise((ok) => tela.toBlob(ok, 
 
 // Sobe a foto nova, aponta a pessoa para ela e apaga a antiga.
 // Devolve o caminho novo (ou null quando removeu).
-export async function trocarFoto(pessoa, arquivo, recorte = null, imagem = null) {
+// `destino` (opcional) troca a pasta e o jeito de gravar: o primeiro acesso
+// (D62) guarda em contas/<id da conta>/ e só confirma no "Continuar".
+export async function trocarFoto(pessoa, arquivo, recorte = null, imagem = null, destino = null) {
     const anterior = pessoa.foto;
     let caminho = null;
     if (arquivo) {
         const blob = await comprimirFoto(arquivo, recorte, imagem);
         const extensao = blob.type === 'image/webp' ? 'webp' : 'jpg';
-        caminho = `${pessoa.id}/${crypto.randomUUID()}.${extensao}`;
+        caminho = `${destino?.pasta ?? pessoa.id}/${crypto.randomUUID()}.${extensao}`;
         const { error } = await supabase.storage.from('fotos')
             .upload(caminho, blob, { contentType: blob.type, cacheControl: UM_ANO, upsert: false });
         if (error) throw error;
     }
-    const { error } = await supabase.rpc('definir_foto', { p_pessoa: pessoa.id, p_caminho: caminho });
+    const { error } = destino
+        ? await destino.definir(caminho)
+        : await supabase.rpc('definir_foto', { p_pessoa: pessoa.id, p_caminho: caminho });
     if (error) {
         if (caminho) await supabase.storage.from('fotos').remove([caminho]);
         throw error;
