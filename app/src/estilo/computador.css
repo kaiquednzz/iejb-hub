@@ -176,6 +176,18 @@
     .tela-inicio .inicio-destaque { display: grid; }
     .tela-inicio .inicio-destaque > * { height: 100%; }
     .tela-inicio .inicio-conferir > * { height: 100%; }
+    /* A aurora da saudação: no celular a caixa encosta na borda da tela e a
+       máscara redonda basta; aqui ela tem a largura do conteúdo e a máscara
+       deixava as laterais retas. Esmaece 160 px de cada lado e embaixo. */
+    .tela-inicio .inicio-aurora {
+        inset: -60px -120px auto;
+        -webkit-mask-image: linear-gradient(to right, transparent, #000 160px, #000 calc(100% - 160px), transparent),
+            linear-gradient(to bottom, #000 45%, transparent);
+        mask-image: linear-gradient(to right, transparent, #000 160px, #000 calc(100% - 160px), transparent),
+            linear-gradient(to bottom, #000 45%, transparent);
+        -webkit-mask-composite: source-in;
+        mask-composite: intersect;
+    }
     .tela-inicio .grade-modulos { grid-template-columns: repeat(3, 1fr); }
     .tela-inicio .eventos-faixa { grid-auto-columns: minmax(260px, calc((100% - 24px) / 3)); }
 
