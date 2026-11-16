@@ -1,0 +1,19 @@
+/* Playfair Display servida pelo próprio app (antes vinha do Google Fonts).
+   Por quê: cada abertura do app mandava o IP da pessoa pro Google, e a CSP
+   fica mais simples com tudo vindo do mesmo endereço. Só os pesos usados
+   (600 e 700) e só o subconjunto latino, que já tem ã, ç, é etc.
+   Licença da fonte: fontes/OFL.txt (SIL Open Font License, livre). */
+@font-face {
+    font-family: 'Playfair Display';
+    font-style: normal;
+    font-weight: 600;
+    font-display: swap;
+    src: url('./fontes/playfair-display-latin-600-normal.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'Playfair Display';
+    font-style: normal;
+    font-weight: 700;
+    font-display: swap;
+    src: url('./fontes/playfair-display-latin-700-normal.woff2') format('woff2');
+}

@@ -9,6 +9,7 @@
 //     Louvor: #/escala, #/montar, #/repertorios, #/equipe (abas embaixo)
 //     Eventos do site: #/eventos (admin e comunicação)
 //     Financeiro: #/financeiro (tesouraria edita, pastor lê)
+import './estilo/fontes.css';
 import './estilo/tokens.css';
 import './estilo/base.css';
 import './estilo/componentes.css';

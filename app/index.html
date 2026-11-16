@@ -17,9 +17,6 @@
     <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96">
     <link rel="apple-touch-icon" href="/icone-192.png">
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&display=swap">
     <style>
         /* Abertura (D51). Aqui dentro e não no CSS do app: precisa aparecer
            antes de qualquer arquivo carregar. Só transform/opacity: liso até
@@ -45,6 +42,19 @@
             opacity: 0; animation: ab-brilho 1.2s 1.7s ease-out;
         }
         .ab-peca { position: absolute; height: auto; display: block; }
+        /* Posição exata de cada peça (em % da logo). Aqui e não em style=""
+           no HTML: a CSP do app não aceita estilo inline em atributo. */
+        .ab-canto-1 { left:0.208%; top:48.989%; width:45.114%; }
+        .ab-canto-2 { left:51.455%; top:48.949%; width:48.233%; }
+        .ab-canto-3 { left:0.208%; top:71.059%; width:46.466%; }
+        .ab-canto-4 { left:52.495%; top:70.736%; width:47.193%; }
+        .ab-letra-i { left:20.79%; top:51.213%; width:16.008%; }
+        .ab-letra-e { left:56.965%; top:51.091%; width:28.17%; }
+        .ab-letra-j { left:15.385%; top:75.061%; width:21.414%; }
+        .ab-letra-b { left:60.395%; top:75.061%; width:30.146%; }
+        .ab-chama-2 { left:20.686%; top:12.652%; width:33.472%; }
+        .ab-chama-3 { left:45.738%; top:25.222%; width:35.239%; }
+        .ab-chama-1 { left:40.437%; top:-0.081%; width:33.576%; }
 
         /* 1. A cruz já está lá, parada: é a base de tudo.
            2. As letras saem de dentro da cruz: cada uma desliza do centro
@@ -80,17 +90,17 @@
         <!-- As 11 peças recortadas da própria logo, cada uma na posição exata:
              no fim da animação elas formam a logo original, pixel por pixel -->
         <div class="ab-logo">
-            <img class="ab-peca ab-canto ab-canto-1" src="/abertura/canto-1.png" alt="" style="left:0.208%;top:48.989%;width:45.114%">
-            <img class="ab-peca ab-canto ab-canto-2" src="/abertura/canto-2.png" alt="" style="left:51.455%;top:48.949%;width:48.233%">
-            <img class="ab-peca ab-canto ab-canto-3" src="/abertura/canto-3.png" alt="" style="left:0.208%;top:71.059%;width:46.466%">
-            <img class="ab-peca ab-canto ab-canto-4" src="/abertura/canto-4.png" alt="" style="left:52.495%;top:70.736%;width:47.193%">
-            <img class="ab-peca ab-letra ab-letra-i" src="/abertura/letra-i.png" alt="" style="left:20.79%;top:51.213%;width:16.008%">
-            <img class="ab-peca ab-letra ab-letra-e" src="/abertura/letra-e.png" alt="" style="left:56.965%;top:51.091%;width:28.17%">
-            <img class="ab-peca ab-letra ab-letra-j" src="/abertura/letra-j.png" alt="" style="left:15.385%;top:75.061%;width:21.414%">
-            <img class="ab-peca ab-letra ab-letra-b" src="/abertura/letra-b.png" alt="" style="left:60.395%;top:75.061%;width:30.146%">
-            <img class="ab-peca ab-chama ab-chama-2" src="/abertura/chama-2.png" alt="" style="left:20.686%;top:12.652%;width:33.472%">
-            <img class="ab-peca ab-chama ab-chama-3" src="/abertura/chama-3.png" alt="" style="left:45.738%;top:25.222%;width:35.239%">
-            <img class="ab-peca ab-chama ab-chama-1" src="/abertura/chama-1.png" alt="" style="left:40.437%;top:-0.081%;width:33.576%">
+            <img class="ab-peca ab-canto ab-canto-1" src="/abertura/canto-1.png" alt="">
+            <img class="ab-peca ab-canto ab-canto-2" src="/abertura/canto-2.png" alt="">
+            <img class="ab-peca ab-canto ab-canto-3" src="/abertura/canto-3.png" alt="">
+            <img class="ab-peca ab-canto ab-canto-4" src="/abertura/canto-4.png" alt="">
+            <img class="ab-peca ab-letra ab-letra-i" src="/abertura/letra-i.png" alt="">
+            <img class="ab-peca ab-letra ab-letra-e" src="/abertura/letra-e.png" alt="">
+            <img class="ab-peca ab-letra ab-letra-j" src="/abertura/letra-j.png" alt="">
+            <img class="ab-peca ab-letra ab-letra-b" src="/abertura/letra-b.png" alt="">
+            <img class="ab-peca ab-chama ab-chama-2" src="/abertura/chama-2.png" alt="">
+            <img class="ab-peca ab-chama ab-chama-3" src="/abertura/chama-3.png" alt="">
+            <img class="ab-peca ab-chama ab-chama-1" src="/abertura/chama-1.png" alt="">
         </div>
     </div>
     <script>
