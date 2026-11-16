@@ -46,31 +46,25 @@
         }
         .ab-peca { position: absolute; height: auto; display: block; }
 
-        /* 1. A cruz: os 4 cantos chegam girando de fora e se encaixam */
-        .ab-canto { animation: ab-canto .8s cubic-bezier(.34,1.45,.64,1) backwards; }
-        .ab-canto-1 { --x: -70px; --y: -70px; --r: -120deg; transform-origin: 100% 100%; animation-delay: .05s; }
-        .ab-canto-2 { --x: 70px;  --y: -70px; --r: 120deg;  transform-origin: 0 100%;    animation-delay: .12s; }
-        .ab-canto-3 { --x: -70px; --y: 70px;  --r: 120deg;  transform-origin: 100% 0;    animation-delay: .19s; }
-        .ab-canto-4 { --x: 70px;  --y: 70px;  --r: -120deg; transform-origin: 0 0;       animation-delay: .26s; }
-        @keyframes ab-canto { from { opacity: 0; transform: translate(var(--x), var(--y)) rotate(var(--r)) scale(.4); } 25% { opacity: 1; } }
-
-        /* 2. As letras: giram uma volta e meia e param no lugar */
-        .ab-letra { animation: ab-girar 1.05s cubic-bezier(.2,.85,.25,1.12) backwards; }
-        .ab-letra-i { animation-delay: .42s; }
-        .ab-letra-e { animation-delay: .52s; }
-        .ab-letra-j { animation-delay: .62s; }
-        .ab-letra-b { animation-delay: .72s; }
-        @keyframes ab-girar {
-            from { opacity: 0; transform: perspective(420px) rotateY(-540deg) scale(.15); }
-            20% { opacity: 1; }
+        /* 1. A cruz já está lá, parada: é a base de tudo.
+           2. As letras saem de dentro da cruz: cada uma desliza do centro
+              para o seu canto e fica nítida. Uma depois da outra. */
+        .ab-letra { animation: ab-sair 1s cubic-bezier(.22,1,.36,1) backwards; }
+        .ab-letra-i { --x: 24px;  --y: 22px;  animation-delay: .25s; }
+        .ab-letra-e { --x: -24px; --y: 22px;  animation-delay: .4s; }
+        .ab-letra-j { --x: 24px;  --y: -24px; animation-delay: .55s; }
+        .ab-letra-b { --x: -24px; --y: -22px; animation-delay: .7s; }
+        @keyframes ab-sair {
+            from { opacity: 0; transform: translate(var(--x), var(--y)) scale(.55); filter: blur(5px); }
+            45% { opacity: 1; }
         }
 
         /* 3. A chama acende: cada língua sobe de dentro da cruz */
         .ab-chama { transform-origin: 50% 100%; animation: ab-acender .85s cubic-bezier(.34,1.5,.64,1) backwards; }
-        .ab-chama-2 { --r: -25deg; animation-delay: 1s; }
-        .ab-chama-3 { --r: 25deg;  animation-delay: 1.1s; }
-        .ab-chama-1 { --r: -8deg;  animation-delay: 1.2s; }
-        @keyframes ab-acender { from { opacity: 0; transform: translateY(70%) rotate(var(--r)) scale(.1); } 35% { opacity: 1; } }
+        .ab-chama-2 { --r: -25deg; animation-delay: 1.05s; }
+        .ab-chama-3 { --r: 25deg;  animation-delay: 1.15s; }
+        .ab-chama-1 { --r: -8deg;  animation-delay: 1.25s; }
+        @keyframes ab-acender { from { opacity: 0; transform: translateY(30%) rotate(var(--r)) scale(.2); } 35% { opacity: 1; } }
         @keyframes ab-brilho { 40% { opacity: 1; } }
 
         @media (prefers-reduced-motion: reduce) {
