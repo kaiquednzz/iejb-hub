@@ -211,13 +211,7 @@
     rotate: 45deg;
     transition: rotate 0.45s var(--mola);
 }
-.grupo-recolhido[open] summary::after { rotate: 225deg; }
-.grupo-recolhido::details-content {
-    block-size: 0;
-    overflow: clip;
-    transition: block-size 0.45s var(--ease-ios), content-visibility 0.45s allow-discrete;
-}
-.grupo-recolhido[open]::details-content { block-size: auto; }
+.grupo-recolhido[open]:not(.fechando) summary::after { rotate: 225deg; }
 .grupo-recolhido .lista-linhas { opacity: 0.8; }
 
 .esqueleto-lista .linha-caixa { position: relative; overflow: hidden; }

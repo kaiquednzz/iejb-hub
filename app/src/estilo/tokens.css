@@ -62,8 +62,6 @@
     /* O logo PNG é branco; este filtro pinta de vermelho da marca */
     --logo-vermelho: brightness(0) invert(38%) sepia(91%) saturate(2925%) hue-rotate(-23deg) brightness(55%) contrast(126%);
 
-    /* Deixa o <details> animar a altura até "auto" */
-    interpolate-size: allow-keywords;
 }
 
 @supports (transition-timing-function: linear(0, 1)) {

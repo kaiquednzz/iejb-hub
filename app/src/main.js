@@ -47,8 +47,10 @@ import { telaInstalar } from './telas/instalar.js';
 import { precisaInstalar, registrarServiceWorker } from './pwa.js';
 import { apagarCopiasLocais } from './offline.js';
 import { ligarToques } from './util/toques.js';
+import { ligarDetalhes } from './util/detalhes.js';
 
 ligarToques();
+ligarDetalhes();
 
 const raiz = document.getElementById('app');
 let rodada = 0;          // descarta resultados de decisões antigas que chegarem atrasadas
