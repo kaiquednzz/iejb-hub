@@ -27,6 +27,7 @@ function privacidade() {
                 [b('Cadastro: '), 'nome, apelido, telefone de contato (se você ou a liderança informar), instrumentos que toca e foto de perfil (se você enviar).'],
                 [b('Participação: '), 'grupos de que faz parte, escalas em que está, quando marca que não vai e funções na igreja (por exemplo Tesouraria ou Comunicação).'],
                 [b('Avisos no celular: '), 'se você ativar, um identificador do aparelho para mandar as notificações. Ele some quando você sai da conta naquele aparelho.'],
+                [b('Agenda do celular: '), 'se você colocar seus cultos na agenda, um link secreto que dá acesso só aos cultos em que você está escalado. Você pode trocá-lo a qualquer momento, e o antigo para de funcionar.'],
                 [b('Financeiro: '), 'entradas, saídas, contagens de culto e quem registrou ou conferiu cada uma. Dízimos e ofertas são guardados só como totais, ', b('sem o nome de quem deu'), '.'],
                 [b('Histórico: '), 'mudanças importantes (aprovar acessos, mexer em escalas, editar ou cancelar lançamentos) ficam registradas com quem fez e quando, para dar transparência e evitar erro ou fraude.'],
             )),

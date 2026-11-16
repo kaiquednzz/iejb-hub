@@ -46,3 +46,4 @@ cenario 08_nao_vou_e_repertorio.sql
 cenario 09_historico.sql
 cenario 10_jovens_e_grupos.sql
 cenario 11_cargos_e_financeiro.sql
+cenario 12_agenda.sql
