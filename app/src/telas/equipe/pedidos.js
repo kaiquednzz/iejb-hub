@@ -8,7 +8,6 @@ import { campo, caixaDeAviso } from '../moldura.js';
 import { vazio } from './pecas.js';
 import { chave } from './dados.js';
 import { avatar } from '../../util/foto.js';
-import { garantirCodigo } from '../../util/codigo.js';
 
 const NOME_CARGO = { tesouraria: 'Tesouraria', pastor: 'Pastor', comunicacao: 'Comunicação' };
 
@@ -125,8 +124,6 @@ function folhaAprovar(pedido, dados, ctx) {
         if (nova && !nome) return aviso.mostrar('Escreva o nome da pessoa.');
 
         const cargosAprovados = cargos.filter((c) => c.caixa.checked).map((c) => c.id);
-        // Dar cargo pede o código do admin (D57)
-        if (cargosAprovados.length && !(await garantirCodigo('dar cargos'))) return;
         await comCarregando(botao, async () => {
             const { error } = await supabase.rpc('aprovar_pedido', {
                 p_conta: pedido.id,

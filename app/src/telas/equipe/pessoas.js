@@ -12,7 +12,6 @@ import {
     gerarSenhaTemporaria, mensagemDeAcesso, blocoFoto,
 } from './pecas.js';
 import { avatar } from '../../util/foto.js';
-import { garantirCodigo } from '../../util/codigo.js';
 
 const NOME_CARGO = { tesouraria: 'Tesouraria', pastor: 'Pastor', comunicacao: 'Comunicação' };
 const DESCRICAO_CARGO = {
@@ -225,7 +224,6 @@ function blocoAcesso(pessoa, dados, ctx, pegarFolha) {
         descricao: souEu ? 'Para deixar de ser admin, outro admin precisa tirar.' : 'Aprova acessos e cuida de tudo.',
         ligado: conta.e_administrador,
         aoMudar: async (valor) => {
-            if (!(await garantirCodigo('mudar quem é administrador'))) return false;
             const { error } = await supabase.rpc('definir_administrador', { p_conta: conta.id, p_valor: valor });
             if (error) { avisar(mensagemDoBanco(error)); return false; }
             avisar(valor ? 'Agora é administrador.' : 'Não é mais administrador.');
@@ -243,8 +241,6 @@ function blocoAcesso(pessoa, dados, ctx, pegarFolha) {
                 descricao: DESCRICAO_CARGO[cargo],
                 ligado: !!atual(),
                 aoMudar: async (valor) => {
-                    // D57: dar ou tirar cargo pede o código (o banco recusa sem ele)
-                    if (!(await garantirCodigo('mudar cargos'))) return false;
                     const { error } = valor
                         ? await supabase.from('cargo_pessoa').insert({ pessoa_id: pessoa.id, cargo })
                         : await supabase.from('cargo_pessoa').delete().eq('id', atual().id);

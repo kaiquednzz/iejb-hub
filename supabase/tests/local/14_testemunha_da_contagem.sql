@@ -68,8 +68,6 @@ select teste.ok((public.testemunha_conferir(:'tok3', 'Zé', 5000, 0) ->> 'situac
 set role authenticated;
 select teste.entrar('avulso@teste');
 select teste.deve_falhar(format('select public.pedir_testemunha(current_date, null, %L, 100, 0)', :'caixa'), 'D61: quem não é da tesouraria não gera QR');
-select teste.entrar_so_com_senha('g2@teste');
-select teste.deve_falhar(format('select public.pedir_testemunha(current_date, null, %L, 100, 0)', :'caixa'), 'D61: tesouraria sem o código não gera QR');
 select teste.entrar('membro@teste');
 select teste.deve_falhar(format('select public.contar_sozinha(current_date, null, %L, 100, 0)', :'caixa'), 'D61: pastor (só leitura) não lança contagem');
 

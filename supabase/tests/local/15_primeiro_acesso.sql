@@ -55,13 +55,9 @@ select teste.ok((select louvor_pedido and cargos_pedidos = array['tesouraria'] a
                         and cardinality(instrumentos_pedidos) = 2 from public.conta where id = :'conta_outra'),
   'D62: o pedido guarda funções e instrumentos (sem repetir)');
 
--- Admin aprova só com a senha: cargo não passa
+-- Louvor + instrumentos + cargo
 set role authenticated;
 select teste.entrar_so_com_senha('lider@teste');
-select teste.deve_falhar(format('select public.aprovar_pedido(%L, null, ''Segundo'', %L, true, array[''Bateria''], array[''tesouraria''])', :'conta_outra', :'louvor'),
-  'D62: aprovar com cargo pede o código do admin');
--- Com o código: Louvor + instrumentos + cargo
-select teste.entrar('lider@teste');
 select public.aprovar_pedido(:'conta_outra', null, 'Segundo da Silva', :'louvor', true, array['Bateria', 'Voz'], array['tesouraria']) as p_seg \gset
 reset role;
 select teste.ok(exists (select 1 from public.membro_ministerio where pessoa_id = :'p_seg' and ministerio_id = :'louvor' and ativo), 'D62: aprovado no Louvor');

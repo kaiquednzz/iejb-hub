@@ -16,7 +16,6 @@ import { temCargo } from '../../sessao.js';
 import { cabecalhoApp } from '../moldura.js';
 import { reais, nomeDoMes, primeiroDoMes, somarMeses, dataCurta, FORMAS, nomeDe } from './util.js';
 import { blocoResumo } from './resumo.js';
-import { garantirCodigo } from '../../util/codigo.js';
 import { folhaLancar, folhaDetalhe, folhaAjustes, folhaCancelarContagem, folhaQR } from './lancar.js';
 
 const DIA_SEMANA = new Intl.DateTimeFormat('pt-BR', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'UTC' });
@@ -84,18 +83,6 @@ export function telaFinanceiro(conta) {
     carregar();
     return tela;
 
-    // Fechou a folha do código sem confirmar
-    function bloqueado() {
-        area.removeAttribute('aria-busy');
-        const botao = h('button', { type: 'button', class: 'botao-principal' }, icone('escudo', 'icone icone-p'), 'Confirmar com o código');
-        botao.addEventListener('click', () => comCarregando(botao, carregar));
-        area.replaceChildren(h('div', { class: 'estado-vazio' },
-            h('p', { class: 'estado-vazio-titulo' }, 'O financeiro pede o código do app'),
-            h('p', { class: 'estado-vazio-texto' }, 'Além da senha, confirme com o código de 6 dígitos. É o que protege o dinheiro da igreja se alguém descobrir sua senha.'),
-            botao));
-        conteudoMes.replaceChildren();
-    }
-
     function desenharMes() {
         if (!dados) return;
         conteudoMes.replaceChildren(...(vista === 'resumo'
@@ -119,8 +106,6 @@ export function telaFinanceiro(conta) {
     }
 
     async function carregar() {
-        // D57: o banco só entrega o financeiro numa sessão confirmada com código
-        if (!(await garantirCodigo('abrir o financeiro'))) return bloqueado();
         const fim = somarMeses(mes, 1);
         const [resumo, lancamentos, contas, categorias, contagens] = await Promise.all([
             supabase.rpc('resumo_financeiro', { p_mes: mes }),
