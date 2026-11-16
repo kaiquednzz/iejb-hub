@@ -110,8 +110,9 @@ export function telaFinanceiro(conta) {
             contagens: contagens.data,
             edita,
         };
-        area.replaceChildren(blocoSaldo(dados), blocoContagens(dados, carregar));
-        areaMes.replaceChildren(blocoMes(dados), blocoLancamentos(dados, (l) => folhaDetalhe(l, dados, conta, carregar)));
+        // replaceChildren escreve "null" na tela se receber null: filtra antes
+        area.replaceChildren(...[blocoSaldo(dados), blocoContagens(dados, carregar)].filter(Boolean));
+        areaMes.replaceChildren(...[blocoMes(dados), blocoLancamentos(dados, (l) => folhaDetalhe(l, dados, conta, carregar))].filter(Boolean));
     }
 }
 

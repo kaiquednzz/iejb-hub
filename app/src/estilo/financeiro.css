@@ -353,3 +353,23 @@ html.com-folha .fin-barra { opacity: 0; pointer-events: none; transition: opacit
     .fin-dois { grid-template-columns: 1fr; }
     .fin-detalhe > div { grid-template-columns: 1fr; gap: 2px; }
 }
+
+/* O iPhone dá ao campo de data uma largura mínima própria, que empurrava a
+   folha para além da tela. Tudo no formulário cabe na largura dele. */
+.fin-form, .tela-financeiro .form, dialog .form .bloco { min-width: 0; }
+dialog .form .bloco { grid-template-columns: minmax(0, 1fr); }
+.fin-entrada, .fin-valor {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+.fin-entrada[type="date"] {
+    -webkit-appearance: none;
+    appearance: none;
+    display: block;
+    text-align: left;
+}
+.fin-entrada[type="date"]::-webkit-date-and-time-value { text-align: left; }
+/* Espaço para o botão fixo "Lançar" não cobrir o rodapé */
+.fin-rodape { margin-bottom: calc(96px + env(safe-area-inset-bottom)); }
