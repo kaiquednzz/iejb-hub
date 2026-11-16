@@ -24,18 +24,32 @@ const enderecos = (token) => {
     return { https, webcal, google: `https://calendar.google.com/calendar/r?cid=${encodeURIComponent(webcal)}` };
 };
 
-export function botaoAgenda() {
-    const botao = h('button', { type: 'button', class: 'linha-acao' },
-        h('span', { class: 'linha-acao-icone', 'aria-hidden': 'true' }, icone('calendario')),
-        h('span', { class: 'linha-acao-textos' },
-            h('span', { class: 'linha-acao-titulo' }, 'Meus cultos na agenda do celular'),
-            h('span', { class: 'linha-acao-texto' }, 'Aparecem sozinhos e se atualizam quando a escala muda')),
+// Depois que a pessoa assina neste aparelho, o convite some da escala e fica
+// só o link discreto no fim da página (para refazer ou trocar o link).
+const JA_ASSINOU = 'iejb-agenda-assinada';
+const jaAssinou = () => { try { return localStorage.getItem(JA_ASSINOU) === '1'; } catch { return false; } };
+const marcarAssinada = () => { try { localStorage.setItem(JA_ASSINOU, '1'); } catch { /* sem armazenamento: o convite continua */ } };
+
+// Convite no topo da escala: uma linha fina, só enquanto não assinou
+export function conviteAgenda() {
+    if (jaAssinou()) return null;
+    const botao = h('button', { type: 'button', class: 'convite-agenda' },
+        icone('calendario', 'icone icone-p'),
+        h('span', null, 'Adicionar à agenda do celular'),
         icone('seta', 'icone icone-p'));
-    botao.addEventListener('click', () => comCarregando(botao, abrir));
+    botao.addEventListener('click', () => comCarregando(botao, () => abrir(() => botao.remove())));
     return botao;
 }
 
-async function abrir() {
+// Link discreto no fim da escala, sempre disponível
+export function linkAgenda() {
+    const botao = h('button', { type: 'button', class: 'link-discreto link-agenda' },
+        icone('calendario', 'icone icone-p'), 'Agenda do celular');
+    botao.addEventListener('click', () => comCarregando(botao, () => abrir()));
+    return botao;
+}
+
+async function abrir(aoAssinar) {
     const { data: token, error } = await supabase.rpc('meu_link_da_agenda');
     if (error) {
         console.error(error);
@@ -49,6 +63,11 @@ async function abrir() {
         icone('calendario'), 'Google Agenda');
     const copiar = h('button', { type: 'button', class: 'botao-texto' }, icone('copiar', 'icone icone-p'), 'Copiar o link');
     const trocar = h('button', { type: 'button', class: 'botao-texto' }, 'Trocar o link');
+
+    // Tocou para assinar: o convite do topo já pode sumir
+    for (const a of [apple, google]) {
+        a.addEventListener('click', () => { marcarAssinada(); aoAssinar?.(); });
+    }
 
     copiar.addEventListener('click', async () => {
         try {
