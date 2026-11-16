@@ -129,7 +129,7 @@ grant execute on function public.aprovar_conta(uuid, uuid, boolean) to authentic
 
 -- Aprovar pedido: o admin escolhe o que vale do que a pessoa pediu.
 -- Antes, toda conta aprovada virava do Louvor; agora só se marcar Louvor.
--- Cargos passam pela tabela cargo_pessoa (RLS): exigem o código do admin (D57).
+-- Cargos passam pela tabela cargo_pessoa (RLS): só admin dá.
 drop function public.aprovar_pedido(uuid, uuid, text, uuid);
 create function public.aprovar_pedido(
   p_conta        uuid,
