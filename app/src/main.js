@@ -18,6 +18,7 @@ import './estilo/montar.css';
 import './estilo/eventos.css';
 import './estilo/inicio.css';
 import './estilo/financeiro.css';
+import './estilo/computador.css';
 
 import { supabase } from './supabase.js';
 import { carregarConta } from './sessao.js';
@@ -37,6 +38,8 @@ import { eLiderDeLouvor, veFinanceiro, cuidaDosEventos } from './sessao.js';
 import { sincronizarPush } from './util/push.js';
 import { limparRetornoDoGoogle } from './util/google.js';
 import { telaErro } from './telas/erro.js';
+import { telaDocumento } from './telas/documentos.js';
+import { barraLateral } from './telas/moldura.js';
 import { telaInstalar } from './telas/instalar.js';
 import { precisaInstalar, registrarServiceWorker } from './pwa.js';
 import { apagarCopiasLocais } from './offline.js';
@@ -56,8 +59,29 @@ const ROTAS_DA_CONTA = {
     '#/montar': (conta) => (eLiderDeLouvor(conta) ? telaMontar(conta) : telaEscala(conta)),
     '#/eventos': (conta) => (cuidaDosEventos(conta) ? telaEventos(conta) : telaInicio(conta)),
     '#/financeiro': (conta) => (veFinanceiro(conta) ? telaFinanceiro(conta) : telaInicio(conta)),
+    '#/privacidade': (conta) => telaDocumento('privacidade', conta),
+    '#/termos': (conta) => telaDocumento('termos', conta),
 };
-const telaDaConta = (conta) => (ROTAS_DA_CONTA[location.hash] ?? telaInicio)(conta);
+// Que item da barra lateral acende: a rota que de fato abriu (quem não pode
+// montar escala cai na Escala, quem não vê o financeiro cai no Início...)
+function rotaAberta(conta) {
+    const h = location.hash;
+    if (h === '#/montar' && !eLiderDeLouvor(conta)) return '#/escala';
+    if ((h === '#/eventos' && !cuidaDosEventos(conta)) || (h === '#/financeiro' && !veFinanceiro(conta))) return '#/inicio';
+    return ROTAS_DA_CONTA[h] ? h : '#/inicio';
+}
+// Toda tela de quem já entrou leva a barra lateral (o CSS só a mostra no computador)
+function telaDaConta(conta) {
+    const tela = (ROTAS_DA_CONTA[location.hash] ?? telaInicio)(conta);
+    tela.prepend(barraLateral(conta, rotaAberta(conta)));
+    return tela;
+}
+// Sem login, além de entrar só dá para pedir acesso e ler os documentos
+const ROTAS_SEM_CONTA = {
+    '#/pedir-acesso': telaPedirAcesso,
+    '#/privacidade': () => telaDocumento('privacidade'),
+    '#/termos': () => telaDocumento('termos'),
+};
 
 async function decidirTela() {
     const minhaRodada = ++rodada;
@@ -78,7 +102,7 @@ async function decidirTela() {
     let tela;
     contaPronta = null;
     if (!session) {
-        tela = location.hash === '#/pedir-acesso' ? telaPedirAcesso() : telaEntrar();
+        tela = (ROTAS_SEM_CONTA[location.hash] ?? telaEntrar)();
     } else {
         // Logado: o #/pedir-acesso não faz mais sentido (e voltaria ao sair)
         if (location.hash && !ROTAS_DA_CONTA[location.hash]) history.replaceState(null, '', location.pathname);

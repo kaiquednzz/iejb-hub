@@ -1,5 +1,6 @@
 // Pedido de acesso (D23): a pessoa cria login e senha e a conta nasce PENDENTE.
 // Ela não vê nada até um administrador aprovar e ligar a conta a uma pessoa.
+import { senhaVazou, AVISO_SENHA_VAZADA } from '../util/senha.js';
 import { h, comCarregando } from '../util/dom.js';
 import { supabase } from '../supabase.js';
 import { mensagemDeErro } from '../sessao.js';
@@ -28,6 +29,7 @@ export function telaPedirAcesso() {
             await comCarregando(botao, async () => {
                 // O "nome" vai em options.data → raw_user_meta_data no banco,
                 // e o gatilho criar_conta guarda em conta.nome_informado.
+                if (await senhaVazou(senha)) return aviso.mostrar(AVISO_SENHA_VAZADA);
                 const { data, error } = await supabase.auth.signUp({
                     email, password: senha, options: { data: { nome } },
                 });
@@ -49,6 +51,8 @@ export function telaPedirAcesso() {
             minlength: SENHA_MINIMA, dica: `Pelo menos ${SENHA_MINIMA} caracteres.` }),
         aviso.elemento,
         botao,
+        h('p', { class: 'campo-dica pedir-aceite' }, 'Ao pedir acesso você concorda com os ',
+            h('a', { href: '#/termos' }, 'termos de uso'), ' e a ', h('a', { href: '#/privacidade' }, 'política de privacidade'), '.'),
     );
 
     return molduraEntrada({

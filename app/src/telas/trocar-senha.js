@@ -1,6 +1,7 @@
 // Primeira entrada com senha temporária (RN-10, RN-65): troca obrigatória.
 // Quando a senha muda, o gatilho limpar_senha_temporaria (no banco) desmarca
 // a conta, e o evento USER_UPDATED faz o main.js levar para a escala.
+import { senhaVazou, AVISO_SENHA_VAZADA } from '../util/senha.js';
 import { h, comCarregando } from '../util/dom.js';
 import { supabase } from '../supabase.js';
 import { mensagemDeErro, nomeCurto } from '../sessao.js';
@@ -24,6 +25,7 @@ export function telaTrocarSenha(conta) {
             if (senha !== repetida) return aviso.mostrar('As duas senhas não são iguais.');
 
             await comCarregando(botao, async () => {
+                if (await senhaVazou(senha)) return aviso.mostrar(AVISO_SENHA_VAZADA);
                 const { error } = await supabase.auth.updateUser({ password: senha });
                 if (error) aviso.mostrar(mensagemDeErro(error));
             });

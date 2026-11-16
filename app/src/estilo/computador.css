@@ -1,0 +1,222 @@
+/* ==========================================================================
+   Computador (D52) e documentos (privacidade, termos)
+
+   O Hub nasceu para o celular. A partir de 1024 px de largura:
+     * a cápsula de cima e as abas de baixo somem;
+     * uma barra lateral de vidro mostra todos os módulos (telas/moldura.js);
+     * Início e Financeiro usam a largura com grades; as telas de lista
+       (Escala, Equipe, Repertórios...) ficam numa coluna de leitura de 760 px,
+       porque linha de texto muito larga cansa.
+   Coisas fixas que no celular ficam centralizadas (toast, barra do Montar)
+   passam a centralizar na área de conteúdo, e não na janela inteira.
+   ========================================================================== */
+
+.lateral { display: none; }
+
+/* --- Documentos ------------------------------------------------------------ */
+.doc { max-width: 720px; }
+.doc-corpo { margin-top: 22px; display: grid; gap: 22px; color: var(--texto); }
+.doc-corpo > p:first-child { font-size: 18px; color: var(--texto-vinho); }
+.doc-secao { display: grid; gap: 8px; animation: subir 0.6s var(--ease-out) backwards; }
+.doc-secao h2 { font-family: var(--fonte-titulo); font-size: 22px; line-height: 1.2; color: var(--texto-vinho); }
+.doc-secao ul { display: grid; gap: 8px; padding-left: 20px; }
+.doc-secao li::marker { color: var(--principal-brighter); }
+.doc-outro { margin: 34px 0 12px; padding-top: 18px; border-top: 1px solid rgba(58, 10, 9, 0.1); color: var(--texto-2); }
+.doc a { text-underline-offset: 3px; }
+.tela-documento.sem-conta { padding-bottom: 40px; }
+
+.entrada-docs { display: flex; justify-content: center; gap: 8px; margin-top: 18px; font-size: 14px; color: rgba(255, 255, 255, 0.55); }
+.entrada-docs a { display: inline-flex; align-items: center; min-height: 44px; color: rgba(255, 255, 255, 0.78); text-underline-offset: 3px; }
+.pedir-aceite { margin-top: 4px; text-align: center; }
+
+/* --- Barra lateral --------------------------------------------------------- */
+@media (min-width: 1024px) {
+    :root { --largura-lateral: 248px; --vao-lateral: 16px; }
+    html { scroll-padding-top: 28px; }
+
+    .tela-app { padding-left: calc(var(--largura-lateral) + var(--vao-lateral) * 2); }
+    .tela-app:not(.tela-montar) { padding-bottom: 56px; }
+    .tela-app > .cabecalho,
+    .tela-app > .barra-abas { display: none; }
+    .tela-documento.sem-conta { padding-left: 0; }
+    .tela-documento.sem-conta > .cabecalho { display: flex; }
+
+    .lateral {
+        position: fixed;
+        top: var(--vao-lateral);
+        bottom: var(--vao-lateral);
+        left: var(--vao-lateral);
+        z-index: 25;
+        width: var(--largura-lateral);
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        padding: 18px 12px 10px;
+        border-radius: var(--raio-l);
+        background: rgba(253, 250, 245, 0.72);
+        -webkit-backdrop-filter: var(--desfoque);
+        backdrop-filter: var(--desfoque);
+        border: 1px solid var(--vidro-borda);
+        box-shadow: var(--sombra-2), var(--brilho);
+        overflow-y: auto;
+        /* Fica parada enquanto o conteúdo cruza (View Transitions) */
+        view-transition-name: lateral;
+    }
+    /* Só na primeira vez que aparece (depois ela fica parada entre as telas) */
+    .lateral.chegando { animation: lateralEntra 0.7s var(--mola) backwards; }
+    @keyframes lateralEntra { from { opacity: 0; translate: -24px 0; } }
+
+    .lateral-marca {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        min-height: 44px;
+        margin: 0 6px 14px;
+        text-decoration: none;
+        border-radius: var(--raio-s);
+    }
+    .lateral-marca img { width: auto; height: 34px; filter: var(--logo-vermelho); }
+
+    .lateral-nav { display: grid; gap: 2px; }
+    .lateral-nav ul { list-style: none; display: grid; gap: 2px; }
+    .lateral-grupo {
+        margin: 16px 12px 4px;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--texto-2);
+    }
+
+    .lateral-item {
+        position: relative;
+        isolation: isolate;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-height: 44px;
+        padding: 0 12px;
+        border-radius: var(--raio-s);
+        color: var(--texto-2);
+        font-size: 15px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: color 0.25s ease, background-color 0.3s var(--ease-out), transform 0.5s var(--mola);
+    }
+    .lateral-item:hover { color: var(--texto-vinho); background: rgba(143, 13, 11, 0.05); }
+    .lateral-item:active { transform: scale(0.97); transition-duration: 0.12s; }
+    .lateral-item[aria-current="page"] { color: var(--principal); }
+    .lateral-item[aria-current="page"]:hover { background: none; }
+    .lateral-item[aria-current="page"] .icone { animation: abaPula 0.55s var(--mola); }
+    .lateral-nome { flex: 1; min-width: 0; }
+
+    /* A pílula vermelha clarinha do item atual. Ela é um elemento à parte com
+       view-transition-name: na troca de tela o navegador anima a posição dela
+       do item antigo até o novo, com a mola. */
+    .lateral-pilula {
+        position: absolute;
+        inset: 0;
+        z-index: -1;
+        border-radius: inherit;
+        background: rgba(143, 13, 11, 0.09);
+        box-shadow: inset 0 0 0 1px rgba(143, 13, 11, 0.06);
+        view-transition-name: lateral-pilula;
+    }
+
+    .lateral-contador {
+        min-width: 20px;
+        height: 20px;
+        padding: 0 6px;
+        display: grid;
+        place-items: center;
+        border-radius: var(--raio-capsula);
+        background: var(--principal-brighter);
+        color: #fff;
+        font-size: 12px;
+        font-weight: 700;
+        animation: surgir 0.5s 0.4s var(--mola) backwards;
+    }
+
+    .lateral-conta {
+        margin-top: auto;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 4px 6px 8px;
+        border-top: 1px solid rgba(58, 10, 9, 0.08);
+    }
+    .lateral-avatar { width: 38px; height: 38px; flex: none; font-size: 14px; }
+    .lateral-quem { flex: 1; min-width: 0; display: grid; line-height: 1.25; }
+    .lateral-quem-nome { font-weight: 700; font-size: 15px; color: var(--texto-vinho); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .lateral-quem-papel { font-size: 13px; color: var(--texto-2); }
+
+    .lateral-links { display: flex; justify-content: center; gap: 6px; font-size: 12px; color: var(--texto-2); }
+    .lateral-links a { display: inline-flex; align-items: center; min-height: 32px; color: var(--texto-2); text-underline-offset: 3px; }
+    .lateral-links a:hover { color: var(--principal); }
+
+    /* --- Conteúdo ---------------------------------------------------------- */
+    .app-conteudo { width: min(100% - 64px, 760px); padding-top: 44px; }
+
+    /* Centraliza o que é fixo na área ao lado da barra, não na janela */
+    .toast { left: calc(50% + (var(--largura-lateral) + var(--vao-lateral) * 2) / 2); bottom: 32px; }
+    .montar-acoes { left: calc(50% + (var(--largura-lateral) + var(--vao-lateral) * 2) / 2); bottom: 24px; }
+    .tela-montar { padding-bottom: 120px; }
+
+    /* --- Início: largo, módulos em 3 colunas, faixa de eventos com 3 ------ */
+    .tela-inicio .app-conteudo {
+        width: min(100% - 64px, 1040px);
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        column-gap: 18px;
+    }
+    .tela-inicio .app-conteudo > * { grid-column: 1 / -1; min-width: 0; }
+    /* Compromisso e contagem para conferir lado a lado, quando há os dois */
+    .tela-inicio .app-conteudo:has(> .inicio-conferir:not(:empty)) > .inicio-destaque { grid-column: 1; }
+    .tela-inicio .app-conteudo:has(> .inicio-conferir:not(:empty)) > .inicio-conferir { grid-column: 2; margin-top: 18px; margin-bottom: 12px; align-self: stretch; }
+    .tela-inicio .inicio-destaque { display: grid; }
+    .tela-inicio .inicio-destaque > * { height: 100%; }
+    .tela-inicio .inicio-conferir > * { height: 100%; }
+    .tela-inicio .grade-modulos { grid-template-columns: repeat(3, 1fr); }
+    .tela-inicio .eventos-faixa { grid-auto-columns: minmax(260px, calc((100% - 24px) / 3)); }
+
+    /* --- Financeiro: saldo à esquerda (parado), o mês à direita ----------- */
+    .tela-financeiro .app-conteudo {
+        width: min(100% - 64px, 1080px);
+        display: grid;
+        grid-template-columns: minmax(300px, 380px) minmax(0, 1fr);
+        grid-template-rows: auto auto auto 1fr;
+        column-gap: 28px;
+        align-items: start;
+        padding-bottom: 56px;
+    }
+    .fin-topo { grid-column: 1 / -1; }
+    .fin-area { grid-column: 1; grid-row: 2 / 4; position: sticky; top: 28px; }
+    .fin-area > .fin-saldo { margin-top: 18px; }
+    .tela-financeiro .fin-mes { grid-column: 2; grid-row: 2; margin-top: 18px; }
+    .fin-mes-area { grid-column: 2; grid-row: 3 / 5; }
+    .tela-financeiro .fin-rodape { grid-column: 1; grid-row: 4; flex-direction: column; align-items: flex-start; }
+    /* O botão Lançar vira um botão flutuante no canto, longe da lista */
+    .fin-barra { left: auto; right: 32px; bottom: 28px; translate: none; animation-name: fabEntra; }
+    @keyframes fabEntra { from { opacity: 0; scale: 0.6; } }
+
+    /* Documentos: coluna de leitura */
+    .doc { width: min(100% - 64px, 720px); }
+}
+
+/* Telas bem largas: um pouco mais de ar */
+@media (min-width: 1440px) {
+    :root { --largura-lateral: 264px; --vao-lateral: 20px; }
+}
+
+/* Transição da pílula: mola, como as outras pílulas do app */
+::view-transition-group(lateral-pilula) { animation-duration: 0.55s; animation-timing-function: var(--mola); }
+::view-transition-old(lateral-pilula), ::view-transition-new(lateral-pilula) { animation: none; mix-blend-mode: normal; height: 100%; }
+::view-transition-old(lateral-pilula) { display: none; }
+/* A barra troca na hora (sem cruzar, que deixaria tudo desbotado no meio);
+   só a pílula desliza */
+::view-transition-old(lateral) { display: none; }
+::view-transition-new(lateral) { animation: none; }
+
+@media (prefers-reduced-motion: reduce) {
+    ::view-transition-group(lateral-pilula) { animation: none; }
+}

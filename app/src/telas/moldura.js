@@ -1,7 +1,8 @@
 // Peças de layout repetidas entre as telas.
 import { h, icone } from '../util/dom.js';
 import { supabase } from '../supabase.js';
-import { eLiderDeLouvor } from '../sessao.js';
+import { eLiderDeLouvor, veFinanceiro, cuidaDosEventos } from '../sessao.js';
+import { avatar } from '../util/foto.js';
 import { removerAparelho } from '../util/push.js';
 import { googleAtivo, entrarComGoogle } from '../util/google.js';
 
@@ -20,6 +21,9 @@ export function molduraEntrada({ titulo, subtitulo, conteudo, rodape }) {
                 conteudo,
             ),
             rodape && h('p', { class: 'entrada-rodape' }, rodape),
+            h('nav', { class: 'entrada-docs', 'aria-label': 'Documentos' },
+                h('a', { href: '#/privacidade' }, 'Privacidade'), h('span', { 'aria-hidden': 'true' }, '·'),
+                h('a', { href: '#/termos' }, 'Termos de uso')),
         ),
     );
 }
@@ -28,11 +32,79 @@ export function molduraEntrada({ titulo, subtitulo, conteudo, rodape }) {
 // Dentro de um módulo (opcoes.modulo = 'Louvor', 'Eventos do site'...), a
 // marca dá lugar a "‹ Início" + o nome do módulo: a pessoa sempre sabe onde
 // está e como voltar. No Início, aparece a marca do Hub.
+// Primeiro desliga o push deste aparelho (ainda logado, o banco deixa apagar)
+async function sair() { await removerAparelho(); supabase.auth.signOut(); }
+
+// Pedidos de acesso esperando o admin. A barra de abas e a barra lateral
+// mostram o mesmo número: guarda a resposta por 30 s para não perguntar duas vezes.
+let pedidosGuardados = null;
+function contarPedidos() {
+    if (!pedidosGuardados) {
+        pedidosGuardados = supabase.from('conta').select('id', { count: 'exact', head: true }).eq('estado', 'pendente')
+            .then(({ count }) => count ?? 0, () => 0);
+        setTimeout(() => { pedidosGuardados = null; }, 30_000);
+    }
+    return pedidosGuardados;
+}
+function contadorDePedidos(lugar, classe) {
+    contarPedidos().then((n) => {
+        if (n) lugar.append(h('span', { class: classe }, String(n), h('span', { class: 'sr-only' }, n === 1 ? ' pedido de acesso' : ' pedidos de acesso')));
+    });
+}
+
+// Barra lateral do computador (telas de 1024 px ou mais). No celular ela fica
+// escondida pelo CSS e quem navega são a cápsula de cima + as abas de baixo;
+// no computador é o contrário. Mostra todos os módulos de uma vez, porque
+// numa tela larga sobra espaço e trocar de área fica a um clique.
+// A pílula do item atual tem view-transition-name: ao trocar de tela, o
+// navegador a desliza do item velho até o novo.
+let lateralJaApareceu = false;
+export function barraLateral(conta, atual) {
+    const classe = lateralJaApareceu ? 'lateral' : 'lateral chegando';
+    lateralJaApareceu = true;
+    const item = (rota, nome, nomeIcone) => {
+        const ativo = atual === rota;
+        return h('a', { class: 'lateral-item', href: rota, 'aria-current': ativo ? 'page' : null },
+            ativo ? h('span', { class: 'lateral-pilula', 'aria-hidden': 'true' }) : null,
+            icone(nomeIcone), h('span', { class: 'lateral-nome' }, nome));
+    };
+    const equipe = item('#/equipe', 'Equipe', 'pessoas');
+    if (conta.e_administrador) contadorDePedidos(equipe, 'lateral-contador');
+    const areas = [
+        cuidaDosEventos(conta) ? item('#/eventos', 'Eventos do site', 'megafone') : null,
+        veFinanceiro(conta) ? item('#/financeiro', 'Financeiro', 'moeda') : null,
+    ].filter(Boolean);
+    const pessoa = conta.pessoa ?? { nome: conta.nome_informado };
+
+    return h('aside', { class: classe },
+        h('a', { class: 'lateral-marca', href: '#/inicio', 'aria-label': 'IEJB Hub, ir para o Início' },
+            h('img', { src: '/logo-iejb-pequeno.png', alt: '', width: 32, height: 32 }),
+            h('span', { class: 'cabecalho-nome' }, 'IEJB ', h('span', null, 'Hub'))),
+        h('nav', { class: 'lateral-nav', 'aria-label': 'Menu principal' },
+            item('#/inicio', 'Início', 'casa'),
+            h('p', { class: 'lateral-grupo', 'aria-hidden': 'true' }, 'Louvor'),
+            h('ul', { 'aria-label': 'Louvor' },
+                [item('#/escala', 'Escala', 'calendario'),
+                    eLiderDeLouvor(conta) ? item('#/montar', 'Montar escala', 'montar') : null,
+                    item('#/repertorios', 'Repertórios', 'musica'),
+                    equipe].filter(Boolean).map((a) => h('li', null, a))),
+            areas.length ? h('p', { class: 'lateral-grupo', 'aria-hidden': 'true' }, 'Áreas') : null,
+            areas.length ? h('ul', { 'aria-label': 'Áreas' }, areas.map((a) => h('li', null, a))) : null),
+        h('div', { class: 'lateral-conta' },
+            avatar(pessoa, 'pessoa-avatar lateral-avatar'),
+            h('span', { class: 'lateral-quem' },
+                h('span', { class: 'lateral-quem-nome' }, pessoa.apelido || pessoa.nome || 'Você'),
+                h('span', { class: 'lateral-quem-papel' }, conta.e_administrador ? 'Administrador' : 'Membro')),
+            h('button', { type: 'button', class: 'botao-icone', 'aria-label': 'Sair da conta', onclick: sair }, icone('sair'))),
+        h('nav', { class: 'lateral-links', 'aria-label': 'Documentos' },
+            h('a', { href: '#/privacidade' }, 'Privacidade'), h('span', { 'aria-hidden': 'true' }, '·'),
+            h('a', { href: '#/termos' }, 'Termos de uso')),
+    );
+}
+
 export function cabecalhoApp(conta, opcoes = {}) {
     const botaoSair = h('button', {
-        type: 'button', class: 'botao-icone', 'aria-label': 'Sair da conta',
-        // Primeiro desliga o push deste aparelho (ainda logado, o banco deixa apagar)
-        onclick: async () => { await removerAparelho(); supabase.auth.signOut(); },
+        type: 'button', class: 'botao-icone', 'aria-label': 'Sair da conta', onclick: sair,
     }, icone('sair'));
 
     const marca = opcoes.modulo
@@ -70,14 +142,7 @@ export function barraAbas(conta, atual) {
         equipe,
     );
 
-    if (conta.e_administrador) {
-        supabase.from('conta').select('id', { count: 'exact', head: true }).eq('estado', 'pendente')
-            .then(({ count }) => {
-                if (!count) return;
-                equipe.append(h('span', { class: 'aba-contador' },
-                    String(count), h('span', { class: 'sr-only' }, count === 1 ? ' pedido de acesso' : ' pedidos de acesso')));
-            });
-    }
+    if (conta.e_administrador) contadorDePedidos(equipe, 'aba-contador');
     return barra;
 }
 
