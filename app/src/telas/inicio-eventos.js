@@ -57,7 +57,7 @@ function detalhes(e) {
     abrirFolha({
         titulo: e.titulo,
         conteudo: h('div', { class: 'form evento-detalhe' },
-            imagem && h('img', { class: 'evento-detalhe-img', src: imagem, alt: '', loading: 'lazy', decoding: 'async' }),
+            imagem && h('img', { class: 'evento-detalhe-img', src: imagem, alt: '', decoding: 'async', width: 800, height: 450 }),
             h('p', { class: 'evento-detalhe-categoria' }, e.categoria),
             h('ul', { class: 'evento-detalhe-fatos' },
                 h('li', null, icone('calendario', 'icone icone-p'), quando),

@@ -422,7 +422,7 @@
     object-fit: cover;
     border-radius: var(--raio-m);
     background: var(--fundo-rosado);
-    animation: surgir 0.5s var(--mola) backwards;
+    /* sem animação própria: sobe junto com a folha (duas animações juntas tremiam) */
 }
 .evento-detalhe-categoria { font-size: 13px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--principal); }
 .evento-detalhe-fatos { display: grid; gap: 8px; padding: 0; margin: 0; list-style: none; }

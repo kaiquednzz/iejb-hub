@@ -48,9 +48,11 @@ export function abrirFolha({ titulo, conteudo, aoFechar }) {
     document.body.append(dialogo);
     document.documentElement.classList.add('com-folha'); // trava a rolagem da página atrás
     dialogo.showModal();
-    // Não abrir o teclado do celular sozinho: foca o título, não o 1º campo
+    // Não abrir o teclado do celular sozinho: foca o título, não o 1º campo.
+    // preventScroll: a folha ainda está lá embaixo (subindo); sem isso o
+    // Safari rola a tela atrás do foco e a folha "pula" no meio da animação.
     dialogo.querySelector('h2').setAttribute('tabindex', '-1');
-    dialogo.querySelector('h2').focus();
+    dialogo.querySelector('h2').focus({ preventScroll: true });
 
     return { fechar, elemento: dialogo, trocarConteudo: (novo) => dialogo.querySelector('.folha-conteudo').replaceChildren(novo) };
 }

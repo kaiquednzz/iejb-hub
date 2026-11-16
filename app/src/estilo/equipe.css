@@ -281,9 +281,9 @@ html.com-folha { overflow: hidden; }
 }
 .folha:not([open]) { display: none; }
 .folha::backdrop {
-    background: rgba(29, 6, 5, 0.42);
-    -webkit-backdrop-filter: blur(3px);
-    backdrop-filter: blur(3px);
+    /* Sem blur de propósito: no iPhone, backdrop-filter no fundo do <dialog>
+       junto com a folha subindo piscava no primeiro quadro. Só escurece. */
+    background: rgba(29, 6, 5, 0.48);
     animation: fundoEntra 0.35s ease;
 }
 .folha-caixa {
@@ -296,7 +296,8 @@ html.com-folha { overflow: hidden; }
     border-radius: 30px 30px 0 0;
     background: var(--background);
     box-shadow: 0 -10px 40px rgba(29, 6, 5, 0.25);
-    animation: folhaSobe 0.55s var(--ease-ios);
+    animation: folhaSobe 0.55s var(--ease-ios) both;
+    will-change: translate; /* já começa na placa de vídeo, sem engasgo no 1º quadro */
 }
 .folha-caixa::before {
     /* brilho da marca no topo da folha */
