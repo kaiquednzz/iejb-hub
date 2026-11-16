@@ -100,8 +100,8 @@
     transition: transform 0.45s var(--mola);
 }
 .fin-mes-seta:active { transform: scale(0.88); transition-duration: 0.12s; }
-.fin-mes-area.entra-dir { animation: deslizarDir 0.5s var(--ease-ios); }
-.fin-mes-area.entra-esq { animation: deslizarEsq 0.5s var(--ease-ios); }
+.fin-mes-conteudo.entra-dir { animation: deslizarDir 0.5s var(--ease-ios); }
+.fin-mes-conteudo.entra-esq { animation: deslizarEsq 0.5s var(--ease-ios); }
 @keyframes deslizarDir { from { opacity: 0; translate: 28px 0; } }
 @keyframes deslizarEsq { from { opacity: 0; translate: -28px 0; } }
 
@@ -373,3 +373,153 @@ dialog .form .bloco { grid-template-columns: minmax(0, 1fr); }
 .fin-entrada[type="date"]::-webkit-date-and-time-value { text-align: left; }
 /* Espaço para o botão fixo "Lançar" não cobrir o rodapé */
 .fin-rodape { margin-bottom: calc(96px + env(safe-area-inset-bottom)); }
+
+/* ==========================================================================
+   Resumo do mês (D55)
+   Cores dos gráficos: entradas #1f7a4d (verde) e saídas #BF262B (vermelho da
+   marca). Os dois passam no validador de paleta, mas se aproximam para quem
+   tem deuteranopia (ΔE 6,3): por isso entrada é sempre a barra da esquerda,
+   tem legenda e o valor leva + ou −. Barras crescem só com transform.
+   ========================================================================== */
+.fin-vistas { margin: 4px 0 14px; }
+.fin-an { display: grid; gap: 12px; }
+.fin-an-esqueleto { height: 320px; border-radius: var(--raio-l); background: rgba(58, 10, 9, 0.05); animation: respirar 1.2s ease-in-out infinite alternate; }
+
+.fin-an-topo {
+    padding: 18px;
+    border-radius: var(--raio-l);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.74));
+    border: 1px solid var(--vidro-borda);
+    box-shadow: var(--sombra-1), var(--brilho);
+    animation: subir 0.55s var(--ease-out) backwards;
+}
+.fin-an-frase { font-family: var(--fonte-titulo); font-size: 22px; line-height: 1.25; color: var(--texto-vinho); }
+.fin-an-topo.positivo strong { color: var(--verde); }
+.fin-an-topo.negativo strong { color: var(--principal-brighter); }
+.fin-an-detalhe { margin-top: 6px; font-size: 15px; color: var(--texto-2); }
+
+.fin-an-bloco {
+    padding: 4px 16px 16px;
+    border-radius: var(--raio-l);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.74));
+    border: 1px solid var(--vidro-borda);
+    box-shadow: var(--sombra-1), var(--brilho);
+    animation: subir 0.55s 0.06s var(--ease-out) backwards;
+}
+.fin-an-nota { margin-top: 8px; font-size: 13px; color: var(--texto-2); }
+
+/* --- Gráfico dos 6 meses --- */
+.fin-graf-topo { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 12px; }
+.fin-legenda { display: flex; gap: 14px; font-size: 13px; color: var(--texto-2); }
+.fin-legenda span { display: inline-flex; align-items: center; gap: 6px; }
+.fin-legenda span::before { content: '' / ''; width: 10px; height: 10px; border-radius: 3px; }
+.fin-legenda .entrada::before { background: #1f7a4d; }
+.fin-legenda .saida::before { background: #BF262B; }
+
+.fin-graf-area {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 4px;
+    height: 176px;
+    margin-top: 6px;
+    padding-top: 8px;
+    /* linha de base */
+    background: linear-gradient(rgba(58, 10, 9, 0.14), rgba(58, 10, 9, 0.14)) left calc(100% - 26px) / 100% 1px no-repeat;
+}
+.fin-graf-col {
+    position: relative;
+    display: grid;
+    grid-template-rows: 1fr 26px;
+    min-width: 0;
+    padding: 0 2px;
+    border: 0;
+    border-radius: var(--raio-s);
+    background: none;
+    cursor: pointer;
+    transition: background-color 0.25s ease, transform 0.45s var(--mola);
+}
+.fin-graf-col:active { transform: scale(0.95); transition-duration: 0.12s; }
+.fin-graf-col.atual { background: rgba(143, 13, 11, 0.06); cursor: default; }
+.fin-graf-barras { display: flex; align-items: flex-end; justify-content: center; gap: 2px; height: 100%; padding-bottom: 0; }
+.fin-graf-barra {
+    width: min(14px, 38%);
+    height: 100%;
+    border-radius: 4px 4px 0 0;
+    transform-origin: bottom;
+    transform: scaleY(var(--h));
+    animation: barraSobeMes 0.8s calc(0.1s + var(--i) * 0.06s) var(--mola) backwards;
+}
+.fin-graf-barra.entrada { background: #1f7a4d; }
+.fin-graf-barra.saida { background: #BF262B; }
+.fin-graf-col:not(.atual) .fin-graf-barra { opacity: 0.55; transition: opacity 0.25s; }
+@keyframes barraSobeMes { from { transform: scaleY(0); } }
+.fin-graf-mes { align-self: center; font-size: 13px; font-weight: 600; color: var(--texto-2); }
+.fin-graf-col.atual .fin-graf-mes { color: var(--texto-vinho); }
+
+/* Dica ao passar o mouse ou focar com o teclado */
+.fin-graf-dica {
+    position: absolute;
+    bottom: calc(100% - 4px);
+    left: 50%;
+    z-index: 2;
+    display: grid;
+    gap: 1px;
+    padding: 8px 10px;
+    border-radius: 12px;
+    background: rgba(29, 6, 5, 0.9);
+    color: #fff;
+    font-size: 13px;
+    white-space: nowrap;
+    text-align: left;
+    pointer-events: none;
+    opacity: 0;
+    translate: -50% 6px;
+    transition: opacity 0.18s ease, translate 0.35s var(--mola);
+}
+.fin-graf-dica .entrada { color: #9fe3bf; }
+.fin-graf-dica .saida { color: #ffb4b0; }
+.fin-graf-col:first-child .fin-graf-dica { left: 0; translate: 0 6px; }
+.fin-graf-col:last-child .fin-graf-dica { left: auto; right: 0; translate: 0 6px; }
+@media (hover: hover) {
+    .fin-graf-col:not(.atual):hover { background: rgba(143, 13, 11, 0.04); }
+    .fin-graf-col:hover .fin-graf-barra { opacity: 1; }
+    .fin-graf-col:hover .fin-graf-dica { opacity: 1; translate: -50% 0; }
+    .fin-graf-col:first-child:hover .fin-graf-dica, .fin-graf-col:last-child:hover .fin-graf-dica { translate: 0 0; }
+}
+.fin-graf-col:focus-visible .fin-graf-dica { opacity: 1; translate: -50% 0; }
+.fin-graf-col:first-child:focus-visible .fin-graf-dica, .fin-graf-col:last-child:focus-visible .fin-graf-dica { translate: 0 0; }
+
+/* --- Pontos de atenção --- */
+.fin-pontos { list-style: none; display: grid; gap: 8px; }
+.fin-ponto {
+    display: grid;
+    grid-template-columns: 30px 1fr;
+    align-items: start;
+    gap: 10px;
+    font-size: 15px;
+    line-height: 1.4;
+    animation: subir 0.5s calc(0.12s + var(--i) * 0.05s) var(--ease-out) backwards;
+}
+.fin-ponto-icone { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; }
+.fin-ponto.alerta .fin-ponto-icone { background: rgba(154, 91, 0, 0.12); color: var(--ambar); }
+.fin-ponto.bom .fin-ponto-icone { background: rgba(31, 122, 77, 0.12); color: var(--verde); }
+.fin-ponto.info .fin-ponto-icone { background: rgba(58, 10, 9, 0.06); color: var(--texto-2); }
+.fin-ponto > span:last-child { padding-top: 4px; }
+
+/* --- Categorias com comparação --- */
+.fin-an-cats { list-style: none; display: grid; gap: 12px; }
+.fin-an-cat { display: grid; grid-template-columns: 1fr auto; gap: 4px 10px; align-items: baseline; animation: subir 0.5s calc(0.1s + var(--i) * 0.05s) var(--ease-out) backwards; }
+.fin-an-cat-nome { font-weight: 600; min-width: 0; }
+.fin-an-cat-valor { display: inline-flex; align-items: baseline; gap: 8px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.fin-an-cat-barra { grid-column: 1 / -1; height: 8px; border-radius: 99px; background: rgba(58, 10, 9, 0.06); overflow: hidden; }
+.fin-an-cat-barra > span { display: block; height: 100%; border-radius: inherit; transform-origin: left; transform: scaleX(var(--fatia)); animation: crescerBarra 0.9s calc(0.15s + var(--i) * 0.06s) var(--mola) backwards; }
+.fin-an-cat.saida .fin-an-cat-barra > span { background: #BF262B; }
+.fin-an-cat.entrada .fin-an-cat-barra > span { background: #1f7a4d; }
+.fin-an-cat-parte { grid-column: 1 / -1; font-size: 13px; color: var(--texto-2); }
+.fin-an-var { padding: 1px 7px; border-radius: 99px; background: rgba(58, 10, 9, 0.06); color: var(--texto-2); font-size: 12px; font-weight: 700; }
+.fin-an-var.ruim { background: rgba(154, 91, 0, 0.12); color: var(--ambar); }
+
+@media (prefers-reduced-motion: reduce) {
+    .fin-graf-barra, .fin-an-cat-barra > span { animation: none; }
+}

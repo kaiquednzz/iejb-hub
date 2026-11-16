@@ -47,20 +47,15 @@ docs/planejamento    visão, regras de negócio, modelo de dados, decisões
 
 ## Fluxo de desenvolvimento
 
-O Hub é desenvolvido por **Kaique** com o **[Claude Code](https://claude.com/claude-code)**. Na prática, a divisão é assim:
+Cada mudança segue o mesmo caminho:
 
-- **Kaique** traz os problemas reais da igreja, define as regras e decide o produto: o que entra, o que sai, qual de três propostas de tela fica. Também testa no iPhone de verdade e manda print do que quebrou.
-- **O Claude Code** propõe caminhos (e discorda quando acha que um caminho é pior), escreve o código e os testes e confere o resultado antes de publicar.
-
-Cada mudança passa pelo mesmo caminho:
-
-1. **Levantamento.** Antes de código, perguntas em rodadas sobre como a igreja funciona hoje (quem monta a escala, como os grupos revezam, quem pode ver o caixa). As respostas viram as [regras de negócio](docs/planejamento/REGRAS-DE-NEGOCIO-PILOTO-LOUVOR.md) e o [modelo de dados](docs/planejamento/MODELO-DE-DADOS-E-PERMISSOES-PILOTO-LOUVOR.md).
-2. **Decisão registrada.** Toda escolha que muda o produto vira uma linha numerada (D1 a D54) na [visão geral](docs/planejamento/VISAO-GERAL-IEJB-HUB.md), com o motivo. As técnicas ficam no [registro de decisões técnicas](docs/planejamento/REGISTRO-DE-DECISOES-TECNICAS.md). Quando uma decisão é desfeita, ela fica riscada com o porquê (as cifras, D38, foram feitas e depois tiradas).
-3. **Banco primeiro.** Tabela, regra de acesso e gatilho entram como migração. Antes de ir para o Supabase de produção, rodam num Postgres local que simula logins diferentes (membro, líder, tesouraria, pastor) e confere o que cada um vê e o que é barrado: hoje são 227 verificações em `supabase/tests/local`.
-4. **Tela.** Mudanças pequenas e incrementais em cima do que existe, sem refatorar o que não precisa.
-5. **Conferência.** Cada tela é aberta num navegador automatizado com dados simulados, de 320 a 1440 px, procurando conteúdo vazando, botão pequeno demais para o dedo e erro no console. A acessibilidade passa pelo axe-core. Animação é conferida quadro a quadro.
-6. **Aplicar só com ok.** Migração que mexe no banco de produção só é aplicada depois de o Kaique liberar.
-7. **Publicar.** Commit em português (`feat:`, `fix:`, `style:`) e push; o Cloudflare publica em cerca de 2 minutos.
+1. **Levantamento.** Antes do código, as regras vêm de como a igreja funciona hoje (quem monta a escala, como os grupos revezam, quem pode ver o caixa) e viram as [regras de negócio](docs/planejamento/REGRAS-DE-NEGOCIO-PILOTO-LOUVOR.md) e o [modelo de dados](docs/planejamento/MODELO-DE-DADOS-E-PERMISSOES-PILOTO-LOUVOR.md).
+2. **Decisão registrada.** Toda escolha que muda o produto vira uma linha numerada na [visão geral](docs/planejamento/VISAO-GERAL-IEJB-HUB.md), com o motivo; as técnicas ficam no [registro de decisões técnicas](docs/planejamento/REGISTRO-DE-DECISOES-TECNICAS.md). Decisão desfeita fica riscada, com o porquê.
+3. **Banco primeiro.** Tabelas, regras de acesso e gatilhos entram como migração e rodam antes num Postgres local que simula logins diferentes (membro, líder, tesouraria, pastor), conferindo o que cada um vê e o que é barrado: 227 verificações em `supabase/tests/local`.
+4. **Tela.** Mudanças pequenas e incrementais sobre o que já existe.
+5. **Conferência.** Cada tela é aberta num navegador automatizado com dados simulados, de 320 a 1440 px, procurando conteúdo vazando, alvo de toque pequeno e erro no console; acessibilidade pelo axe-core; teste final em iPhone e Android reais.
+6. **Revisão antes de produção.** Migração no banco de produção só é aplicada depois de revisada.
+7. **Publicação.** Commit em português (`feat:`, `fix:`, `style:`) na `main`; o Cloudflare publica em cerca de 2 minutos.
 
 ## Rodar localmente
 
@@ -93,4 +88,4 @@ O que o Hub guarda, quem vê e como pedir para apagar está na própria tela de 
 
 ---
 
-Repositório privado. Os dados pertencem à IEJB (D8).
+Desenvolvido por Kaique, com o [Claude Code](https://claude.com/claude-code) como ferramenta de desenvolvimento. Repositório privado; os dados pertencem à IEJB.

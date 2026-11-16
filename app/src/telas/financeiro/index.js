@@ -15,6 +15,7 @@ import { hojeEmBrasilia } from '../../util/datas.js';
 import { temCargo } from '../../sessao.js';
 import { cabecalhoApp } from '../moldura.js';
 import { reais, nomeDoMes, primeiroDoMes, somarMeses, dataCurta, FORMAS, nomeDe } from './util.js';
+import { blocoResumo } from './resumo.js';
 import { folhaLancar, folhaDetalhe, folhaAjustes, folhaCancelarContagem } from './lancar.js';
 
 const DIA_SEMANA = new Intl.DateTimeFormat('pt-BR', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'UTC' });
@@ -40,6 +41,26 @@ export function telaFinanceiro(conta) {
     const exportar = h('button', { type: 'button', class: 'botao-texto' }, icone('baixar', 'icone icone-p'), 'Baixar o mês (planilha)');
     exportar.addEventListener('click', () => dados && baixarCSV(dados, mes));
 
+    // Lançamentos | Resumo (D55). Lembra a escolha enquanto o app está aberto.
+    let vista = sessionStorage.getItem('iejb-fin-vista') === 'resumo' ? 'resumo' : 'lancamentos';
+    const VISTAS = [['lancamentos', 'Lançamentos'], ['resumo', 'Resumo']];
+    const segmentos = h('div', { class: 'segmentos fin-vistas', role: 'tablist', 'aria-label': 'O que ver do mês', style: { '--n': 2 } });
+    function desenharSegmentos() {
+        segmentos.style.setProperty('--ativo', VISTAS.findIndex(([id]) => id === vista));
+        segmentos.replaceChildren(...VISTAS.map(([id, nome]) => {
+            const b = h('button', { type: 'button', role: 'tab', 'aria-selected': String(id === vista), 'aria-controls': 'fin-mes-painel' }, nome);
+            b.addEventListener('click', () => {
+                if (vista === id) return;
+                vista = id;
+                sessionStorage.setItem('iejb-fin-vista', id);
+                desenharSegmentos();
+                desenharMes();
+            });
+            return b;
+        }));
+    }
+    desenharSegmentos();
+
     const lancar = edita ? h('button', { type: 'button', class: 'botao-principal fin-lancar' }, icone('mais'), 'Lançar') : null;
     lancar?.addEventListener('click', () => dados && folhaLancar(dados, conta, carregar));
 
@@ -51,22 +72,35 @@ export function telaFinanceiro(conta) {
                 !edita && h('span', { class: 'selo selo-neutro' }, icone('olho', 'icone icone-p'), 'Só leitura')),
             area,
             h('nav', { class: 'fin-mes', 'aria-label': 'Mês' }, anterior, tituloMes, proximo),
-            h('div', { class: 'fin-mes-area' }),
+            h('div', { class: 'fin-mes-area' }, segmentos, h('div', { class: 'fin-mes-conteudo', id: 'fin-mes-painel', role: 'tabpanel' })),
             h('div', { class: 'fin-rodape' }, exportar, ajustes),
         ),
         lancar && h('div', { class: 'fin-barra' }, lancar),
     );
-    const areaMes = tela.querySelector('.fin-mes-area');
+    const conteudoMes = tela.querySelector('.fin-mes-conteudo');
 
     carregar();
     return tela;
 
+    function desenharMes() {
+        if (!dados) return;
+        conteudoMes.replaceChildren(...(vista === 'resumo'
+            ? [blocoResumo(dados, mes, irParaMes)]
+            : [blocoMes(dados), blocoLancamentos(dados, (l) => folhaDetalhe(l, dados, conta, carregar))]).filter(Boolean));
+    }
+
+    // O gráfico do resumo leva direto a um mês
+    function irParaMes(iso) {
+        const n = (Number(iso.slice(0, 4)) - Number(mes.slice(0, 4))) * 12 + Number(iso.slice(5, 7)) - Number(mes.slice(5, 7));
+        if (n) trocarMes(n);
+    }
+
     function trocarMes(n) {
         mes = somarMeses(mes, n);
         tituloMes.textContent = nomeDoMes(mes);
-        areaMes.classList.remove('entra-esq', 'entra-dir');
-        void areaMes.offsetWidth;
-        areaMes.classList.add(n > 0 ? 'entra-dir' : 'entra-esq');
+        conteudoMes.classList.remove('entra-esq', 'entra-dir');
+        void conteudoMes.offsetWidth;
+        conteudoMes.classList.add(n > 0 ? 'entra-dir' : 'entra-esq');
         carregar();
     }
 
@@ -97,7 +131,7 @@ export function telaFinanceiro(conta) {
             area.replaceChildren(h('div', { class: 'estado-vazio' },
                 h('p', { class: 'estado-vazio-titulo' }, 'Não deu para carregar o financeiro.'),
                 h('p', { class: 'estado-vazio-texto' }, mensagemDoBanco(erro)), botao));
-            areaMes.replaceChildren();
+            conteudoMes.replaceChildren();
             return;
         }
         dados = {
@@ -112,7 +146,7 @@ export function telaFinanceiro(conta) {
         };
         // replaceChildren escreve "null" na tela se receber null: filtra antes
         area.replaceChildren(...[blocoSaldo(dados), blocoContagens(dados, carregar)].filter(Boolean));
-        areaMes.replaceChildren(...[blocoMes(dados), blocoLancamentos(dados, (l) => folhaDetalhe(l, dados, conta, carregar))].filter(Boolean));
+        desenharMes();
     }
 }
 
