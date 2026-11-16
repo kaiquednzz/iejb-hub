@@ -76,7 +76,7 @@ export function abrirCulto(cultoId, ctx) {
                     });
                     return chip;
                 })),
-            h('p', { class: 'bloco-texto' }, 'Toque em mais de um para juntar grupos (culto especial).'),
+            h('p', { class: 'bloco-texto' }, 'Pode marcar mais de um.'),
         ));
 
         // Pessoas da escala (sem quem está só pela mesa: isso fica no bloco da mesa)
@@ -98,7 +98,7 @@ export function abrirCulto(cultoId, ctx) {
                         h('span', { class: 'linha-textos' },
                             h('span', { class: 'linha-nome' }, nomeCurto(item.pessoa)),
                             naoVai(item)
-                                ? h('span', { class: 'linha-detalhe linha-nao-vai' }, 'Avisou que não vai · toque para trocar')
+                                ? h('span', { class: 'linha-detalhe linha-nao-vai' }, 'Não vai · trocar')
                                 : h('span', { class: 'linha-detalhe' },
                                     item.instrumento_exibido.filter((x) => x !== FUNCAO_MESA).join(', ') || 'sem instrumento',
                                     !item.origem_grupo_id && ' · avulso')),
@@ -118,7 +118,7 @@ export function abrirCulto(cultoId, ctx) {
         // Ceia
         partes.push(h('section', { class: 'bloco' }, interruptor({
             rotulo: 'Culto de Ceia',
-            descricao: 'Aparece destacado na escala e na mensagem.',
+            descricao: null,
             ligado: culto.rotulo === ROTULO_CEIA,
             aoMudar: (valor) => fazer(() => supabase.from('culto')
                 .update({ rotulo: valor ? ROTULO_CEIA : null }).eq('id', culto.id)),
@@ -258,7 +258,7 @@ export function folhaMesa(culto, ctx, depois) {
         titulo: `Mesa · ${rotuloDoDia(culto.data)}`,
         conteudo: h('div', { class: 'form' },
             fazem.length === 0 && h('p', { class: 'folha-texto' },
-                'Dica: marque "Mesa" nos instrumentos de quem opera o som (em Equipe → Pessoas) para essas pessoas aparecerem primeiro.'),
+                'Quem tem "Mesa" nos instrumentos aparece primeiro.'),
             h('div', { class: 'grade-mesa', role: 'radiogroup', 'aria-label': 'Quem fica na mesa' },
                 fazem.map(opcao), opcao(null)),
             outros.length > 0 && h('details', { class: 'grupo-recolhido', open: fazem.length === 0 },

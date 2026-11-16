@@ -17,7 +17,7 @@ import { partesDaData, formatarHorario, somarDias, hojeEmBrasilia } from '../../
 import { nomeCurto } from '../../sessao.js';
 import { cabecalhoApp, barraAbas } from '../moldura.js';
 import { carregarMontagem, somarMes, nomeDoMes, mesSugerido, nomesDosGrupos, textoDoMes } from './dados.js';
-import { abrirCulto, folhaMesa, folhaAdicionarCulto, grupoVazio, avisarGrupoVazio } from './culto.js';
+import { abrirCulto, folhaAdicionarCulto, grupoVazio, avisarGrupoVazio } from './culto.js';
 
 const LEMBRAR = 'iejb-hub-montar-mes';
 
@@ -31,15 +31,17 @@ export function telaMontar(conta) {
     anterior.addEventListener('click', () => trocarMes(-1));
     proximo.addEventListener('click', () => trocarMes(1));
 
-    const resumo = h('p', { class: 'mes-resumo' });
+    const resumo = h('p', { class: 'mes-resumo', 'aria-live': 'polite' });
+    // Mandar no WhatsApp: botão redondo no canto do título (como a agenda na Escala)
+    const whatsapp = h('button', { type: 'button', class: 'botao-icone montar-whatsapp', 'aria-label': 'Mandar a escala do mês no WhatsApp' }, icone('whatsapp'));
+    whatsapp.addEventListener('click', () => dados && folhaWhatsApp(dados, dados.cultos.filter((c) => c.ativo && c.escala?.estado === 'rascunho' && c.itens.length > 0).length));
     const area = h('div', { class: 'montar-area', 'aria-busy': 'true' }, esqueleto());
     const barraAcoes = h('div', { class: 'montar-acoes' });
 
     const tela = h('div', { class: 'tela tela-app tela-montar' },
         cabecalhoApp(conta, { modulo: 'Louvor' }),
         h('main', { id: 'conteudo', class: 'app-conteudo' },
-            h('h1', { tabindex: -1, class: 'titulo-tela' }, 'Montar escala'),
-            h('p', { class: 'subtitulo-tela' }, 'Um toque no grupo da semana escala domingo e terça.'),
+            h('div', { class: 'escala-topo' }, h('h1', { tabindex: -1, class: 'titulo-tela' }, 'Montar escala'), whatsapp),
             h('div', { class: 'mes-navegacao' }, anterior, tituloMes, proximo),
             resumo,
             area,
@@ -93,14 +95,12 @@ export function telaMontar(conta) {
         const publicadas = ativos.filter((c) => c.escala?.estado === 'publicada').length;
 
         // replaceChildren não achata listas nem ignora false: filtra antes
-        resumo.replaceChildren(...(ativos.length === 0 ? ['Nenhum culto com louvor neste mês.'] : [
-            `${ativos.length} ${ativos.length === 1 ? 'culto' : 'cultos'}`,
-            publicadas > 0 && h('span', { class: 'resumo-ok' }, ` · ${publicadas} ${publicadas === 1 ? 'publicado' : 'publicados'}`),
-            rascunhos.length > 0 && h('span', { class: 'resumo-rascunho' }, ` · ${rascunhos.length} em rascunho`),
-            semGrupo > 0 && h('span', { class: 'resumo-falta' }, ` · ${semGrupo} sem ninguém`),
-        ].filter(Boolean)));
+        // Só fala quando tem algo a fazer (o resto os cartões já mostram)
+        resumo.replaceChildren(...(ativos.length === 0 ? ['Nenhum culto com louvor neste mês.']
+            : semGrupo > 0 ? [h('span', { class: 'resumo-falta' }, `${semGrupo} ${semGrupo === 1 ? 'culto sem ninguém' : 'cultos sem ninguém'}`)]
+            : publicadas === ativos.length ? [h('span', { class: 'resumo-ok' }, 'Mês todo publicado')] : []));
 
-        const especial = h('button', { type: 'button', class: 'botao-secundario botao-largo' }, icone('mais'), 'Adicionar culto (jovens, especial)');
+        const especial = h('button', { type: 'button', class: 'botao-secundario botao-largo' }, icone('mais'), 'Adicionar culto');
         especial.addEventListener('click', () => folhaAdicionarCulto(dados, ctx));
 
         // Semanas que já acabaram sem nada para ver saem da lista: só poluem.
@@ -110,13 +110,12 @@ export function telaMontar(conta) {
         area.replaceChildren(h('div', { class: 'lista-semanas' },
             semanas.map((s, i) => cartaoSemana(s, i)),
             especial,
-            h('p', { class: 'montar-dica' }, 'Depois de publicar, mudar alguém avisa só quem entrou, saiu ou mudou de instrumento.'),
         ));
 
-        // Ações do mês: publicar o que está em rascunho e mandar o resumo no WhatsApp
+        // O botão de publicar só aparece quando tem o que publicar
+        if (!rascunhos.length) { barraAcoes.replaceChildren(); return; }
         const publicar = h('button', { type: 'button', class: 'botao-principal' },
-            rascunhos.length ? `Publicar ${rascunhos.length === 1 ? '1 culto' : `${rascunhos.length} cultos`}` : 'Tudo publicado');
-        publicar.disabled = rascunhos.length === 0;
+            `Publicar ${rascunhos.length === 1 ? '1 culto' : `${rascunhos.length} cultos`}`);
         publicar.addEventListener('click', () => comCarregando(publicar, async () => {
             const { error } = await supabase.from('escala').update({ estado: 'publicada' })
                 .in('id', rascunhos.map((c) => c.escala.id));
@@ -124,9 +123,7 @@ export function telaMontar(conta) {
             comemorar('Escala publicada!', 'Todo o Louvor já vê a escala, e quem foi escalado recebe o aviso.');
             await carregar();
         }));
-        const whatsapp = h('button', { type: 'button', class: 'botao-secundario', 'aria-label': 'Mandar a escala do mês no WhatsApp' }, icone('whatsapp'));
-        whatsapp.addEventListener('click', () => folhaWhatsApp(dados, rascunhos.length));
-        barraAcoes.replaceChildren(publicar, whatsapp);
+        barraAcoes.replaceChildren(publicar);
     }
 
     function cartaoSemana(semana, indice) {
@@ -136,6 +133,7 @@ export function telaMontar(conta) {
             ? fixos[0].gruposIds[0] : null;
 
         const chips = fixos.length > 0 && h('div', { class: 'chips-grupo', role: 'group', 'aria-label': 'Grupo da semana' },
+            h('span', { class: 'chips-grupo-rotulo', 'aria-hidden': 'true' }, 'Grupo'),
             dados.grupos.map((g) => {
                 const chip = h('button', {
                     type: 'button', class: 'chip-grupo', 'aria-pressed': String(g.id === daSemana),
@@ -181,9 +179,14 @@ export function telaMontar(conta) {
         const datas = partesDaData(culto.data);
         const grupos = nomesDosGrupos(culto, dados);
         const tocam = culto.itens.length;
+        // Publicada é o normal: só um ✓ verde. Selo de texto só quando pede atenção.
+        const publicada = culto.ativo && culto.escala?.estado === 'publicada';
         const estado = !culto.ativo ? ['cancelado', 'Cancelado']
-            : culto.escala?.estado === 'publicada' ? ['publicada', 'Publicada']
+            : publicada ? null
             : tocam ? ['rascunho', 'Rascunho'] : ['vazio', culto.passou ? 'Sem escala' : 'Falta montar'];
+        const mesa = culto.ativo && tocam
+            ? (culto.mesa.length ? ` · Mesa: ${culto.mesa.map((p) => nomeCurto(p)).join(', ')}` : h('span', { class: 'sem-mesa' }, ' · sem mesa'))
+            : null;
 
         const abrir = h('button', { type: 'button', class: 'culto-montar-abrir' },
             h('span', { class: 'mini-data', 'aria-hidden': 'true' },
@@ -193,18 +196,15 @@ export function telaMontar(conta) {
                     culto.rotulo && h('span', { class: 'rotulo-culto' }, culto.rotulo)),
                 h('span', { class: 'culto-montar-detalhe' },
                     `${formatarHorario(culto.horario)} · `,
-                    grupos.length ? h('strong', null, grupos.join(' + ')) : (tocam ? `${tocam} ${tocam === 1 ? 'pessoa' : 'pessoas'}` : 'ninguém ainda')),
+                    grupos.length ? h('strong', null, grupos.join(' + ')) : (tocam ? `${tocam} ${tocam === 1 ? 'pessoa' : 'pessoas'}` : 'ninguém ainda'),
+                    mesa),
             ),
-            h('span', { class: `estado-pill estado-${estado[0]}` }, estado[1]),
+            estado ? h('span', { class: `estado-pill estado-${estado[0]}` }, estado[1])
+                : h('span', { class: 'publicada-certo', role: 'img', 'aria-label': 'Publicada' }, icone('certo', 'icone icone-p')),
         );
         abrir.addEventListener('click', () => abrirCulto(culto.id, ctx));
 
-        const mesa = !culto.ativo ? null : h('button', { type: 'button', class: `chip-mesa${culto.mesa.length ? ' definida' : ''}` },
-            h('span', { class: 'chip-mesa-rotulo' }, 'Mesa'),
-            culto.mesa.length ? culto.mesa.map((p) => nomeCurto(p)).join(', ') : 'escolher');
-        mesa?.addEventListener('click', () => folhaMesa(culto, ctx));
-
-        return h('li', { class: `culto-montar${culto.ativo ? '' : ' cancelado'}${culto.passou ? ' passou' : ''}` }, abrir, mesa);
+        return h('li', { class: `culto-montar${culto.ativo ? '' : ' cancelado'}${culto.passou ? ' passou' : ''}` }, abrir);
     }
 }
 
