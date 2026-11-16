@@ -30,22 +30,13 @@ const JA_ASSINOU = 'iejb-agenda-assinada';
 const jaAssinou = () => { try { return localStorage.getItem(JA_ASSINOU) === '1'; } catch { return false; } };
 const marcarAssinada = () => { try { localStorage.setItem(JA_ASSINOU, '1'); } catch { /* sem armazenamento: o convite continua */ } };
 
-// Convite no topo da escala: uma linha fina, só enquanto não assinou
-export function conviteAgenda() {
-    if (jaAssinou()) return null;
-    const botao = h('button', { type: 'button', class: 'convite-agenda' },
-        icone('calendario', 'icone icone-p'),
-        h('span', null, 'Adicionar à agenda do celular'),
-        icone('seta', 'icone icone-p'));
-    botao.addEventListener('click', () => comCarregando(botao, () => abrir(() => botao.remove())));
-    return botao;
-}
-
-// Link discreto no fim da escala, sempre disponível
-export function linkAgenda() {
-    const botao = h('button', { type: 'button', class: 'link-discreto link-agenda' },
-        icone('calendario', 'icone icone-p'), 'Agenda do celular');
-    botao.addEventListener('click', () => comCarregando(botao, () => abrir()));
+// Botão redondo no canto do título da Escala. Até a pessoa assinar neste
+// aparelho, leva um pontinho de "novidade"; depois fica só o ícone.
+export function botaoAgenda() {
+    const rotulo = 'Adicionar meus cultos à agenda do celular';
+    const botao = h('button', { type: 'button', class: `botao-icone botao-agenda${jaAssinou() ? '' : ' novidade'}`, 'aria-label': rotulo, title: rotulo },
+        icone('calendario'));
+    botao.addEventListener('click', () => comCarregando(botao, () => abrir(() => botao.classList.remove('novidade'))));
     return botao;
 }
 

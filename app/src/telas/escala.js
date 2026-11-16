@@ -4,7 +4,7 @@
 // usando os relacionamentos das chaves estrangeiras (o "embed" do PostgREST).
 // A RLS já filtra no banco: rascunho só aparece para o líder de louvor, e
 // quem não é do ministério não recebe nada. A tela só desenha o que chegou.
-import { conviteAgenda, linkAgenda } from '../util/agenda.js';
+import { botaoAgenda } from '../util/agenda.js';
 import { h, icone, comCarregando } from '../util/dom.js';
 import { supabase } from '../supabase.js';
 import { nomeCurto } from '../sessao.js';
@@ -40,15 +40,13 @@ export function telaEscala(conta) {
     const tela = h('div', { class: 'tela tela-app' },
         cabecalhoApp(conta, { modulo: 'Louvor' }),
         h('main', { id: 'conteudo', class: 'app-conteudo' },
-            titulo,
+            h('div', { class: 'escala-topo' }, titulo, botaoAgenda()),
             h('p', { class: 'subtitulo-tela' }, 'Aqui estão os próximos cultos do Louvor.'),
             faixaOffline,
             cartaoAvisos(),
             destaque,
-            conviteAgenda(),
             h('h2', { class: 'titulo-secao' }, 'Próximos cultos'),
             lista,
-            h('p', { class: 'escala-rodape' }, linkAgenda()),
         ),
         barraAbas(conta, '#/escala'),
     );

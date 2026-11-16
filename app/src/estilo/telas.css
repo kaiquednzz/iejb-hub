@@ -782,34 +782,33 @@
 .mesma-escala[open] .cartao-escala { animation: surgir 0.35s var(--mola); }
 
 /* --- "Meus cultos na agenda" (D56) ---------------------------------------
-   Convite numa linha fina só enquanto a pessoa não assinou; depois fica o
-   link discreto no fim da escala. */
-.convite-agenda {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    width: 100%;
-    min-height: 44px;
-    margin-top: 10px;
-    padding: 0 14px;
-    border: 1px solid rgba(143, 13, 11, 0.12);
-    border-radius: var(--raio-capsula);
-    background: rgba(255, 255, 255, 0.6);
-    color: var(--principal);
-    font-size: 15px;
-    font-weight: 600;
-    text-align: left;
-    cursor: pointer;
-    animation: subir 0.6s 0.12s var(--ease-out) backwards;
+   Botão redondo no canto do título da Escala; o pontinho some depois que a
+   pessoa assina neste aparelho. */
+.escala-topo { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.escala-topo .titulo-tela { min-width: 0; }
+.botao-agenda {
+    position: relative;
+    flex: none;
+    height: 44px;
+    margin-top: 2px;
+    border-radius: 50%;
+    animation: surgir 0.55s 0.2s var(--mola) backwards;
     transition: transform 0.45s var(--mola), background-color 0.25s ease;
 }
-.convite-agenda > span { flex: 1; min-width: 0; }
-.convite-agenda:active { transform: scale(0.98); transition-duration: 0.12s; }
-@media (hover: hover) { .convite-agenda:hover { background: #fff; } }
-.convite-agenda.carregando { opacity: 0.7; }
-.escala-rodape { display: flex; justify-content: center; margin-top: 22px; }
-.link-agenda { gap: 6px; padding: 0 12px; border: 0; background: none; color: var(--texto-2); font-size: 14px; font-weight: 600; cursor: pointer; border-radius: var(--raio-capsula); }
-.link-agenda:hover { color: var(--principal); }
+.botao-agenda:active { transform: scale(0.9); transition-duration: 0.12s; }
+@media (hover: hover) { .botao-agenda:hover { background: rgba(143, 13, 11, 0.14); } }
+.botao-agenda.novidade::after {
+    content: '' / '';
+    position: absolute;
+    top: 7px;
+    right: 7px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--principal-brighter);
+    box-shadow: 0 0 0 2px var(--background);
+    animation: surgir 0.5s 0.6s var(--mola) backwards;
+}
 .agenda-folha a.botao-largo { display: inline-flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; }
 .agenda-mais { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; }
 .agenda-mais .botao-texto { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; }
