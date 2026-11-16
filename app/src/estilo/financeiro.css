@@ -35,6 +35,11 @@
     font-variant-numeric: tabular-nums;
     animation: surgir 0.7s 0.12s var(--mola) backwards;
 }
+/* Saldo contando: o molde (valor final) reserva o espaço e é o que se lê */
+.fin-saldo-valor.contando { display: grid; }
+.fin-saldo-valor.contando > * { grid-area: 1 / 1; }
+.fin-saldo-valor.contando .fin-saldo-molde { color: transparent; }
+.fin-saldo-valor:not(.contando) .fin-saldo-correndo { display: none; }
 .fin-contas { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; padding: 0; margin: 0; list-style: none; }
 .fin-conta {
     display: flex;

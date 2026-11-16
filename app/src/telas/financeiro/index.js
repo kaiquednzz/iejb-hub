@@ -29,6 +29,7 @@ export function telaFinanceiro(conta) {
     const edita = temCargo(conta, 'tesouraria');
     let mes = primeiroDoMes(hojeEmBrasilia());
     let dados = null;
+    let jaContou = false; // o saldo conta até o valor só na 1ª vez que aparece
 
     const area = h('div', { class: 'fin-area', 'aria-busy': 'true' }, esqueleto());
     const tituloMes = h('h2', { class: 'fin-mes-nome', 'aria-live': 'polite' }, nomeDoMes(mes));
@@ -160,22 +161,46 @@ export function telaFinanceiro(conta) {
             edita,
         };
         // replaceChildren escreve "null" na tela se receber null: filtra antes
-        area.replaceChildren(...[blocoSaldo(dados), blocoContagens(dados, carregar)].filter(Boolean));
+        area.replaceChildren(...[blocoSaldo(dados, !jaContou), blocoContagens(dados, carregar)].filter(Boolean));
+        jaContou = true;
         desenharMes();
     }
 }
 
 // --- Saldo ------------------------------------------------------------------
-function blocoSaldo(dados) {
+function blocoSaldo(dados, contar) {
     const contas = dados.resumo.contas;
     const total = contas.reduce((s, c) => s + Number(c.saldo), 0);
     return h('section', { class: 'fin-saldo', 'aria-label': 'Saldo' },
         h('p', { class: 'fin-saldo-rotulo' }, 'Saldo da igreja'),
-        h('p', { class: 'fin-saldo-valor' }, reais(total)),
+        contar ? valorContando(total) : h('p', { class: 'fin-saldo-valor' }, reais(total)),
         h('ul', { class: 'fin-contas' }, contas.map((c) => h('li', { class: 'fin-conta' },
             h('span', { class: 'fin-conta-nome' }, c.nome),
             h('span', { class: `fin-conta-valor${c.saldo < 0 ? ' negativo' : ''}` }, reais(c.saldo))))),
     );
+}
+
+// O saldo "conta" de zero até o valor ao abrir a tela. Duas camadas no mesmo
+// lugar (grid de uma célula): o valor final invisível reserva a largura (nada
+// pula) e é o que o leitor de tela lê; por cima, os números correndo.
+// Termina sozinho em ~1 s; com "reduzir movimento", mostra o valor direto.
+function valorContando(centavos) {
+    const final = reais(centavos);
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return h('p', { class: 'fin-saldo-valor' }, final);
+    const correndo = h('span', { class: 'fin-saldo-correndo', 'aria-hidden': 'true' }, reais(0));
+    const el = h('p', { class: 'fin-saldo-valor contando' }, h('span', { class: 'fin-saldo-molde' }, final), correndo);
+    const DURACAO = 1100, ATRASO = 150;
+    let inicio = null;
+    const passo = (agora) => {
+        inicio ??= agora + ATRASO;
+        const t = Math.min(1, Math.max(0, (agora - inicio) / DURACAO));
+        const suave = 1 - (1 - t) ** 4; // começa rápido e assenta devagar
+        correndo.textContent = t < 1 ? reais(Math.round(centavos * suave)) : final;
+        if (t < 1) requestAnimationFrame(passo);
+        else el.classList.remove('contando');
+    };
+    requestAnimationFrame(passo);
+    return el;
 }
 
 // --- Contagens esperando ----------------------------------------------------
