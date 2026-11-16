@@ -88,4 +88,8 @@ O que o Hub guarda, quem vê e como pedir para apagar está na própria tela de 
 
 ---
 
-Desenvolvido por Kaique, com o [Claude Code](https://claude.com/claude-code) como ferramenta de desenvolvimento. Repositório privado; os dados pertencem à IEJB.
+## Licença
+
+**© 2026 Kaique Diniz. Todos os direitos reservados.** O código está público só para consulta: não é código aberto, e usar, copiar, modificar ou instalar outra cópia exige autorização por escrito do autor. A IEJB tem permissão de uso na instalação mantida pelo autor, e os dados dela pertencem a ela. Detalhes em [LICENSE](LICENSE).
+
+Desenvolvido por Kaique Diniz, com o [Claude Code](https://claude.com/claude-code) como ferramenta de desenvolvimento.
