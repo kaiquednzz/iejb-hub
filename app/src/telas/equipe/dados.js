@@ -25,7 +25,7 @@ export async function carregarEquipe(conta) {
         supabase.from('ministerio').select('id').eq('nome', 'Louvor').maybeSingle(),
         conta.e_administrador
             ? supabase.from('conta')
-                .select('id, login, nome_informado, foto_informada, estado, criado_em')
+                .select('id, login, nome_informado, foto_informada, apresentou_em, louvor_pedido, instrumentos_pedidos, cargos_pedidos, estado, criado_em')
                 .in('estado', ['pendente', 'recusada'])
                 .order('criado_em', { ascending: false })
             : Promise.resolve({ data: [] }),

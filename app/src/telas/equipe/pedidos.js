@@ -8,6 +8,9 @@ import { campo, caixaDeAviso } from '../moldura.js';
 import { vazio } from './pecas.js';
 import { chave } from './dados.js';
 import { avatar } from '../../util/foto.js';
+import { garantirCodigo } from '../../util/codigo.js';
+
+const NOME_CARGO = { tesouraria: 'Tesouraria', pastor: 'Pastor', comunicacao: 'Comunicação' };
 
 export function secaoPedidos(dados, ctx) {
     const pendentes = dados.pedidos.filter((p) => p.estado === 'pendente');
@@ -51,6 +54,7 @@ function cartaoPedido(pedido, indice, dados, ctx) {
             h('div', null,
                 h('p', { class: 'pedido-nome' }, pedido.nome_informado || 'Sem nome'),
                 h('p', { class: 'pedido-login' }, pedido.login),
+                pediu(pedido) && h('p', { class: 'pedido-funcoes' }, pediu(pedido)),
                 h('p', { class: 'pedido-quando' }, `Pediu ${haQuanto(pedido.criado_em)}`),
             ),
         ),
@@ -85,10 +89,22 @@ function folhaAprovar(pedido, dados, ctx) {
     [opcaoNova, opcaoExistente].forEach((o) => o.addEventListener('change', atualizar));
     atualizar();
 
+    // O que a pessoa pediu no primeiro acesso (D62), já marcado. Desmarque o
+    // que não concordar. Quem não preencheu (pedido antigo): Louvor marcado,
+    // que era o comportamento de antes.
+    const marcar = (rotulo, ligado, detalhe) => {
+        const caixa = h('input', { type: 'checkbox', checked: ligado });
+        return { caixa, elemento: h('label', { class: 'opcao' }, caixa, h('span', null, rotulo, detalhe && h('small', { class: 'opcao-detalhe-texto' }, ` · ${detalhe}`))) };
+    };
+    const louvor = marcar('Louvor', pedido.louvor_pedido || !pedido.apresentou_em, (pedido.instrumentos_pedidos ?? []).join(', '));
+    const cargos = (pedido.cargos_pedidos ?? []).map((c) => ({ id: c, ...marcar(NOME_CARGO[c], true) }));
+    const blocoPediu = h('fieldset', { class: 'opcoes' },
+        h('legend', { class: 'bloco-subtitulo' }, 'Aprovar também'),
+        louvor.elemento, cargos.map((c) => c.elemento));
+
     const form = h('form', { class: 'form', novalidate: true },
         h('p', { class: 'folha-texto' },
-            h('strong', null, pedido.nome_informado || pedido.login), ' vai entrar com ', h('strong', null, pedido.login),
-            '. Quem é essa pessoa no Louvor?'),
+            h('strong', null, pedido.nome_informado || pedido.login), ' entra com ', h('strong', null, pedido.login), '.'),
         h('fieldset', { class: 'opcoes' },
             h('legend', { class: 'sr-only' }, 'Quem é essa pessoa'),
             h('label', { class: 'opcao' }, opcaoNova, h('span', null, 'Pessoa nova no cadastro')),
@@ -96,6 +112,7 @@ function folhaAprovar(pedido, dados, ctx) {
             candidatas.length > 0 && h('label', { class: 'opcao' }, opcaoExistente, h('span', null, 'Já está cadastrada')),
             candidatas.length > 0 && blocoExistente,
         ),
+        blocoPediu,
         aviso.elemento,
         botao,
     );
@@ -107,12 +124,18 @@ function folhaAprovar(pedido, dados, ctx) {
         const nome = form.elements.nome.value.trim();
         if (nova && !nome) return aviso.mostrar('Escreva o nome da pessoa.');
 
+        const cargosAprovados = cargos.filter((c) => c.caixa.checked).map((c) => c.id);
+        // Dar cargo pede o código do admin (D57)
+        if (cargosAprovados.length && !(await garantirCodigo('dar cargos'))) return;
         await comCarregando(botao, async () => {
             const { error } = await supabase.rpc('aprovar_pedido', {
                 p_conta: pedido.id,
                 p_pessoa: nova ? null : lista.value,
                 p_nome: nova ? nome : null,
                 p_ministerio: dados.ministerioId,
+                p_louvor: louvor.caixa.checked,
+                p_instrumentos: louvor.caixa.checked ? (pedido.instrumentos_pedidos ?? []) : [],
+                p_cargos: cargosAprovados,
             });
             if (error) return aviso.mostrar(mensagemDoBanco(error));
             folha.fechar();
@@ -122,6 +145,14 @@ function folhaAprovar(pedido, dados, ctx) {
     });
 
     const folha = abrirFolha({ titulo: 'Aprovar acesso', conteudo: form });
+}
+
+// "Louvor (Bateria, Voz) · Tesouraria", ou nada se não pediu
+function pediu(pedido) {
+    const partes = [];
+    if (pedido.louvor_pedido) partes.push(`Louvor${pedido.instrumentos_pedidos?.length ? ` (${pedido.instrumentos_pedidos.join(', ')})` : ''}`);
+    for (const c of pedido.cargos_pedidos ?? []) partes.push(NOME_CARGO[c]);
+    return partes.join(' · ');
 }
 
 function haQuanto(quando) {
