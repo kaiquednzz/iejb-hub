@@ -65,6 +65,7 @@ const ROTAS_DA_CONTA = {
     '#/montar': (conta) => (eLiderDeLouvor(conta) ? telaMontar(conta) : telaEscala(conta)),
     '#/eventos': (conta) => (cuidaDosEventos(conta) ? telaEventos(conta) : telaInicio(conta)),
     '#/financeiro': (conta) => (veFinanceiro(conta) ? telaFinanceiro(conta) : telaInicio(conta)),
+    '#/pessoas': (conta) => (conta.e_administrador ? telaEquipe(conta, { area: 'pessoas' }) : telaInicio(conta)),
     '#/privacidade': (conta) => telaDocumento('privacidade', conta),
     '#/termos': (conta) => telaDocumento('termos', conta),
 };
@@ -73,7 +74,8 @@ const ROTAS_DA_CONTA = {
 function rotaAberta(conta) {
     const h = location.hash;
     if (h === '#/montar' && !eLiderDeLouvor(conta)) return '#/escala';
-    if ((h === '#/eventos' && !cuidaDosEventos(conta)) || (h === '#/financeiro' && !veFinanceiro(conta))) return '#/inicio';
+    if ((h === '#/eventos' && !cuidaDosEventos(conta)) || (h === '#/financeiro' && !veFinanceiro(conta))
+        || (h === '#/pessoas' && !conta.e_administrador)) return '#/inicio';
     return ROTAS_DA_CONTA[h] ? h : '#/inicio';
 }
 // Toda tela de quem já entrou leva a barra lateral (o CSS só a mostra no computador)

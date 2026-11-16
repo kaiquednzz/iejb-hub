@@ -12,23 +12,26 @@ import { secaoGrupos } from './grupos.js';
 import { mensagemDoBanco } from '../../util/erros.js';
 import { vazio } from './pecas.js';
 
-const LEMBRAR = 'iejb-hub-equipe-aba';
-
-export function telaEquipe(conta) {
-    const area = h('div', { class: 'equipe-area', 'aria-busy': 'true' }, esqueleto());
+// A mesma tela serve dois lugares:
+//   - Louvor > Equipe: pessoas e grupos do Louvor;
+//   - Pessoas (só admin, D63): pedidos de acesso e o cadastro de todo mundo,
+//     direto do Início, sem precisar entrar no Louvor.
+export function telaEquipe(conta, { area = 'louvor' } = {}) {
+    const ePessoas = area === 'pessoas';
+    const LEMBRAR = ePessoas ? 'iejb-hub-pessoas-aba' : 'iejb-hub-equipe-aba';
+    const lugar = h('div', { class: 'equipe-area', 'aria-busy': 'true' }, esqueleto());
     const abas = h('div', { class: 'segmentos', role: 'tablist', 'aria-label': 'Partes da equipe' });
     let dados = null;
     let atual = sessionStorage.getItem(LEMBRAR);
 
     const tela = h('div', { class: 'tela tela-app' },
-        cabecalhoApp(conta, { modulo: 'Louvor' }),
+        cabecalhoApp(conta, { modulo: ePessoas ? 'Pessoas' : 'Louvor' }),
         h('main', { id: 'conteudo', class: 'app-conteudo' },
-            h('h1', { tabindex: -1, class: 'titulo-tela' }, 'Equipe'),
-            h('p', { class: 'subtitulo-tela' }, 'Quem faz parte do Louvor e em que grupo toca.'),
+            h('h1', { tabindex: -1, class: 'titulo-tela' }, ePessoas ? 'Pessoas' : 'Equipe'),
             abas,
-            area,
+            lugar,
         ),
-        barraAbas(conta, '#/equipe'),
+        !ePessoas && barraAbas(conta, '#/equipe'),
     );
 
     const ctx = { conta, recarregar: carregar, dados: () => dados };
@@ -37,12 +40,12 @@ export function telaEquipe(conta) {
 
     async function carregar() {
         const resultado = await carregarEquipe(conta);
-        area.removeAttribute('aria-busy');
+        lugar.removeAttribute('aria-busy');
         if (resultado.erro) {
             console.error(resultado.erro);
             const botao = h('button', { type: 'button', class: 'botao-principal' }, 'Tentar de novo');
-            botao.addEventListener('click', () => { area.setAttribute('aria-busy', 'true'); area.replaceChildren(esqueleto()); carregar(); });
-            area.replaceChildren(vazio('Não deu para carregar a equipe.', mensagemDoBanco(resultado.erro), botao));
+            botao.addEventListener('click', () => { lugar.setAttribute('aria-busy', 'true'); lugar.replaceChildren(esqueleto()); carregar(); });
+            lugar.replaceChildren(vazio('Não deu para carregar a equipe.', mensagemDoBanco(resultado.erro), botao));
             return;
         }
         dados = resultado.dados;
@@ -52,11 +55,9 @@ export function telaEquipe(conta) {
 
     function secoesVisiveis() {
         const pendentes = dados.pedidos.filter((p) => p.estado === 'pendente').length;
-        return [
-            dados.papeis.admin && { id: 'pedidos', nome: 'Pedidos', contador: pendentes },
-            { id: 'pessoas', nome: 'Pessoas' },
-            { id: 'grupos', nome: 'Grupos' },
-        ].filter(Boolean);
+        return ePessoas
+            ? [{ id: 'pedidos', nome: 'Pedidos', contador: pendentes }, { id: 'pessoas', nome: 'Cadastro' }]
+            : [{ id: 'pessoas', nome: 'Pessoas' }, { id: 'grupos', nome: 'Grupos' }];
     }
 
     function desenharAbas() {
@@ -99,7 +100,7 @@ export function telaEquipe(conta) {
         const painel = h('div', {
             class: 'painel-equipe', id: 'painel-equipe', role: 'tabpanel', 'aria-labelledby': `aba-${atual}`,
         }, montar(dados, ctx));
-        area.replaceChildren(painel);
+        lugar.replaceChildren(painel);
     }
 }
 

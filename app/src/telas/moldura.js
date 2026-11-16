@@ -46,7 +46,7 @@ function contarPedidos() {
     }
     return pedidosGuardados;
 }
-function contadorDePedidos(lugar, classe) {
+export function contadorDePedidos(lugar, classe) {
     contarPedidos().then((n) => {
         if (n) lugar.append(h('span', { class: classe }, String(n), h('span', { class: 'sr-only' }, n === 1 ? ' pedido de acesso' : ' pedidos de acesso')));
     });
@@ -69,8 +69,10 @@ export function barraLateral(conta, atual) {
             icone(nomeIcone), h('span', { class: 'lateral-nome' }, nome));
     };
     const equipe = item('#/equipe', 'Equipe', 'pessoas');
-    if (conta.e_administrador) contadorDePedidos(equipe, 'lateral-contador');
+    const pessoas = conta.e_administrador ? item('#/pessoas', 'Pessoas', 'chave') : null;
+    if (pessoas) contadorDePedidos(pessoas, 'lateral-contador');
     const areas = [
+        pessoas,
         cuidaDosEventos(conta) ? item('#/eventos', 'Eventos do site', 'megafone') : null,
         veFinanceiro(conta) ? item('#/financeiro', 'Financeiro', 'moeda') : null,
     ].filter(Boolean);
@@ -142,7 +144,6 @@ export function barraAbas(conta, atual) {
         equipe,
     );
 
-    if (conta.e_administrador) contadorDePedidos(equipe, 'aba-contador');
     return barra;
 }
 

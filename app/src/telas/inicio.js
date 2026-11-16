@@ -15,6 +15,7 @@ import { escalaGuardada } from '../offline.js';
 import { naoVai, FUNCAO_MESA } from '../util/escala.js';
 import { cabecalhoApp } from './moldura.js';
 import { veFinanceiro, cuidaDosEventos } from '../sessao.js';
+import { contadorDePedidos } from './moldura.js';
 import { blocoConferir } from './financeiro/conferir.js';
 import { blocoEventos } from './inicio-eventos.js';
 
@@ -24,6 +25,8 @@ const MODULOS = [
     { id: 'pregacoes', nome: 'Pregações', texto: 'Mensagens e acervo', icone: 'livro', emBreve: true },
     { id: 'kids', nome: 'Kids', texto: 'Turmas e escalas', icone: 'crianca', emBreve: true },
     { id: 'financeiro', nome: 'Financeiro', texto: 'Caixa da igreja', icone: 'moeda', rota: '#/financeiro', pode: veFinanceiro },
+    // Só o admin: aprovar acessos, cadastro, cargos (antes ficava escondido dentro do Louvor)
+    { id: 'pessoas', nome: 'Pessoas', texto: 'Acessos e cadastro', icone: 'chave', rota: '#/pessoas', pode: (c) => c.e_administrador },
 ];
 
 function saudacao() {
@@ -82,7 +85,9 @@ function cartaoModulo(modulo, i) {
         });
         return h('li', { style: { '--i': i } }, b);
     }
-    return h('li', { style: { '--i': i } }, h('a', { class: `modulo modulo-${modulo.id}`, href: modulo.rota }, ...conteudo));
+    const link = h('a', { class: `modulo modulo-${modulo.id}`, href: modulo.rota }, ...conteudo);
+    if (modulo.pedidos) contadorDePedidos(link.querySelector('.modulo-nome'), 'modulo-contador');
+    return h('li', { style: { '--i': i } }, link);
 }
 
 // Próximo culto em que a pessoa toca (publicado, não marcou "não vou")
@@ -127,7 +132,7 @@ async function carregarCompromisso(conta, destaque) {
 async function carregarPedidos(lugar) {
     const { count } = await supabase.from('conta').select('id', { count: 'exact', head: true }).eq('estado', 'pendente');
     if (!count) return;
-    lugar.replaceChildren(h('a', { class: 'inicio-pedidos', href: '#/equipe' },
+    lugar.replaceChildren(h('a', { class: 'inicio-pedidos', href: '#/pessoas' },
         h('span', { class: 'pedidos-numero' }, String(count)),
         h('span', null, count === 1 ? 'pessoa pedindo acesso ao Hub' : 'pessoas pedindo acesso ao Hub'),
         icone('seta', 'icone icone-p')));

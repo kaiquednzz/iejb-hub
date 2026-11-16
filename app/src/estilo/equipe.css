@@ -676,3 +676,6 @@ fieldset.campo { border: none; padding: 0; margin: 0; min-width: 0; }
     text-transform: uppercase;
     color: var(--texto-2);
 }
+.grupo-acoes { display: flex; align-items: center; gap: 6px; flex: none; }
+.botao-icone.botao-icone-p { width: 44px; height: 44px; }
+.lista-grupos > .botao-largo { display: inline-flex; align-items: center; justify-content: center; gap: 8px; }

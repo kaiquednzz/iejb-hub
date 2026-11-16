@@ -12,9 +12,62 @@ import { pessoasDoLouvor, sugestoesDeInstrumento } from './dados.js';
 import { seletorInstrumentos, interruptor, linhaPessoa, selo, vazio } from './pecas.js';
 
 export function secaoGrupos(dados, ctx) {
-    if (dados.grupos.length === 0) return vazio('Nenhum grupo cadastrado.', null);
+    // Admin e líder de louvor criam grupo novo (o banco já permitia; faltava o botão)
+    const novo = dados.papeis.gerePessoas
+        ? h('button', { type: 'button', class: 'botao-secundario botao-largo' }, icone('mais', 'icone icone-p'), 'Novo grupo')
+        : null;
+    novo?.addEventListener('click', () => folhaGrupo(null, dados, ctx));
     return h('div', { class: 'secao lista-grupos' },
-        dados.grupos.map((grupo, i) => cartaoGrupo(grupo, i, dados, ctx)));
+        dados.grupos.length === 0 && vazio('Nenhum grupo ainda.', null),
+        dados.grupos.map((grupo, i) => cartaoGrupo(grupo, i, dados, ctx)),
+        novo);
+}
+
+// Criar (grupo = null) ou renomear/desativar um grupo
+function folhaGrupo(grupo, dados, ctx) {
+    const aviso = caixaDeAviso();
+    const id = 'grupo-nome-campo';
+    const entrada = h('input', { id, type: 'text', class: 'fin-entrada', maxlength: 30, value: grupo?.nome ?? '', placeholder: 'Ex.: G4', autocomplete: 'off' });
+    const salvar = h('button', { type: 'submit', class: 'botao-principal botao-largo' }, grupo ? 'Salvar' : 'Criar grupo');
+    const form = h('form', { class: 'form', novalidate: true },
+        h('div', { class: 'campo' }, h('label', { for: id }, 'Nome do grupo'), entrada), aviso.elemento, salvar);
+    form.addEventListener('submit', (evento) => {
+        evento.preventDefault();
+        const nome = entrada.value.trim();
+        if (!nome) return aviso.mostrar('Dê um nome ao grupo.');
+        comCarregando(salvar, async () => {
+            const { error } = grupo
+                ? await supabase.from('grupo').update({ nome }).eq('id', grupo.id)
+                : await supabase.from('grupo').insert({ nome, ministerio_id: dados.ministerioId });
+            if (error) return aviso.mostrar(error.code === '23505' ? 'Já existe um grupo com esse nome.' : mensagemDoBanco(error));
+            folha.fechar();
+            avisar(grupo ? 'Grupo salvo.' : `${nome} criado. Agora adicione as pessoas.`);
+            await ctx.recarregar();
+        });
+    });
+
+    // Desativar: some das listas, mas escalas antigas continuam como estão
+    const desativar = grupo && h('button', { type: 'button', class: 'botao-texto-perigo' }, 'Desativar grupo');
+    desativar?.addEventListener('click', async () => {
+        const ok = await confirmar({
+            titulo: `Desativar o ${grupo.nome}?`,
+            texto: 'Ele some das listas. Escalas já feitas não mudam.',
+            botao: 'Desativar', perigo: true,
+        });
+        if (!ok) return;
+        await comCarregando(desativar, async () => {
+            const { error } = await supabase.from('grupo').update({ ativo: false }).eq('id', grupo.id);
+            if (error) return avisar(mensagemDoBanco(error));
+            folha.fechar();
+            avisar(`${grupo.nome} desativado.`);
+            await ctx.recarregar();
+        });
+    });
+
+    const folha = abrirFolha({
+        titulo: grupo ? grupo.nome : 'Novo grupo',
+        conteudo: h('div', { class: 'folha-pilha' }, form, desativar && h('div', { class: 'bloco bloco-final' }, desativar)),
+    });
 }
 
 function podeEditar(grupo, papeis) {
@@ -35,6 +88,10 @@ function cartaoGrupo(grupo, indice, dados, ctx) {
         ? h('button', { type: 'button', class: 'botao-secundario botao-pequeno' }, icone('mais', 'icone icone-p'), 'Adicionar')
         : null;
     adicionar?.addEventListener('click', () => folhaAdicionar(grupo, dados, ctx));
+    const editarGrupo = dados.papeis.gerePessoas
+        ? h('button', { type: 'button', class: 'botao-icone botao-icone-p', 'aria-label': `Renomear ou desativar o ${grupo.nome}` }, icone('reticencias', 'icone icone-p'))
+        : null;
+    editarGrupo?.addEventListener('click', () => folhaGrupo(grupo, dados, ctx));
 
     return h('section', { class: 'cartao-grupo', style: { '--i': indice }, 'aria-labelledby': `grupo-${grupo.id}` },
         h('header', { class: 'grupo-topo' },
@@ -45,7 +102,7 @@ function cartaoGrupo(grupo, indice, dados, ctx) {
                     ' · ',
                     lider ? `líder: ${lider.apelido || lider.nome}` : 'sem líder'),
             ),
-            adicionar,
+            h('div', { class: 'grupo-acoes' }, adicionar, editarGrupo),
         ),
         membros.length === 0
             ? h('p', { class: 'cartao-vazio' }, editavel ? 'Ninguém neste grupo ainda. Toque em Adicionar.' : 'Ninguém neste grupo ainda.')
