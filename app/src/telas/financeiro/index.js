@@ -17,7 +17,7 @@ import { cabecalhoApp } from '../moldura.js';
 import { reais, nomeDoMes, primeiroDoMes, somarMeses, dataCurta, FORMAS, nomeDe } from './util.js';
 import { blocoResumo } from './resumo.js';
 import { garantirCodigo } from '../../util/codigo.js';
-import { folhaLancar, folhaDetalhe, folhaAjustes, folhaCancelarContagem } from './lancar.js';
+import { folhaLancar, folhaDetalhe, folhaAjustes, folhaCancelarContagem, folhaQR } from './lancar.js';
 
 const DIA_SEMANA = new Intl.DateTimeFormat('pt-BR', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'UTC' });
 const rotuloDia = (iso) => {
@@ -127,13 +127,14 @@ export function telaFinanceiro(conta) {
             supabase.from('lancamento')
                 .select(`id, tipo, valor_centavos, data, descricao, forma, conta_id, conta_destino_id, categoria_id,
                          contagem_id, culto_id, cancelado_em, motivo_cancelamento, criado_em,
-                         criado:pessoa!lancamento_criado_por_fkey ( nome, apelido )`)
+                         criado:pessoa!lancamento_criado_por_fkey ( nome, apelido ),
+                         contagem:contagem!lancamento_contagem_id_fkey ( modo, testemunha_nome, conferente:pessoa!contagem_conferente_id_fkey ( nome, apelido ) )`)
                 .gte('data', mes).lt('data', fim)
                 .order('data', { ascending: false }).order('criado_em', { ascending: false }),
             supabase.from('conta_financeira').select('*').order('ordem').order('nome'),
             supabase.from('categoria_financeira').select('*').order('nome'),
             supabase.from('contagem')
-                .select(`id, data, dizimos_centavos, ofertas_centavos, estado, motivo, decidido_em, criado_em,
+                .select(`id, data, culto_id, dizimos_centavos, ofertas_centavos, observacao, estado, motivo, decidido_em, criado_em, modo, tentativas, testemunha_nome,
                          conferente:pessoa!contagem_conferente_id_fkey ( nome, apelido )`)
                 .in('estado', ['aguardando', 'recusada'])
                 .order('data', { ascending: false }).limit(10),
@@ -161,7 +162,7 @@ export function telaFinanceiro(conta) {
             edita,
         };
         // replaceChildren escreve "null" na tela se receber null: filtra antes
-        area.replaceChildren(...[blocoSaldo(dados, !jaContou), blocoContagens(dados, carregar)].filter(Boolean));
+        area.replaceChildren(...[blocoSaldo(dados, !jaContou), blocoContagens(dados, carregar, conta)].filter(Boolean));
         jaContou = true;
         desenharMes();
     }
@@ -204,22 +205,30 @@ function valorContando(centavos) {
 }
 
 // --- Contagens esperando ----------------------------------------------------
-function blocoContagens(dados, recarregar) {
+function blocoContagens(dados, recarregar, conta) {
     if (!dados.contagens.length) return null;
     return h('section', { class: 'fin-contagens', 'aria-label': 'Contagens' },
         dados.contagens.map((c) => {
             const total = c.dizimos_centavos + c.ofertas_centavos;
             const recusada = c.estado === 'recusada';
+            const qr = c.modo === 'qr' && !recusada;
             const cancelar = dados.edita && !recusada ? h('button', { type: 'button', class: 'botao-texto' }, 'Desistir') : null;
             cancelar?.addEventListener('click', () => folhaCancelarContagem(c, recarregar));
+            // QR fechado sem ninguém conferir: mostra de novo (gera um segredo novo)
+            const mostrar = qr && dados.edita ? h('button', { type: 'button', class: 'botao-texto' }, 'Mostrar o QR') : null;
+            mostrar?.addEventListener('click', () => comCarregando(mostrar, async () => {
+                const { data: token, error } = await supabase.rpc('renovar_testemunha', { p_contagem: c.id });
+                if (error) return avisar(mensagemDoBanco(error));
+                folhaQR(c.id, token, dados, conta, recarregar);
+            }));
             return h('div', { class: `fin-contagem${recusada ? ' recusada' : ''}` },
                 h('span', { class: 'fin-contagem-icone', 'aria-hidden': 'true' }, icone(recusada ? 'fechar' : 'relogio', 'icone icone-p')),
                 h('span', { class: 'fin-contagem-textos' },
                     h('span', { class: 'fin-contagem-titulo' }, `Contagem de ${dataCurta(c.data)} · ${reais(total)}`),
                     h('span', { class: 'fin-contagem-detalhe' }, recusada
                         ? `${nomeDe(c.conferente)} não confirmou: ${c.motivo}`
-                        : `Esperando ${nomeDe(c.conferente)} conferir`)),
-                cancelar);
+                        : qr ? 'Esperando a testemunha ler o QR' : `Esperando ${nomeDe(c.conferente)} conferir`)),
+                h('span', { class: 'fin-contagem-acoes' }, mostrar, cancelar));
         }));
 }
 
@@ -272,7 +281,7 @@ function blocoLancamentos(dados, abrir) {
             h('span', { class: 'fin-linha-icone', 'aria-hidden': 'true' }, l.tipo === 'entrada' ? '+' : l.tipo === 'saida' ? '−' : '⇄'),
             h('span', { class: 'fin-linha-textos' },
                 h('span', { class: 'fin-linha-titulo' }, titulo),
-                h('span', { class: 'fin-linha-detalhe' }, l.contagem_id ? `${detalhe} · contagem conferida` : detalhe)),
+                h('span', { class: 'fin-linha-detalhe' }, l.contagem_id ? `${detalhe} · ${l.contagem?.modo === 'sozinha' ? 'sem conferência' : 'contagem conferida'}` : detalhe)),
             h('span', { class: 'fin-linha-valor' }, `${sinal}${reais(l.valor_centavos)}`));
         b.addEventListener('click', () => abrir(l));
         return h('li', null, b);

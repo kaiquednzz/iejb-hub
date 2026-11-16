@@ -9,6 +9,8 @@ import { caixaDeAviso } from '../moldura.js';
 import { avatar } from '../moldura.js';
 import { interruptor } from '../equipe/pecas.js';
 import { reais, lerReais, dataCurta, FORMAS, nomeDe } from './util.js';
+import { qrSvg } from '../../util/qr.js';
+import { comemorar } from '../../util/comemorar.js';
 
 let seq = 0;
 
@@ -155,35 +157,80 @@ export function folhaTransferencia(dados, existente, recarregar, conta) {
     const folha = abrirFolha({ titulo: editando ? 'Editar transferência' : 'Depósito ou transferência', conteudo: form });
 }
 
-// --- Contagem do culto (D48) ------------------------------------------------
-async function folhaContagem(dados, conta, recarregar) {
+// --- Contagem do culto (D48, D61) -------------------------------------------
+// Quatro jeitos de conferir. O padrão é a testemunha com celular (QR): a pessoa
+// que ajudou a contar digita o que ELA contou, sem ver o número de quem pediu.
+const MODOS = [
+    { id: 'qr', nome: 'Testemunha com celular' },
+    { id: 'papel', nome: 'Testemunha sem celular' },
+    { id: 'conta', nome: 'Alguém com conta no app' },
+    { id: 'sozinha', nome: 'Contei sozinha' },
+];
+const BOTAO_DO_MODO = { qr: 'Mostrar o QR', papel: 'Conferir', conta: 'Pedir conferência', sozinha: 'Lançar sem conferência' };
+
+export async function folhaContagem(dados, conta, recarregar, inicial = {}) {
     const aviso = caixaDeAviso();
     const caixa = dados.contas.find((c) => c.ativa && c.tipo === 'dinheiro') ?? dados.contas.find((c) => c.ativa);
-    const data = campoSimples({ rotulo: 'Dia do culto', tipo: 'date', value: hojeEmBrasilia(), max: hojeEmBrasilia() });
+    const data = campoSimples({ rotulo: 'Dia do culto', tipo: 'date', value: inicial.data ?? hojeEmBrasilia(), max: hojeEmBrasilia() });
     const culto = escolha({ rotulo: 'Culto', opcoes: [] });
-    const dizimos = campoValor('Dízimos');
-    const ofertas = campoValor('Ofertas');
+    const dizimos = campoValor('Dízimos', inicial.dizimos);
+    const ofertas = campoValor('Ofertas', inicial.ofertas);
     const total = h('p', { class: 'fin-contagem-total', 'aria-live': 'polite' }, 'Total: R$ 0,00');
+    const obs = campoSimples({ rotulo: 'Observação (opcional)', maxlength: 300, placeholder: 'Ex.: uma nota de 50 rasgada', value: inicial.observacao ?? '' });
+    const salvar = h('button', { type: 'submit', class: 'botao-principal botao-largo' });
+
+    // Partes que mudam com o modo
     const conferente = escolha({ rotulo: 'Quem confere', opcoes: [] });
-    const obs = campoSimples({ rotulo: 'Observação (opcional)', maxlength: 300, placeholder: 'Ex.: uma nota de 50 rasgada' });
-    const salvar = h('button', { type: 'submit', class: 'botao-principal botao-largo' }, 'Pedir conferência');
+    let pessoasCarregadas = false;
+    const tNome = campoSimples({ rotulo: 'Nome de quem contou com você', maxlength: 60, autocomplete: 'off' });
+    const tDizimos = campoValor('Dízimos que a pessoa anotou');
+    const tOfertas = campoValor('Ofertas que a pessoa anotou');
+    const areaModo = h('div', { class: 'fin-modo' });
+    const modo = escolha({ rotulo: 'Quem confere com você?', opcoes: MODOS, valor: inicial.modo ?? 'qr', aoMudar: desenharModo });
+
+    function desenharModo() {
+        const m = modo.valor();
+        salvar.textContent = BOTAO_DO_MODO[m];
+        aviso.limpar();
+        const dica = (texto) => h('p', { class: 'campo-dica fin-modo-dica' }, texto);
+        if (m === 'qr') areaModo.replaceChildren(dica('A pessoa lê um QR com o celular dela e digita quanto contou.'));
+        if (m === 'papel') areaModo.replaceChildren(
+            dica('A pessoa anota no papel quanto contou. Digite o que ela anotou.'),
+            tNome.elemento, h('div', { class: 'fin-dois' }, tDizimos.elemento, tOfertas.elemento));
+        if (m === 'conta') {
+            areaModo.replaceChildren(dica('A pessoa confere pelo app dela.'), conferente.elemento);
+            carregarPessoas();
+        }
+        if (m === 'sozinha') areaModo.replaceChildren(dica('O pastor recebe um aviso.'));
+    }
+
+    async function carregarPessoas() {
+        if (pessoasCarregadas) return;
+        pessoasCarregadas = true;
+        const { data: pessoas, error } = await supabase.rpc('quem_pode_conferir');
+        if (error) return aviso.mostrar(mensagemDoBanco(error));
+        conferente.trocar(pessoas.map((p) => ({ id: p.id, nome: nomeDe(p) })));
+        if (!pessoas.length) aviso.mostrar('Ninguém mais tem acesso ao app. Use a testemunha com ou sem celular.', 'info');
+    }
 
     const somar = () => { total.textContent = `Total: ${reais((dizimos.centavos() ?? 0) + (ofertas.centavos() ?? 0))}`; };
     dizimos.entrada.addEventListener('input', somar);
     ofertas.entrada.addEventListener('input', somar);
+    somar();
 
     async function buscarCultos() {
         const { data: cultos } = await supabase.from('culto').select('id, nome, horario').eq('data', data.entrada.value).eq('estado', 'ativo').order('horario');
         const lista = (cultos ?? []).map((c) => ({ id: c.id, nome: `${c.nome} · ${formatarHorario(c.horario)}` }));
-        culto.trocar([...lista, { id: '', nome: 'Sem culto' }], lista.at(-1)?.id ?? '');
+        const opcoes = [...lista, { id: '', nome: 'Sem culto' }];
+        culto.trocar(opcoes, opcoes.some((o) => o.id === inicial.culto) ? inicial.culto : (lista.at(-1)?.id ?? ''));
     }
     data.entrada.addEventListener('change', buscarCultos);
 
     const form = h('form', { class: 'form fin-form contagem', novalidate: true },
-        h('p', { class: 'folha-texto folha-texto-pequeno' }, `Vai para ${caixa?.nome ?? 'o caixa'} só depois que a outra pessoa conferir no celular dela.`),
+        h('p', { class: 'folha-texto folha-texto-pequeno' }, `Vai para ${caixa?.nome ?? 'o caixa'} depois da conferência.`),
         data.elemento, culto.elemento,
         h('div', { class: 'fin-dois' }, dizimos.elemento, ofertas.elemento),
-        total, conferente.elemento, obs.elemento, aviso.elemento, salvar);
+        total, modo.elemento, areaModo, obs.elemento, aviso.elemento, salvar);
     form.addEventListener('submit', (evento) => {
         evento.preventDefault();
         comCarregando(salvar, async () => {
@@ -192,25 +239,146 @@ async function folhaContagem(dados, conta, recarregar) {
             const o = ofertas.centavos() ?? 0;
             if ((dizimos.entrada.value && dizimos.centavos() === null) || (ofertas.entrada.value && ofertas.centavos() === null)) return aviso.mostrar('Algum valor não está certo. Ex.: 150 ou 1.250,90');
             if (d + o === 0) return aviso.mostrar('Digite quanto deu.');
-            if (!conferente.valor()) return aviso.mostrar('Escolha quem vai conferir.');
-            const { error } = await supabase.from('contagem').insert({
-                data: data.entrada.value, culto_id: culto.valor() || null, conta_id: caixa.id,
-                dizimos_centavos: d, ofertas_centavos: o, observacao: obs.entrada.value.trim() || null,
-                contado_por: conta.pessoa.id, conferente_id: conferente.valor(),
-            });
+            const base = { p_data: data.entrada.value, p_culto: culto.valor() || null, p_conta: caixa.id, p_dizimos: d, p_ofertas: o, p_observacao: obs.entrada.value.trim() || null };
+            const m = modo.valor();
+
+            if (m === 'conta') {
+                if (!conferente.valor()) return aviso.mostrar('Escolha quem vai conferir.');
+                const { error } = await supabase.from('contagem').insert({
+                    data: base.p_data, culto_id: base.p_culto, conta_id: caixa.id, dizimos_centavos: d, ofertas_centavos: o,
+                    observacao: base.p_observacao, contado_por: conta.pessoa.id, conferente_id: conferente.valor(),
+                });
+                if (error) return aviso.mostrar(mensagemDoBanco(error));
+                folha.fechar();
+                avisar('Pedido de conferência enviado.');
+                return recarregar();
+            }
+            if (m === 'sozinha') {
+                const { error } = await supabase.rpc('contar_sozinha', base);
+                if (error) return aviso.mostrar(mensagemDoBanco(error));
+                folha.fechar();
+                avisar('Lançado sem conferência. O pastor foi avisado.');
+                return recarregar();
+            }
+            if (m === 'papel') {
+                const td = tDizimos.entrada.value.trim() === '' ? 0 : tDizimos.centavos();
+                const to = tOfertas.entrada.value.trim() === '' ? 0 : tOfertas.centavos();
+                if (tNome.entrada.value.trim().length < 2) return aviso.mostrar('Digite o nome de quem contou com você.');
+                if (td === null || to === null) return aviso.mostrar('O valor anotado pela testemunha não está certo. Ex.: 150 ou 1.250,90');
+                const { data: r, error } = await supabase.rpc('contar_com_testemunha_sem_celular',
+                    { ...base, p_testemunha: tNome.entrada.value.trim(), p_t_dizimos: td, p_t_ofertas: to });
+                if (error) return aviso.mostrar(mensagemDoBanco(error));
+                if (!r.bateu) {
+                    const partes = [!r.dizimos && `dízimos (você ${reais(d)}, testemunha ${reais(td)})`, !r.ofertas && `ofertas (você ${reais(o)}, testemunha ${reais(to)})`].filter(Boolean);
+                    return aviso.mostrar(`Não bateu: ${partes.join(' e ')}. Contem de novo.`);
+                }
+                folha.fechar();
+                comemorar('Bateu!', `${tNome.entrada.value.trim()} conferiu. O valor já entrou no caixa.`);
+                return recarregar();
+            }
+            // QR
+            const { data: r, error } = await supabase.rpc('pedir_testemunha', base);
             if (error) return aviso.mostrar(mensagemDoBanco(error));
             folha.fechar();
-            avisar('Pedido de conferência enviado.');
-            recarregar();
+            folhaQR(r.contagem, r.token, dados, conta, recarregar);
         });
     });
     const folha = abrirFolha({ titulo: 'Contagem do culto', conteudo: form });
-
+    desenharModo();
     buscarCultos();
-    const { data: pessoas, error } = await supabase.rpc('quem_pode_conferir');
-    if (error) return aviso.mostrar(mensagemDoBanco(error));
-    conferente.trocar(pessoas.map((p) => ({ id: p.id, nome: nomeDe(p) })));
-    if (!pessoas.length) aviso.mostrar('Ninguém mais tem acesso ao app para conferir. Peça ao admin para dar acesso a quem conta com você.', 'info');
+}
+
+// O QR na tela de quem contou. Fica conferindo (de 3 em 3 s) se a testemunha
+// já respondeu, e mantém a tela acesa enquanto está aberto.
+export function folhaQR(contagemId, token, dados, conta, recarregar) {
+    let tokenAtual = token;
+    let ultimaTentativa = 0;
+    let terminou = false;
+    let vence = Date.now() + 15 * 60 * 1000;
+    let travaTela = null;
+    const lugarQR = h('div', { class: 'fin-qr' });
+    const estado = h('p', { class: 'fin-qr-estado', role: 'status' }, 'Esperando a pessoa…');
+    const relogio = h('p', { class: 'fin-qr-relogio' });
+    const aviso = caixaDeAviso();
+    const outroQR = h('button', { type: 'button', class: 'botao-secundario botao-largo', hidden: true }, 'Gerar outro QR');
+    const semCelular = h('button', { type: 'button', class: 'botao-texto' }, 'A testemunha não tem celular');
+
+    const desenharQR = () => {
+        lugarQR.replaceChildren(qrSvg(`${location.origin}/#/testemunha/${tokenAtual}`, 'QR code para a testemunha conferir a contagem'));
+        lugarQR.classList.remove('vencido');
+        outroQR.hidden = true;
+        vence = Date.now() + 15 * 60 * 1000;
+    };
+    desenharQR();
+
+    outroQR.addEventListener('click', () => comCarregando(outroQR, async () => {
+        const { data: novo, error } = await supabase.rpc('renovar_testemunha', { p_contagem: contagemId });
+        if (error) return aviso.mostrar(mensagemDoBanco(error));
+        tokenAtual = novo;
+        ultimaTentativa = 0;
+        aviso.limpar();
+        estado.textContent = 'Esperando a pessoa…';
+        desenharQR();
+    }));
+
+    // Troca para "sem celular" sem perder o que já foi digitado
+    semCelular.addEventListener('click', () => comCarregando(semCelular, async () => {
+        const { data: c } = await supabase.from('contagem').select('data, culto_id, dizimos_centavos, ofertas_centavos, observacao').eq('id', contagemId).single();
+        const { error } = await supabase.rpc('cancelar_contagem', { p_contagem: contagemId, p_motivo: 'Trocou para testemunha sem celular' });
+        if (error) return aviso.mostrar(mensagemDoBanco(error));
+        terminou = true;
+        folha.fechar();
+        folhaContagem(dados, conta, recarregar, {
+            modo: 'papel', data: c?.data, culto: c?.culto_id, dizimos: c?.dizimos_centavos, ofertas: c?.ofertas_centavos, observacao: c?.observacao,
+        });
+    }));
+
+    async function conferir() {
+        if (terminou) return;
+        const resta = Math.max(0, vence - Date.now());
+        relogio.textContent = resta ? `O QR vale por mais ${Math.floor(resta / 60000)}:${String(Math.floor(resta / 1000) % 60).padStart(2, '0')}` : 'QR vencido';
+        if (!resta && outroQR.hidden) { lugarQR.classList.add('vencido'); outroQR.hidden = false; }
+        const { data: c } = await supabase.from('contagem')
+            .select('estado, tentativas, testemunha_nome, testemunha_dizimos_centavos, testemunha_ofertas_centavos, dizimos_centavos, ofertas_centavos')
+            .eq('id', contagemId).maybeSingle();
+        if (!c || terminou) return;
+        if (c.estado === 'conferida') {
+            terminou = true;
+            folha.fechar();
+            comemorar('Bateu!', `${c.testemunha_nome} conferiu. O valor já entrou no caixa.`);
+            recarregar();
+        } else if (c.estado !== 'aguardando') {
+            terminou = true;
+            folha.fechar();
+        } else if (c.tentativas > ultimaTentativa) {
+            ultimaTentativa = c.tentativas;
+            const partes = [
+                c.testemunha_dizimos_centavos !== c.dizimos_centavos && `dízimos (você ${reais(c.dizimos_centavos)}, ${c.testemunha_nome} ${reais(c.testemunha_dizimos_centavos)})`,
+                c.testemunha_ofertas_centavos !== c.ofertas_centavos && `ofertas (você ${reais(c.ofertas_centavos)}, ${c.testemunha_nome} ${reais(c.testemunha_ofertas_centavos)})`,
+            ].filter(Boolean);
+            estado.textContent = `Não bateu: ${partes.join(' e ')}. Contem de novo.`;
+            if (c.tentativas >= 5) { estado.textContent += ' Foram muitas tentativas: gere outro QR.'; outroQR.hidden = false; }
+        }
+    }
+    const timer = setInterval(conferir, 3000);
+    const aoVoltar = () => { if (document.visibilityState === 'visible') conferir(); };
+    document.addEventListener('visibilitychange', aoVoltar);
+    navigator.wakeLock?.request('screen').then((t) => { travaTela = t; }).catch(() => {});
+    conferir();
+
+    const folha = abrirFolha({
+        titulo: 'Testemunha',
+        conteudo: h('div', { class: 'form fin-qr-folha' },
+            h('p', { class: 'folha-texto' }, 'Peça para a pessoa apontar a câmera do celular aqui.'),
+            lugarQR, relogio, estado, aviso.elemento, outroQR,
+            h('p', { class: 'campo-dica' }, 'Pode fechar. O QR fica em "Contagens".'),
+            semCelular),
+        aoFechar: () => {
+            clearInterval(timer);
+            document.removeEventListener('visibilitychange', aoVoltar);
+            travaTela?.release().catch(() => {});
+        },
+    });
 }
 
 export function folhaCancelarContagem(c, recarregar) {
@@ -237,6 +405,15 @@ export function folhaCancelarContagem(c, recarregar) {
 const ACAO = { criado: 'Lançou', editado: 'Alterou', cancelado: 'Cancelou' };
 const CAMPOS = { valor_centavos: 'valor', data: 'data', categoria_id: 'categoria', conta_id: 'conta', conta_destino_id: 'destino', forma: 'forma', descricao: 'descrição' };
 
+// Quem conferiu, em uma frase (D61). Lançamento antigo sem o dado: frase genérica.
+export function origemDaContagem(c) {
+    if (!c) return 'Contagem do culto, conferida por duas pessoas';
+    if (c.modo === 'sozinha') return 'Contagem do culto, contada sozinha (sem conferência)';
+    if (c.modo === 'qr') return `Contagem do culto, conferida por ${c.testemunha_nome} (testemunha pelo celular)`;
+    if (c.modo === 'papel') return `Contagem do culto, conferida por ${c.testemunha_nome} (testemunha sem celular)`;
+    return `Contagem do culto, conferida por ${nomeDe(c.conferente)} no app`;
+}
+
 export async function folhaDetalhe(l, dados, conta, recarregar) {
     const cat = dados.categoriaPorId.get(l.categoria_id);
     const contaFin = dados.contaPorId.get(l.conta_id);
@@ -257,7 +434,7 @@ export async function folhaDetalhe(l, dados, conta, recarregar) {
         l.tipo !== 'transferencia' && ['Conta', contaFin?.nome],
         l.forma && ['Como', FORMAS[l.forma]],
         l.descricao && ['Descrição', l.descricao],
-        l.contagem_id && ['Origem', 'Contagem do culto, conferida por duas pessoas'],
+        l.contagem_id && ['Origem', origemDaContagem(l.contagem)],
         l.cancelado_em && ['Cancelado', l.motivo_cancelamento],
     ].filter(Boolean);
     const folha = abrirFolha({
@@ -265,7 +442,7 @@ export async function folhaDetalhe(l, dados, conta, recarregar) {
         conteudo: h('div', { class: 'form' },
             h('p', { class: `fin-detalhe-valor ${l.tipo}${l.cancelado_em ? ' cancelado' : ''}` }, reais(l.valor_centavos)),
             h('dl', { class: 'fin-detalhe' }, linhas.map(([t, v]) => h('div', null, h('dt', null, t), h('dd', null, v)))),
-            l.contagem_id && pode && h('p', { class: 'campo-dica' }, 'Veio de uma contagem conferida: não se edita. Se estiver errado, cancele com o motivo e lance de novo.'),
+            l.contagem_id && pode && h('p', { class: 'campo-dica' }, 'Veio de uma contagem: não se edita. Se estiver errado, cancele com o motivo e lance de novo.'),
             h('h3', { class: 'fin-sub' }, 'Histórico'),
             historico,
             editar, cancelar),

@@ -40,6 +40,7 @@ import { eLiderDeLouvor, veFinanceiro, cuidaDosEventos } from './sessao.js';
 import { sincronizarPush } from './util/push.js';
 import { limparRetornoDoGoogle } from './util/google.js';
 import { telaErro } from './telas/erro.js';
+import { telaTestemunha } from './telas/testemunha.js';
 import { telaDocumento } from './telas/documentos.js';
 import { barraLateral } from './telas/moldura.js';
 import { telaInstalar } from './telas/instalar.js';
@@ -88,8 +89,19 @@ const ROTAS_SEM_CONTA = {
     '#/termos': () => telaDocumento('termos'),
 };
 
+// Testemunha da contagem (D61): abre pelo QR, para QUALQUER pessoa, logada
+// ou não e sem instalar o app (quem ajuda a contar só aponta a câmera).
+const TESTEMUNHA = /^#\/testemunha\/([0-9a-f]{64})$/;
+
 async function decidirTela() {
     const minhaRodada = ++rodada;
+
+    const testemunha = location.hash.match(TESTEMUNHA);
+    if (testemunha) {
+        contaPronta = null;
+        mostrar(telaTestemunha(testemunha[1]));
+        return;
+    }
 
     // No celular o Hub só roda instalado (D-PWA). A instalação vem ANTES do
     // login: no iPhone o app da tela de início não enxerga a sessão do Safari,
@@ -162,6 +174,7 @@ window.addEventListener('hashchange', () => {
     // Trocar de aba não precisa buscar a conta de novo. Âncoras dentro da
     // tela (#culto-...) não são rotas: deixa o navegador só rolar até elas.
     const eRota = location.hash === '' || location.hash.startsWith('#/');
+    if (TESTEMUNHA.test(location.hash)) return decidirTela();
     if (contaPronta) { if (eRota) mostrar(telaDaConta(contaPronta)); }
     else if (!usuarioAtual) decidirTela();
 });
