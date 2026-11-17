@@ -64,6 +64,9 @@ export function abrirFolha({ titulo, conteudo, aoFechar }) {
             aoFechar?.();
         };
         if (matchMedia('(prefers-reduced-motion: reduce)').matches) return terminar();
+        // Fechou ainda subindo: cancela a subida (feita pelo JS), senão ela
+        // ficaria por cima da animação de descida do CSS
+        caixa.getAnimations().forEach((a) => { if (!(a instanceof CSSAnimation)) a.cancel(); });
         dialogo.classList.add('saindo');
         dialogo.addEventListener('animationend', terminar, { once: true });
         setTimeout(terminar, 400); // garantia se a animação não disparar
@@ -77,7 +80,22 @@ export function abrirFolha({ titulo, conteudo, aoFechar }) {
 
     document.body.append(dialogo);
     travarRolagem();
+    const caixa = dialogo.querySelector('.folha-caixa');
+    const comAnimacao = !matchMedia('(prefers-reduced-motion: reduce)').matches
+        && !matchMedia('(min-width: 720px)').matches; // no computador quem anima é o CSS (cartão no meio)
+    if (comAnimacao) caixa.style.visibility = 'hidden';
     dialogo.showModal();
+    if (comAnimacao) {
+        // Espera 2 quadros: o iPhone termina de posicionar o <dialog> e só
+        // então a folha sobe. Escondida nesse meio tempo (~30ms, imperceptível).
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+            caixa.style.visibility = '';
+            caixa.animate(
+                [{ transform: 'translateY(100%)' }, { transform: 'translateY(0)' }],
+                { duration: 550, easing: 'cubic-bezier(0.32, 0.72, 0, 1)' }, // --ease-ios
+            );
+        }));
+    }
     // Não abrir o teclado do celular sozinho: foca o título, não o 1º campo.
     // preventScroll: a folha ainda está lá embaixo (subindo); sem isso o
     // Safari rola a tela atrás do foco e a folha "pula" no meio da animação.

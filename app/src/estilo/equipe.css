@@ -296,8 +296,9 @@ html.com-folha { overflow: hidden; }
     border-radius: 30px 30px 0 0;
     background: var(--background);
     box-shadow: 0 -10px 40px rgba(29, 6, 5, 0.25);
-    animation: folhaSobe 0.55s var(--ease-ios) both;
-    will-change: translate; /* já começa na placa de vídeo, sem engasgo no 1º quadro */
+    /* A subida é feita pelo JS (abrirFolha), um quadro depois do showModal:
+       no iPhone, animar no mesmo quadro em que o <dialog> entra na tela fazia
+       a folha ser desenhada no lugar errado (lá em cima) até a animação acabar. */
 }
 .folha-caixa::before {
     /* brilho da marca no topo da folha */
@@ -311,8 +312,7 @@ html.com-folha { overflow: hidden; }
 }
 .folha.saindo .folha-caixa { animation: folhaDesce 0.3s var(--ease-ios) forwards; }
 .folha.saindo::backdrop { animation: fundoSai 0.3s ease forwards; }
-@keyframes folhaSobe { from { translate: 0 100%; } }
-@keyframes folhaDesce { to { translate: 0 100%; } }
+@keyframes folhaDesce { to { transform: translateY(100%); } }
 @keyframes fundoEntra { from { opacity: 0; } }
 @keyframes fundoSai { to { opacity: 0; } }
 
