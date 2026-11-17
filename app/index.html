@@ -35,12 +35,6 @@
             transition: transform .6s cubic-bezier(.32,.72,0,1);
         }
         #abertura.saindo .ab-logo { transform: scale(1.14); }
-        /* Brilho que acende atrás da logo quando ela fica completa */
-        .ab-logo::before {
-            content: ''; position: absolute; inset: -40% -90%;
-            background: radial-gradient(closest-side, rgba(255,255,255,.28), transparent);
-            opacity: 0; animation: ab-brilho 1.2s 1.7s ease-out;
-        }
         .ab-peca { position: absolute; height: auto; display: block; }
         /* Posição exata de cada peça (em % da logo). Aqui e não em style=""
            no HTML: a CSP do app não aceita estilo inline em atributo. */
@@ -75,10 +69,9 @@
         .ab-chama-3 { --r: 25deg;  animation-delay: 1.15s; }
         .ab-chama-1 { --r: -8deg;  animation-delay: 1.25s; }
         @keyframes ab-acender { from { opacity: 0; transform: translateY(30%) rotate(var(--r)) scale(.2); } 35% { opacity: 1; } }
-        @keyframes ab-brilho { 40% { opacity: 1; } }
 
         @media (prefers-reduced-motion: reduce) {
-            .ab-peca, .ab-logo::before { animation: none !important; }
+            .ab-peca { animation: none !important; }
             #abertura.saindo .ab-logo { transform: none; }
         }
     </style>

@@ -49,7 +49,6 @@ export function telaInicio(conta) {
     const tela = h('div', { class: 'tela tela-app tela-inicio' },
         cabecalhoApp(conta),
         h('main', { id: 'conteudo', class: 'app-conteudo' },
-            h('div', { class: 'inicio-aurora', 'aria-hidden': 'true' }, h('span'), h('span')),
             h('p', { class: 'inicio-data' }, dataDeHoje()),
             h('h1', { tabindex: -1, class: 'titulo-tela inicio-ola' }, `${saudacao()}${primeiroNome ? `, ${primeiroNome}` : ''}!`),
             destaque,

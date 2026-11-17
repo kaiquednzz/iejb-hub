@@ -22,7 +22,7 @@
     padding: 12px 12px 12px 10px;
     border: 1px solid var(--vidro-borda);
     border-radius: var(--raio-l);
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.86), rgba(255, 255, 255, 0.66));
+    background: rgba(255, 255, 255, 0.86);
     box-shadow: var(--sombra-1), var(--brilho);
     font: inherit;
     color: inherit;
@@ -81,7 +81,7 @@
     justify-items: center;
     padding: 8px 4px;
     border-radius: var(--raio-s);
-    background: linear-gradient(160deg, var(--principal), var(--principal-brighter));
+    background: var(--principal);
     color: #fff;
     text-align: center;
     font-size: 11px;

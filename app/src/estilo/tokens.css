@@ -40,11 +40,6 @@
     --sombra-2: 0 2px 6px rgba(58, 10, 9, 0.05), 0 12px 32px rgba(58, 10, 9, 0.09);
     --sombra-3: 0 8px 24px rgba(58, 10, 9, 0.10), 0 28px 64px rgba(58, 10, 9, 0.16);
 
-    --aurora: radial-gradient(55% 60% at 8% 0%, rgba(191, 38, 43, 0.10), transparent 70%),
-        radial-gradient(45% 55% at 95% 100%, rgba(232, 150, 70, 0.10), transparent 70%);
-    --aurora-escura: radial-gradient(60% 70% at 0% 0%, rgba(191, 38, 43, 0.38), transparent 70%),
-        radial-gradient(50% 60% at 100% 100%, rgba(143, 13, 11, 0.55), transparent 70%);
-
     /* Raios */
     --raio-s: 14px;
     --raio-m: 20px;

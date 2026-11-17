@@ -141,7 +141,7 @@
     display: grid;
     padding: 6px;
     border-radius: var(--raio-l);
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(255, 255, 255, 0.64));
+    background: rgba(255, 255, 255, 0.82);
     border: 1px solid var(--vidro-borda);
     box-shadow: var(--sombra-1), var(--brilho);
 }
@@ -226,7 +226,7 @@
     gap: 14px;
     padding: 16px;
     border-radius: var(--raio-l);
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.7));
+    background: rgba(255, 255, 255, 0.9);
     border: 1px solid rgba(191, 38, 43, 0.22);
     box-shadow: var(--sombra-2), var(--brilho);
     animation: subir 0.6s calc(0.05s + var(--i, 0) * 0.06s) var(--ease-out) backwards;
@@ -247,7 +247,7 @@
 .cartao-grupo {
     padding: 16px 12px 10px;
     border-radius: var(--raio-l);
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(255, 255, 255, 0.64));
+    background: rgba(255, 255, 255, 0.82);
     border: 1px solid var(--vidro-borda);
     box-shadow: var(--sombra-1), var(--brilho);
     animation: subir 0.6s calc(0.05s + var(--i, 0) * 0.07s) var(--ease-out) backwards;
@@ -299,16 +299,6 @@ html.com-folha { overflow: hidden; }
     /* A subida é feita pelo JS (abrirFolha), um quadro depois do showModal:
        no iPhone, animar no mesmo quadro em que o <dialog> entra na tela fazia
        a folha ser desenhada no lugar errado (lá em cima) até a animação acabar. */
-}
-.folha-caixa::before {
-    /* brilho da marca no topo da folha */
-    content: '' / '';
-    position: absolute;
-    inset: 0 0 auto;
-    height: 160px;
-    background: var(--aurora);
-    pointer-events: none;
-    border-radius: inherit;
 }
 .folha.saindo .folha-caixa { animation: folhaDesce 0.3s var(--ease-ios) forwards; }
 .folha.saindo::backdrop { animation: fundoSai 0.3s ease forwards; }

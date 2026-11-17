@@ -34,32 +34,6 @@
 /* --- Início ------------------------------------------------------------------ */
 .tela-inicio .app-conteudo { position: relative; padding-bottom: calc(env(safe-area-inset-bottom) + 32px); }
 
-/* Duas manchas de luz que flutuam devagar atrás da saudação. Só transform
-   (GPU), sem animar blur: o desfoque é fixo e a mancha só se move. */
-.inicio-aurora {
-    position: absolute;
-    inset: -40px 0 auto;
-    height: 320px;
-    pointer-events: none;
-    overflow: hidden;
-    z-index: -1;
-}
-.inicio-aurora span {
-    position: absolute;
-    width: 260px;
-    height: 260px;
-    border-radius: 50%;
-    filter: blur(48px);
-    opacity: 0.55;
-    will-change: transform;
-}
-.inicio-aurora span:first-child { left: -60px; top: 10px; background: rgba(191, 38, 43, 0.35); animation: flutuar 14s ease-in-out infinite alternate; }
-.inicio-aurora span:last-child { right: -80px; top: 60px; background: rgba(242, 184, 181, 0.6); animation: flutuar 17s ease-in-out -6s infinite alternate-reverse; }
-@keyframes flutuar {
-    from { transform: translate3d(0, 0, 0) scale(1); }
-    to { transform: translate3d(40px, 24px, 0) scale(1.12); }
-}
-
 .inicio-data {
     font-size: 14px;
     font-weight: 600;
@@ -75,7 +49,7 @@
     gap: 12px;
     padding: 18px 18px 16px;
     border-radius: var(--raio-l);
-    background: radial-gradient(120% 140% at 0% 0%, var(--principal-brighter), var(--principal) 55%, var(--principal-escuro));
+    background: var(--principal);
     color: #fff;
     text-decoration: none;
     box-shadow: 0 14px 36px rgba(143, 13, 11, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.18);
@@ -176,7 +150,7 @@
     padding: 12px 16px 12px 12px;
     border: 1px solid var(--vidro-borda);
     border-radius: var(--raio-l);
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.7));
+    background: rgba(255, 255, 255, 0.92);
     box-shadow: var(--sombra-1), var(--brilho);
     color: var(--texto);
     font: inherit;
@@ -194,11 +168,11 @@
     height: 52px;
     border-radius: 16px;
     color: #fff;
-    background: linear-gradient(150deg, var(--principal-brighter), var(--principal));
+    background: var(--principal);
     box-shadow: 0 6px 16px rgba(143, 13, 11, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.25);
 }
 .modulo-icone .icone { width: 26px; height: 26px; }
-.modulo-eventos .modulo-icone { background: linear-gradient(150deg, #c2571a, #8f3a0b); box-shadow: 0 6px 16px rgba(143, 58, 11, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.25); }
+.modulo-eventos .modulo-icone { background: #a5480f; box-shadow: 0 6px 16px rgba(143, 58, 11, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.25); }
 .modulo-textos { display: grid; gap: 2px; min-width: 0; }
 .modulo-nome { font-size: 17px; font-weight: 700; color: var(--texto-vinho); }
 .modulo-texto { font-size: 14px; color: var(--texto-2); }
@@ -282,7 +256,7 @@
     padding: 14px 14px 8px;
     border-radius: var(--raio-l);
     border: 1px solid var(--vidro-borda);
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.7));
+    background: rgba(255, 255, 255, 0.9);
     box-shadow: var(--sombra-1), var(--brilho);
     animation: subir 0.5s calc(var(--i, 0) * 0.05s) var(--ease-out) backwards;
 }
@@ -317,22 +291,10 @@
 .historico-musica.achada .linha-nome { color: var(--principal); }
 .historico-fone { color: var(--texto-2); }
 
-@media (prefers-reduced-motion: reduce) {
-    .inicio-aurora span { animation: none; }
-}
-
 /* Ajustes da revisão visual */
-/* Aurora: as bordas da caixa apareciam retas; o degradê some com elas e a
-   caixa vai até a borda da tela (o main tem padding lateral) */
-.inicio-aurora {
-    inset: -60px -24px auto;
-    height: 380px;
-    -webkit-mask-image: radial-gradient(70% 65% at 50% 40%, #000 35%, transparent 100%);
-    mask-image: radial-gradient(70% 65% at 50% 40%, #000 35%, transparent 100%);
-}
 /* O tom usa grid-area "tom" na lista da escala; aqui a grade é outra */
 .historico-musica .musica-tom { grid-area: auto; }
-/* A aurora passa da largura do main; clip (e não hidden) não cria área de
+/* Nada pode vazar para o lado; clip (e não hidden) não cria área de
    rolagem, então o cabeçalho continua grudado no topo */
 .tela-inicio { overflow-x: clip; }
 
@@ -369,7 +331,7 @@
     padding: 10px 14px 10px 10px;
     border: 1px solid var(--vidro-borda);
     border-radius: var(--raio-m);
-    background: linear-gradient(180deg, #fff, rgba(255, 255, 255, 0.82));
+    background: #fff;
     box-shadow: var(--sombra-1), var(--brilho);
     color: inherit;
     font: inherit;

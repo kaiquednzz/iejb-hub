@@ -81,7 +81,7 @@
 .cartao-semana {
     padding: 14px 12px 8px;
     border-radius: var(--raio-l);
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.86), rgba(255, 255, 255, 0.66));
+    background: rgba(255, 255, 255, 0.86);
     border: 1px solid var(--vidro-borda);
     box-shadow: var(--sombra-1), var(--brilho);
     animation: subir 0.55s calc(0.04s + var(--i, 0) * 0.06s) var(--ease-out) backwards;
@@ -461,7 +461,7 @@
     margin-top: 18px;
     padding: 14px 14px 10px;
     border-radius: var(--raio-l);
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.92), rgba(246, 238, 236, 0.9));
+    background: rgba(255, 255, 255, 0.92);
     border: 1px solid rgba(191, 38, 43, 0.18);
     box-shadow: var(--sombra-2), var(--brilho);
     animation: surgir 0.6s 0.15s var(--mola) backwards;
