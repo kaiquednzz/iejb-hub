@@ -8,56 +8,47 @@
     justify-content: center;
     gap: 0.5em;
     min-height: 48px;
-    padding: 12px 22px;
+    padding: 12px 20px;
     border: none;
-    border-radius: var(--raio-capsula);
+    border-radius: var(--raio-2);
     font-size: 16px;
     font-weight: 600;
     line-height: 1.2;
-    letter-spacing: -0.01em;
     text-decoration: none;
     cursor: pointer;
     user-select: none;
-    transition: transform 0.5s var(--mola), background-color 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease;
+    transition: transform 0.5s var(--mola), background-color var(--dur-media) ease, opacity var(--dur-media) ease;
 }
 
 /* "Afunda" ao tocar e volta com mola ao soltar, como no iOS */
 :where(.botao-principal, .botao-secundario, .botao-perigo, .botao-icone):active:not(:disabled) {
-    transform: scale(0.95);
-    transition-duration: 0.12s;
+    transform: scale(0.97);
+    transition-duration: var(--dur-rapida);
 }
 
-.botao-principal {
-    background: var(--principal);
-    color: #fff;
-    box-shadow: 0 6px 18px rgba(143, 13, 11, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.18);
-}
+/* Principal: a ação da tela (uma por tela). Vermelho cheio, sem sombra. */
+.botao-principal { background: var(--cor-marca); color: var(--cor-sobre-marca); }
+.botao-principal:active:not(:disabled) { background: var(--cor-marca-hover); }
 @media (hover: hover) {
-    .botao-principal:hover:not(:disabled) { background: var(--principal-brighter); }
+    .botao-principal:hover:not(:disabled) { background: var(--cor-marca-hover); }
 }
 
-.botao-secundario {
-    background: rgba(143, 13, 11, 0.08);
-    color: var(--principal);
-}
+/* Secundário: fundo vermelho bem claro, texto da marca */
+.botao-secundario { background: var(--cor-marca-sutil); color: var(--cor-marca); }
 @media (hover: hover) {
-    .botao-secundario:hover:not(:disabled) { background: rgba(143, 13, 11, 0.14); }
+    .botao-secundario:hover:not(:disabled) { background: #F0D6D3; }
 }
 
-.botao-perigo {
-    background: var(--principal-brighter);
-    color: #fff;
-    box-shadow: 0 6px 18px rgba(191, 38, 43, 0.26), inset 0 1px 0 rgba(255, 255, 255, 0.18);
-}
+.botao-perigo { background: var(--cor-perigo); color: #fff; }
 
 /* Ação destrutiva discreta (fim das folhas): texto vermelho, sem fundo */
 .botao-texto-perigo {
     min-height: 44px;
     padding: 10px 14px;
     border: none;
-    border-radius: var(--raio-capsula);
+    border-radius: var(--raio-2);
     background: none;
-    color: var(--principal-brighter);
+    color: var(--cor-perigo);
     font-size: 16px;
     font-weight: 600;
     cursor: pointer;
@@ -74,9 +65,9 @@
     min-height: 44px;
     padding: 10px 14px;
     border: none;
-    border-radius: var(--raio-capsula);
+    border-radius: var(--raio-2);
     background: none;
-    color: var(--principal);
+    color: var(--cor-marca);
     font: inherit;
     font-size: 16px;
     font-weight: 600;
@@ -91,8 +82,9 @@
     width: 44px;
     min-height: 44px;
     padding: 0;
-    background: rgba(143, 13, 11, 0.08);
-    color: var(--principal);
+    border-radius: var(--raio-pilula);
+    background: var(--cor-superficie-rebaixada);
+    color: var(--cor-texto);
 }
 
 .botao-largo { width: 100%; }
@@ -133,16 +125,16 @@
 
 /* Ícones SVG */
 .icone {
-    width: 22px;
-    height: 22px;
+    width: var(--icone-m);
+    height: var(--icone-m);
     flex: none;
     fill: none;
     stroke: currentColor;
-    stroke-width: 1.9;
+    stroke-width: 1.75;
     stroke-linecap: round;
     stroke-linejoin: round;
 }
-.icone-p { width: 16px; height: 16px; }
+.icone-p { width: var(--icone-p); height: var(--icone-p); }
 
 /* ----- Formulário ----- */
 
@@ -154,27 +146,26 @@
 
 .campo { display: flex; flex-direction: column; gap: 6px; }
 .campo label {
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 600;
-    color: var(--texto-vinho);
+    color: var(--cor-texto);
 }
 .campo input {
     min-height: 50px;
     padding: 12px 16px;
     /* 17px: abaixo de 16px o iPhone dá zoom no campo ao focar */
     font-size: 17px;
-    border: 1.5px solid rgba(58, 10, 9, 0.14);
-    border-radius: var(--raio-s);
-    background: rgba(255, 255, 255, 0.85);
+    border: 1px solid var(--cor-borda-forte);
+    border-radius: var(--raio-2);
+    background: var(--cor-superficie);
     transition: border-color 0.2s ease, box-shadow 0.3s var(--ease-out), background-color 0.2s ease;
 }
 .campo input:focus {
     outline: none;
-    border-color: var(--principal-brighter);
-    background: #fff;
-    box-shadow: 0 0 0 4px rgba(191, 38, 43, 0.16);
+    border-color: var(--cor-marca);
+    box-shadow: 0 0 0 3px var(--cor-marca-sutil);
 }
-.campo-dica { font-size: 13px; color: var(--texto-2); }
+.campo-dica { font: var(--texto-apoio); color: var(--cor-texto-2); }
 
 /* Erro/sucesso do formulário. Vazio não ocupa espaço, mas existe no DOM
    desde o início (é isso que faz o leitor de tela anunciar). */
@@ -187,14 +178,14 @@
 .aviso-form:empty { display: none; }
 .aviso-form[data-tipo="erro"] {
     padding: 12px 14px;
-    background: rgba(191, 38, 43, 0.09);
-    color: var(--principal);
+    background: var(--cor-perigo-sutil);
+    color: var(--cor-marca);
     animation: tremer 0.42s var(--ease-out);
 }
 .aviso-form[data-tipo="ok"] {
     padding: 12px 14px;
-    background: rgba(31, 122, 77, 0.1);
-    color: var(--verde);
+    background: var(--cor-sucesso-sutil);
+    color: var(--cor-sucesso);
 }
 @keyframes tremer {
     20% { translate: -6px 0; }
@@ -209,18 +200,18 @@
     display: inline-flex;
     align-items: center;
     gap: 5px;
-    padding: 4px 10px;
-    border-radius: var(--raio-capsula);
+    padding: 3px 8px;
+    border-radius: 6px;
     font-size: 12px;
-    font-weight: 700;
-    letter-spacing: 0.02em;
-    background: rgba(143, 13, 11, 0.09);
-    color: var(--principal);
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    background: var(--cor-marca-sutil);
+    color: var(--cor-marca);
 }
 .selo .icone { width: 14px; height: 14px; }
 .selo-voce { background: var(--principal); color: #fff; }
-.selo-rascunho { background: rgba(154, 91, 0, 0.12); color: var(--ambar); }
-.selo-cancelado { background: rgba(84, 84, 88, 0.12); color: var(--texto-2); }
+.selo-rascunho { background: var(--cor-atencao-sutil); color: var(--cor-atencao); }
+.selo-cancelado { background: var(--cor-superficie-rebaixada); color: var(--cor-texto-2); }
 
 /* ----- Cabeçalho do app: cápsula de vidro flutuante (igual ao site) -----
    O vidro fica no ::before, não no header: um ancestral com backdrop-filter

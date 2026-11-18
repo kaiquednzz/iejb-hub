@@ -123,23 +123,23 @@
     --fundo-rosado: #F6EEEC;
     --rosa: #f2b8b5;
     --verde: var(--verde-700);
-    --ambar: #9a5b00;
-    --texto: #1d1d1f;
-    --texto-2: #545458;
+    --ambar: var(--cor-atencao);
+    --texto: var(--cor-texto);
+    --texto-2: var(--cor-texto-2);
     --texto-vinho: var(--tinta-700);
     --vidro-claro: rgba(255, 255, 255, 0.62);
-    --vidro-borda: rgba(255, 255, 255, 0.75);
+    --vidro-borda: var(--cor-borda);          /* era branco translúcido */
     --vidro-escuro: rgba(255, 255, 255, 0.07);
     --vidro-borda-escura: rgba(255, 255, 255, 0.14);
     --desfoque: blur(24px) saturate(180%);
-    --brilho: inset 0 1px 0 rgba(255, 255, 255, 0.85);
+    --brilho: 0 0 #0000;                      /* sem brilho no topo */
     --brilho-escuro: inset 0 1px 0 rgba(255, 255, 255, 0.12);
-    --sombra-1: 0 1px 2px rgba(58, 10, 9, 0.06), 0 4px 12px rgba(58, 10, 9, 0.06);
-    --sombra-2: 0 2px 6px rgba(58, 10, 9, 0.05), 0 12px 32px rgba(58, 10, 9, 0.09);
-    --sombra-3: 0 8px 24px rgba(58, 10, 9, 0.10), 0 28px 64px rgba(58, 10, 9, 0.16);
-    --raio-s: 14px;
-    --raio-m: 20px;
-    --raio-l: 28px;
+    --sombra-1: 0 0 #0000;                    /* cartões: planos, só borda */
+    --sombra-2: var(--elev-1);
+    --sombra-3: var(--elev-2);
+    --raio-s: var(--raio-2);
+    --raio-m: 16px;
+    --raio-l: var(--raio-3);
     --raio-capsula: var(--raio-pilula);
 }
 
