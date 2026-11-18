@@ -10,6 +10,10 @@
     --altura-abas: calc(58px + env(safe-area-inset-bottom));
 }
 
+/* Campos: contorno com 3:1 de contraste (WCAG 1.4.11), em todas as telas.
+   Só muda a cor: campo que não tem borda continua sem. */
+:is(input:not([type="checkbox"], [type="radio"], [type="range"]), textarea, select) { border-color: var(--cor-borda-campo); }
+
 /* --- Tipografia de tela ---------------------------------------------------- */
 .titulo-tela { font: var(--texto-display); color: var(--cor-titulo); letter-spacing: -0.01em; }
 .subtitulo-tela { font: var(--texto-corpo); color: var(--cor-texto-2); margin-top: var(--esp-1); }
@@ -362,6 +366,30 @@ html.leve .barra-abas { -webkit-backdrop-filter: none; backdrop-filter: none; ba
 @media (min-width: 1024px) {
     .tela-inicio .app-conteudo { display: block; width: min(100% - 64px, 760px); }
 }
+
+/* --- Escala (etapa 4) ------------------------------------------------------ */
+.destaque.inicio-compromisso { margin: 0; animation: subir 0.5s var(--ease-out) backwards; }
+/* Dia escolhido da semana: contorno vermelho em vez de bloco vermelho cheio
+   (um único destaque vermelho por tela) */
+.bloco-dia { background: var(--cor-superficie-rebaixada); color: var(--cor-titulo); border-radius: var(--raio-2); }
+.bloco-dia.sel { background: var(--cor-superficie); color: var(--cor-titulo); box-shadow: inset 0 0 0 2px var(--cor-marca); }
+.bloco-dia.sel .bloco-dia-num { color: var(--cor-marca); }
+.bloco-dia-rostos .pessoa-avatar { border-color: var(--cor-superficie-rebaixada); }
+.bloco-dia.sel .bloco-dia-rostos .pessoa-avatar { border-color: var(--cor-superficie); }
+.bloco-dia.sel .bloco-dia-eu { background: var(--cor-marca); }
+@container (min-width: 120px) { .bloco-dia.sel .bloco-dia-eu { background: var(--cor-marca); } }
+
+/* --- Estado vazio das telas antigas: mesmo padrão do .estado -------------- */
+.estado-vazio {
+    background: var(--cor-superficie);
+    color: var(--cor-texto);
+    border: 1px dashed var(--cor-borda-forte);
+    border-radius: var(--raio-3);
+    box-shadow: none;
+}
+.estado-vazio-icone { background: var(--cor-superficie-rebaixada); color: var(--cor-texto-2); box-shadow: none; }
+.estado-vazio-titulo { font: 600 17px/1.3 var(--fonte-texto); color: var(--cor-texto); }
+.estado-vazio-texto { font: var(--texto-corpo); color: var(--cor-texto-2); }
 
 /* --- Computador ------------------------------------------------------------ */
 @media (min-width: 1024px) {

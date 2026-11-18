@@ -22,7 +22,8 @@
     --tinta-900: #1F1513;      /* preto quente */
     --tinta-700: #3A0A09;      /* vinho dos títulos */
     --tinta-600: #5C5150;
-    --tinta-400: #7D7270;      /* >= 4,5:1 sobre creme-50 */
+    --tinta-400: #746967;      /* 5,1:1 sobre creme-50, 4,7:1 sobre creme-100 */
+    --creme-500: #9C8E80;      /* borda de campo: 3,2:1 sobre branco (WCAG 1.4.11) */
     --verde-700: #1F7A4D;
     --verde-100: #E3F2EA;
     --ambar-700: #8A5200;
@@ -37,6 +38,7 @@
     --cor-superficie-rebaixada: var(--creme-100);
     --cor-borda: var(--creme-200);
     --cor-borda-forte: var(--creme-300);
+    --cor-borda-campo: var(--creme-500);
     /* Texto */
     --cor-texto: var(--tinta-900);
     --cor-texto-2: var(--tinta-600);

@@ -155,12 +155,13 @@ function cartaoDestaque(cultos, meuId) {
         if (culto.estado !== 'ativo' || escala?.estado !== 'publicada') continue;
         const eu = escala.escala_item.find((item) => item.pessoa_id === meuId);
         if (!eu || naoVai(eu)) continue;
-        return [h('a', { class: 'destaque', href: `#culto-${culto.id}` },
-            h('span', { class: 'destaque-rotulo' }, icone('estrela'), 'Sua próxima escala'),
-            h('strong', { class: 'destaque-quando' }, `${rotuloDoDia(culto.data)} · ${formatarHorario(culto.horario)}`),
-            h('span', { class: 'destaque-culto' }, culto.nome),
-            eu.instrumento_exibido.length > 0 &&
-                h('span', { class: 'destaque-instrumento' }, eu.instrumento_exibido.join(' · ')),
+        // Mesmo cartão do Início (design system): o nome do culto é o título
+        return [h('a', { class: 'inicio-compromisso destaque', href: `#culto-${culto.id}` },
+            h('span', { class: 'compromisso-rotulo' }, h('span', null, 'Sua próxima escala')),
+            h('span', { class: 'compromisso-titulo' }, culto.nome),
+            h('span', { class: 'compromisso-quando' }, `${rotuloDoDia(culto.data)} · ${formatarHorario(culto.horario)}`),
+            h('span', { class: 'compromisso-chips' },
+                eu.instrumento_exibido.map((x) => h('span', { class: 'compromisso-chip' }, x))),
         )];
     }
     return [];
