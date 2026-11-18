@@ -15,7 +15,7 @@ export function somarDias(dataISO, dias) {
     return d.toISOString().slice(0, 10);
 }
 
-function diasEntre(a, b) {
+export function diasEntre(a, b) {
     return Math.round((Date.parse(`${b}T12:00:00Z`) - Date.parse(`${a}T12:00:00Z`)) / 86400000);
 }
 

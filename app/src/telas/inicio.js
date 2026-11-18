@@ -5,15 +5,16 @@
 //
 // Módulos:
 //   * cada um declara quem vê (pode) e para onde vai (rota);
-//   * "em breve" aparece apagado, com aviso ao tocar (decisão de Kaique:
-//     mostra para onde o Hub vai). Um módulo novo é uma linha em MODULOS.
+//   * "em breve" vira uma linha discreta no fim (decisão de Kaique: mostrar
+//     para onde o Hub vai, mas sem pesar como o que já funciona).
+//     Um módulo novo é uma linha em MODULOS.
 import { h, icone } from '../util/dom.js';
 import { supabase } from '../supabase.js';
-import { avisar } from '../util/folha.js';
-import { hojeEmBrasilia, rotuloDoDia, formatarHorario, partesDaData } from '../util/datas.js';
+import { hojeEmBrasilia, rotuloDoDia, formatarHorario, diasEntre } from '../util/datas.js';
 import { escalaGuardada } from '../offline.js';
 import { naoVai, FUNCAO_MESA } from '../util/escala.js';
 import { cabecalhoApp } from './moldura.js';
+import { linhaLista } from './voce.js';
 import { veFinanceiro, cuidaDosEventos } from '../sessao.js';
 import { contadorDePedidos } from './moldura.js';
 import { blocoConferir } from './financeiro/conferir.js';
@@ -39,6 +40,14 @@ function dataDeHoje() {
     return t.charAt(0).toUpperCase() + t.slice(1);
 }
 
+// Ordem da tela (redesign, etapa 3), do mais pessoal para o mais geral:
+//   1. saudação;
+//   2. "precisa da sua atenção": só aparece se houver algo (contagem para
+//      conferir, pedidos de acesso para o admin). É aqui que o admin vê a
+//      diferença, e não num selo;
+//   3. o próximo compromisso (o único destaque vermelho da tela);
+//   4. Vem aí (eventos do site, em lista);
+//   5. suas áreas (só as que a pessoa pode abrir) e, numa linha, as que vêm aí.
 export function telaInicio(conta) {
     const primeiroNome = (conta.pessoa?.apelido || conta.pessoa?.nome || conta.nome_informado || '').split(' ')[0];
     const destaque = h('div', { class: 'inicio-destaque', 'aria-live': 'polite' }, h('div', { class: 'inicio-compromisso esqueleto' }));
@@ -46,18 +55,27 @@ export function telaInicio(conta) {
     // Contagem do culto esperando a conferência desta pessoa (D48)
     const conferir = blocoConferir(conta);
 
+    const ativos = MODULOS.filter((m) => !m.emBreve && m.pode(conta));
+    const emBreve = MODULOS.filter((m) => m.emBreve).map((m) => m.nome);
+    const areas = ativos.map((m) => linhaLista({ href: m.rota, nome: m.nome, texto: m.texto, nomeIcone: m.icone }));
+    ativos.forEach((m, i) => {
+        areas[i].style.setProperty('--i', i);
+        if (m.id === 'pessoas') contadorDePedidos(areas[i].querySelector('.item-nome'), 'item-contador');
+    });
+
     const tela = h('div', { class: 'tela tela-app tela-inicio' },
         cabecalhoApp(conta),
         h('main', { id: 'conteudo', class: 'app-conteudo' },
-            h('p', { class: 'inicio-data' }, dataDeHoje()),
-            h('h1', { tabindex: -1, class: 'titulo-tela inicio-ola' }, `${saudacao()}${primeiroNome ? `, ${primeiroNome}` : ''}!`),
-            destaque,
+            h('div', { class: 'inicio-ola-area' },
+                h('p', { class: 'inicio-data' }, dataDeHoje()),
+                h('h1', { tabindex: -1, class: 'titulo-tela inicio-ola' }, `${saudacao()}${primeiroNome ? `, ${primeiroNome}` : ''}`)),
             conferir,
             avisosAdmin,
+            destaque,
             blocoEventos(),
-            h('h2', { class: 'inicio-secao' }, 'Ministérios e áreas'),
-            h('ul', { class: 'grade-modulos' }, MODULOS.filter((m) => m.emBreve || m.pode(conta)).map(cartaoModulo)),
-            h('p', { class: 'inicio-rodape' }, 'IEJB · Igreja Evangélica do Jardim Brasil'),
+            h('h2', { class: 'rotulo-secao' }, 'Suas áreas'),
+            h('ul', { class: 'grupo-lista inicio-areas' }, areas),
+            emBreve.length ? h('p', { class: 'inicio-em-breve' }, `Em breve no Hub: ${listaNatural(emBreve)}`) : null,
         ),
     );
 
@@ -66,27 +84,18 @@ export function telaInicio(conta) {
     return tela;
 }
 
-function cartaoModulo(modulo, i) {
-    const conteudo = [
-        h('span', { class: 'modulo-icone', 'aria-hidden': 'true' }, icone(modulo.icone)),
-        h('span', { class: 'modulo-textos' },
-            h('span', { class: 'modulo-nome' }, modulo.nome),
-            h('span', { class: 'modulo-texto' }, modulo.texto)),
-        modulo.emBreve ? h('span', { class: 'modulo-em-breve' }, 'Em breve') : icone('seta', 'icone icone-p modulo-seta'),
-    ];
-    if (modulo.emBreve) {
-        const b = h('button', { type: 'button', class: `modulo modulo-${modulo.id} em-breve`, 'aria-label': `${modulo.nome}: em breve` }, ...conteudo);
-        b.addEventListener('click', () => {
-            b.classList.remove('balancar');
-            void b.offsetWidth;   // reinicia a animação se tocar de novo
-            b.classList.add('balancar');
-            avisar(`${modulo.nome} ainda está sendo construído. Logo chega ao Hub!`);
-        });
-        return h('li', { style: { '--i': i } }, b);
-    }
-    const link = h('a', { class: `modulo modulo-${modulo.id}`, href: modulo.rota }, ...conteudo);
-    if (modulo.pedidos) contadorDePedidos(link.querySelector('.modulo-nome'), 'modulo-contador');
-    return h('li', { style: { '--i': i } }, link);
+// ['Pregações', 'Kids'] → 'Pregações e Kids'
+function listaNatural(itens) {
+    return itens.length < 2 ? itens.join('') : `${itens.slice(0, -1).join(', ')} e ${itens.at(-1)}`;
+}
+
+// "em 5 dias" (hoje e amanhã já aparecem na própria data)
+function quantoFalta(dataISO) {
+    const dias = diasEntre(hojeEmBrasilia(), dataISO);
+    if (dias <= 1) return null;
+    if (dias < 7) return `em ${dias} dias`;
+    const semanas = Math.round(dias / 7);
+    return semanas === 1 ? 'semana que vem' : `em ${semanas} semanas`;
 }
 
 // Próximo culto em que a pessoa toca (publicado, não marcou "não vou")
@@ -106,7 +115,7 @@ async function carregarCompromisso(conta, destaque) {
         e.escala_item.some((i) => i.pessoa_id === meuId && !naoVai(i))));
     if (!proximo) {
         destaque.replaceChildren(h('a', { class: 'inicio-compromisso vazio', href: '#/escala' },
-            h('span', { class: 'compromisso-rotulo' }, icone('calendario', 'icone icone-p'), 'Sua agenda'),
+            h('span', { class: 'compromisso-rotulo' }, 'Sua agenda'),
             h('span', { class: 'compromisso-titulo' }, 'Nenhuma escala sua pela frente'),
             h('span', { class: 'compromisso-acao' }, 'Ver a escala do Louvor', icone('seta', 'icone icone-p'))));
         return;
@@ -114,25 +123,25 @@ async function carregarCompromisso(conta, destaque) {
     const eu = proximo.escala.flatMap((e) => e.escala_item).find((i) => i.pessoa_id === meuId);
     const instrumentos = eu.instrumento_exibido.filter((x) => x !== FUNCAO_MESA);
     const naMesa = eu.instrumento_exibido.includes(FUNCAO_MESA);
-    const partes = partesDaData(proximo.data);
+    const falta = quantoFalta(proximo.data);
+    // O nome do culto é o título; a data vem numa linha só, embaixo
+    // (antes ela aparecia duas vezes: no bloco "DOM 22 NOV" e no título).
     destaque.replaceChildren(h('a', { class: 'inicio-compromisso', href: '#/escala' },
-        h('span', { class: 'compromisso-rotulo' }, icone('estrela', 'icone icone-p'), 'Seu próximo compromisso'),
-        h('span', { class: 'compromisso-linha' },
-            h('span', { class: 'compromisso-data', 'aria-hidden': 'true' },
-                h('span', null, partes.semana), h('strong', null, partes.dia), h('span', null, partes.mes)),
-            h('span', { class: 'compromisso-textos' },
-                h('span', { class: 'compromisso-titulo' }, `${rotuloDoDia(proximo.data)} · ${formatarHorario(proximo.horario)}`),
-                h('span', { class: 'compromisso-culto' }, proximo.nome, proximo.rotulo ? ` · ${proximo.rotulo}` : ''),
-                h('span', { class: 'compromisso-chips' },
-                    [...instrumentos, ...(naMesa ? ['Mesa de som'] : [])].map((x) => h('span', { class: 'compromisso-chip' }, x))))),
+        h('span', { class: 'compromisso-rotulo' },
+            h('span', null, 'Próximo compromisso'),
+            falta && h('span', { class: 'compromisso-falta' }, falta)),
+        h('span', { class: 'compromisso-titulo' }, proximo.nome, proximo.rotulo ? ` · ${proximo.rotulo}` : ''),
+        h('span', { class: 'compromisso-quando' }, `${rotuloDoDia(proximo.data)} · ${formatarHorario(proximo.horario)}`),
+        h('span', { class: 'compromisso-chips' },
+            [...instrumentos, ...(naMesa ? ['Mesa de som'] : [])].map((x) => h('span', { class: 'compromisso-chip' }, x))),
         h('span', { class: 'compromisso-acao' }, 'Ver escala e repertório', icone('seta', 'icone icone-p'))));
 }
 
 async function carregarPedidos(lugar) {
     const { count } = await supabase.from('conta').select('id', { count: 'exact', head: true }).eq('estado', 'pendente');
     if (!count) return;
-    lugar.replaceChildren(h('a', { class: 'inicio-pedidos', href: '#/pessoas' },
-        h('span', { class: 'pedidos-numero' }, String(count)),
-        h('span', null, count === 1 ? 'pessoa pedindo acesso ao Hub' : 'pessoas pedindo acesso ao Hub'),
-        icone('seta', 'icone icone-p')));
+    lugar.replaceChildren(h('a', { class: 'atencao', href: '#/pessoas' },
+        h('span', { class: 'atencao-ponto', 'aria-hidden': 'true' }),
+        h('span', { class: 'atencao-texto' }, count === 1 ? '1 pessoa pedindo acesso ao Hub' : `${count} pessoas pedindo acesso ao Hub`),
+        icone('seta', 'icone icone-p item-seta')));
 }
