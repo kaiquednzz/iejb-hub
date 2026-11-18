@@ -1,32 +1,132 @@
 /* ==========================================================================
-   Tokens do IEJB Hub
-   Copiados do site iejb.com.br (estilo/style.css) para o Hub parecer da
-   mesma família: mesmo vermelho, mesmo vidro, mesmas molas. Se a marca mudar
-   no site, mude aqui também.
+   Design System do IEJB Hub (planejamento/REDESIGN-E-DESIGN-SYSTEM.md)
+   Três camadas:
+     1. Primitivas: valores crus da marca. Só são usadas AQUI.
+     2. Semânticas: o papel de cada cor/medida. As telas usam estas.
+     3. Apelidos antigos (mais abaixo): nomes de antes do redesign, apontando
+        para os novos, para o código antigo continuar funcionando.
    ========================================================================== */
 
 :root {
-    /* Marca */
-    --principal: #8F0D0B;
-    --principal-brighter: #BF262B;
-    --principal-escuro: #500403;
-    --secondary: #EBDEDD;
-    --background: #FDFAF5;
-    --fundo-rosado: #F6EEEC;
-    --rosa: #f2b8b5;
-    --verde: #1f7a4d;
-    --ambar: #9a5b00;
+    /* --- 1. Primitivas ---------------------------------------------------- */
+    --vermelho-900: #500403;
+    --vermelho-800: #6E0908;
+    --vermelho-700: #8F0D0B;   /* vermelho institucional */
+    --vermelho-500: #BF262B;
+    --vermelho-100: #F6E4E2;
+    --vermelho-50:  #FBF1EF;
+    --creme-50:  #FDFAF5;
+    --creme-100: #F6F0E8;
+    --creme-200: #EBE2D6;
+    --creme-300: #DCD0C2;
+    --tinta-900: #1F1513;      /* preto quente */
+    --tinta-700: #3A0A09;      /* vinho dos títulos */
+    --tinta-600: #5C5150;
+    --tinta-400: #7D7270;      /* >= 4,5:1 sobre creme-50 */
+    --verde-700: #1F7A4D;
+    --verde-100: #E3F2EA;
+    --ambar-700: #8A5200;
+    --ambar-100: #F8EBD6;
+    --azul-700: #1D5A8C;
+    --azul-100: #E3EEF8;
 
+    /* --- 2. Semânticas ---------------------------------------------------- */
+    /* Superfícies e bordas */
+    --cor-fundo: var(--creme-50);
+    --cor-superficie: #FFFFFF;
+    --cor-superficie-rebaixada: var(--creme-100);
+    --cor-borda: var(--creme-200);
+    --cor-borda-forte: var(--creme-300);
     /* Texto */
-    --texto: #1d1d1f;
-    --texto-2: #545458;
-    --texto-vinho: #3a0a09;
+    --cor-texto: var(--tinta-900);
+    --cor-texto-2: var(--tinta-600);
+    --cor-texto-3: var(--tinta-400);
+    --cor-titulo: var(--tinta-700);
+    /* Marca */
+    --cor-marca: var(--vermelho-700);
+    --cor-marca-hover: var(--vermelho-800);
+    --cor-marca-viva: var(--vermelho-500);
+    --cor-marca-sutil: var(--vermelho-100);
+    --cor-marca-sutil-2: var(--vermelho-50);
+    --cor-sobre-marca: #FFFFFF;
+    /* Status: a cor forte é para texto/ícone, a sutil para o fundo */
+    --cor-sucesso: var(--verde-700);
+    --cor-sucesso-sutil: var(--verde-100);
+    --cor-atencao: var(--ambar-700);
+    --cor-atencao-sutil: var(--ambar-100);
+    --cor-perigo: var(--vermelho-500);
+    --cor-perigo-sutil: var(--vermelho-50);
+    --cor-info: var(--azul-700);
+    --cor-info-sutil: var(--azul-100);
 
-    /* Fontes: Playfair nos títulos, a do sistema no resto (SF Pro no iPhone) */
+    /* Tipografia: 8 passos (tamanho / altura da linha) */
     --fonte-texto: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     --fonte-titulo: 'Playfair Display', Georgia, serif;
+    --texto-display: 700 32px/1.18 var(--fonte-titulo);
+    --texto-titulo-1: 700 24px/1.25 var(--fonte-titulo);
+    --texto-titulo-2: 600 20px/1.3 var(--fonte-texto);
+    --texto-corpo-g: 400 17px/1.4 var(--fonte-texto);
+    --texto-corpo: 400 15px/1.45 var(--fonte-texto);
+    --texto-apoio: 400 13px/1.4 var(--fonte-texto);
+    --texto-rotulo: 600 12px/1.3 var(--fonte-texto);  /* + maiúsculas e espaçamento */
+    --rotulo-espaco: 0.06em;
 
-    /* Vidro */
+    /* Espaço: grade de 4 px */
+    --esp-1: 4px;
+    --esp-2: 8px;
+    --esp-3: 12px;
+    --esp-4: 16px;
+    --esp-5: 20px;
+    --esp-6: 24px;
+    --esp-8: 32px;
+    --esp-10: 40px;
+    --esp-12: 48px;
+    --esp-16: 64px;
+    --margem-tela: var(--esp-5);
+
+    /* Raios */
+    --raio-1: 8px;
+    --raio-2: 12px;
+    --raio-3: 20px;
+    --raio-pilula: 999px;
+
+    /* Elevação: quase tudo é plano (borda). Sombra só no que flutua. */
+    --elev-1: 0 1px 2px rgba(31, 21, 19, 0.06);
+    --elev-2: 0 8px 24px rgba(31, 21, 19, 0.12), 0 1px 3px rgba(31, 21, 19, 0.06);
+
+    /* Ícones */
+    --icone-p: 16px;
+    --icone-m: 20px;
+    --icone-g: 24px;
+
+    /* Movimento */
+    --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-ios: cubic-bezier(0.32, 0.72, 0, 1);
+    --mola: cubic-bezier(0.34, 1.4, 0.64, 1);
+    --dur-rapida: 120ms;
+    --dur-media: 240ms;
+    --dur-lenta: 420ms;
+
+    /* Foco */
+    --cor-foco: var(--vermelho-500);
+    --foco: var(--cor-foco);
+
+    /* O logo PNG é branco; este filtro pinta de vermelho da marca */
+    --logo-vermelho: brightness(0) invert(38%) sepia(91%) saturate(2925%) hue-rotate(-23deg) brightness(55%) contrast(126%);
+
+    /* --- 3. Apelidos antigos (não use em código novo) ------------------- */
+    --principal: var(--vermelho-700);
+    --principal-brighter: var(--vermelho-500);
+    --principal-escuro: var(--vermelho-900);
+    --secondary: #EBDEDD;
+    --background: var(--cor-fundo);
+    --fundo-rosado: #F6EEEC;
+    --rosa: #f2b8b5;
+    --verde: var(--verde-700);
+    --ambar: #9a5b00;
+    --texto: #1d1d1f;
+    --texto-2: #545458;
+    --texto-vinho: var(--tinta-700);
     --vidro-claro: rgba(255, 255, 255, 0.62);
     --vidro-borda: rgba(255, 255, 255, 0.75);
     --vidro-escuro: rgba(255, 255, 255, 0.07);
@@ -34,29 +134,13 @@
     --desfoque: blur(24px) saturate(180%);
     --brilho: inset 0 1px 0 rgba(255, 255, 255, 0.85);
     --brilho-escuro: inset 0 1px 0 rgba(255, 255, 255, 0.12);
-
-    /* Sombras tingidas de vinho */
     --sombra-1: 0 1px 2px rgba(58, 10, 9, 0.06), 0 4px 12px rgba(58, 10, 9, 0.06);
     --sombra-2: 0 2px 6px rgba(58, 10, 9, 0.05), 0 12px 32px rgba(58, 10, 9, 0.09);
     --sombra-3: 0 8px 24px rgba(58, 10, 9, 0.10), 0 28px 64px rgba(58, 10, 9, 0.16);
-
-    /* Raios */
     --raio-s: 14px;
     --raio-m: 20px;
     --raio-l: 28px;
-    --raio-capsula: 999px;
-
-    /* Foco: vermelho no claro (as telas escuras trocam para branco) */
-    --foco: var(--principal-brighter);
-
-    /* Movimento: --mola imita a mola do iOS (passa um pouco do ponto e volta) */
-    --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
-    --ease-ios: cubic-bezier(0.32, 0.72, 0, 1);
-    --mola: cubic-bezier(0.34, 1.4, 0.64, 1);
-
-    /* O logo PNG é branco; este filtro pinta de vermelho da marca */
-    --logo-vermelho: brightness(0) invert(38%) sepia(91%) saturate(2925%) hue-rotate(-23deg) brightness(55%) contrast(126%);
-
+    --raio-capsula: var(--raio-pilula);
 }
 
 @supports (transition-timing-function: linear(0, 1)) {
