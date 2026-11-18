@@ -9,7 +9,7 @@ import { h, icone, comCarregando } from '../util/dom.js';
 import { supabase } from '../supabase.js';
 import { nomeCurto } from '../sessao.js';
 import { hojeEmBrasilia, somarDias, rotuloDoDia, partesDaData, formatarHorario } from '../util/datas.js';
-import { cabecalhoApp, barraAbas, avatar } from './moldura.js';
+import { cabecalhoApp, avatar, seletorEscala } from './moldura.js';
 import { FUNCAO_MESA, separarMesa, naoVai, cultoJaComecou } from '../util/escala.js';
 import { confirmar, avisar } from '../util/folha.js';
 import { mensagemDoBanco } from '../util/erros.js';
@@ -40,6 +40,7 @@ export function telaEscala(conta) {
     const tela = h('div', { class: 'tela tela-app' },
         cabecalhoApp(conta, { modulo: 'Louvor' }),
         h('main', { id: 'conteudo', class: 'app-conteudo' },
+            seletorEscala(conta, '#/escala'),
             h('div', { class: 'escala-topo' }, titulo, botaoAgenda()),
             h('p', { class: 'subtitulo-tela' }, 'Aqui estão os próximos cultos do Louvor.'),
             faixaOffline,
@@ -48,7 +49,6 @@ export function telaEscala(conta) {
             h('h2', { class: 'titulo-secao' }, 'Próximos cultos'),
             lista,
         ),
-        barraAbas(conta, '#/escala'),
     );
 
     const seletores = new Map(); // culto.id → abre o bloco dele

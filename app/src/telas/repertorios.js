@@ -10,7 +10,7 @@ import { h, icone, comCarregando } from '../util/dom.js';
 import { supabase } from '../supabase.js';
 import { mensagemDoBanco } from '../util/erros.js';
 import { hojeEmBrasilia, formatarHorario, partesDaData } from '../util/datas.js';
-import { cabecalhoApp, barraAbas } from './moldura.js';
+import { cabecalhoApp } from './moldura.js';
 import { folhaOuvir } from './repertorio.js';
 
 const POR_PAGINA = 40;   // cultos por vez; "Ver mais antigos" busca os próximos
@@ -54,7 +54,6 @@ export function telaRepertorios(conta) {
             lista,
             mais,
         ),
-        barraAbas(conta, '#/repertorios'),
     );
     carregar();
     return tela;

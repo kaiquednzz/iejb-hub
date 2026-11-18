@@ -1,7 +1,7 @@
 // Peças de layout repetidas entre as telas.
 import { h, icone } from '../util/dom.js';
 import { supabase } from '../supabase.js';
-import { eLiderDeLouvor, veFinanceiro, cuidaDosEventos } from '../sessao.js';
+import { eLiderDeLouvor, veFinanceiro, cuidaDosEventos, temCargo } from '../sessao.js';
 import { avatar } from '../util/foto.js';
 import { removerAparelho } from '../util/push.js';
 import { googleAtivo, entrarComGoogle } from '../util/google.js';
@@ -28,12 +28,18 @@ export function molduraEntrada({ titulo, subtitulo, conteudo, rodape }) {
     );
 }
 
-// Cabeçalho de vidro das telas de dentro do app
-// Dentro de um módulo (opcoes.modulo = 'Louvor', 'Eventos do site'...), a
-// marca dá lugar a "‹ Início" + o nome do módulo: a pessoa sempre sabe onde
-// está e como voltar. No Início, aparece a marca do Hub.
 // Primeiro desliga o push deste aparelho (ainda logado, o banco deixa apagar)
-async function sair() { await removerAparelho(); supabase.auth.signOut(); }
+// O papel mais importante, para mostrar embaixo do nome
+export function papelPrincipal(conta) {
+    if (conta.e_administrador) return 'Administrador';
+    if (temCargo(conta, 'pastor')) return 'Pastor';
+    if (eLiderDeLouvor(conta)) return 'Líder de louvor';
+    if (temCargo(conta, 'tesouraria')) return 'Tesouraria';
+    if (temCargo(conta, 'comunicacao')) return 'Comunicação';
+    return 'Membro';
+}
+
+export async function sair() { await removerAparelho(); supabase.auth.signOut(); }
 
 // Pedidos de acesso esperando o admin. A barra de abas e a barra lateral
 // mostram o mesmo número: guarda a resposta por 30 s para não perguntar duas vezes.
@@ -92,59 +98,81 @@ export function barraLateral(conta, atual) {
                     equipe].filter(Boolean).map((a) => h('li', null, a))),
             areas.length ? h('p', { class: 'lateral-grupo', 'aria-hidden': 'true' }, 'Áreas') : null,
             areas.length ? h('ul', { 'aria-label': 'Áreas' }, areas.map((a) => h('li', null, a))) : null),
-        h('div', { class: 'lateral-conta' },
+        // A conta leva à tela Você (onde mora o Sair, no fim)
+        h('a', { class: 'lateral-conta', href: '#/voce', 'aria-current': atual === '#/voce' ? 'page' : null },
             avatar(pessoa, 'pessoa-avatar lateral-avatar'),
             h('span', { class: 'lateral-quem' },
                 h('span', { class: 'lateral-quem-nome' }, pessoa.apelido || pessoa.nome || 'Você'),
-                h('span', { class: 'lateral-quem-papel' }, conta.e_administrador ? 'Administrador' : 'Membro')),
-            h('button', { type: 'button', class: 'botao-icone', 'aria-label': 'Sair da conta', onclick: sair }, icone('sair'))),
+                h('span', { class: 'lateral-quem-papel' }, papelPrincipal(conta))),
+            icone('seta', 'icone icone-p lateral-conta-seta')),
         h('nav', { class: 'lateral-links', 'aria-label': 'Documentos' },
             h('a', { href: '#/privacidade' }, 'Privacidade'), h('span', { 'aria-hidden': 'true' }, '·'),
             h('a', { href: '#/termos' }, 'Termos de uso')),
     );
 }
 
+// Cabeçalho das telas de dentro do app (redesign, etapa 2).
+// Simples e baixo: à esquerda a marca (ou "‹ Voltar" dentro de uma área que
+// não é aba, como Financeiro e Eventos); à direita o avatar, que leva à tela
+// Você. O Sair e o selo "Admin" saíram daqui: o Sair mora no fim da tela Você
+// e o admin se diferencia pelo que vê (avisos no Início, número no avatar).
+const AREAS_DA_VOCE = new Set(['Privacidade', 'Termos']);
 export function cabecalhoApp(conta, opcoes = {}) {
-    const botaoSair = h('button', {
-        type: 'button', class: 'botao-icone', 'aria-label': 'Sair da conta', onclick: sair,
-    }, icone('sair'));
-
-    const marca = opcoes.modulo
+    // As telas do Louvor são abas: mostram a marca, não um "voltar"
+    const area = opcoes.modulo && opcoes.modulo !== 'Louvor' ? opcoes.modulo : null;
+    const [destino, rotulo] = AREAS_DA_VOCE.has(area) ? ['#/voce', 'Você'] : ['#/inicio', 'Início'];
+    const esquerda = area
         ? h('div', { class: 'cabecalho-marca cabecalho-modulo' },
-            h('a', { class: 'botao-voltar', href: '#/inicio', 'aria-label': 'Voltar ao Início' }, icone('seta', 'icone icone-p seta-esquerda'), h('span', null, 'Início')),
-            h('span', { class: 'cabecalho-titulo-modulo' }, opcoes.modulo))
-        : h('div', { class: 'cabecalho-marca' },
+            h('a', { class: 'botao-voltar', href: destino, 'aria-label': `Voltar para ${rotulo}` }, icone('seta', 'icone icone-p seta-esquerda'), h('span', null, rotulo)),
+            h('span', { class: 'cabecalho-titulo-modulo' }, area))
+        : h('a', { class: 'cabecalho-marca', href: '#/inicio', 'aria-label': 'IEJB Hub, ir para o Início' },
             h('img', { src: '/logo-iejb-pequeno.png', alt: '', width: 32, height: 32 }),
             h('span', { class: 'cabecalho-nome' }, 'IEJB ', h('span', null, 'Hub')));
-    return h('header', { class: 'cabecalho' },
-        marca,
-        h('div', { class: 'cabecalho-acoes' },
-            conta.e_administrador && h('span', { class: 'selo' }, 'Admin'),
-            botaoSair,
-        ),
+    const pessoa = conta.pessoa ?? { nome: conta.nome_informado };
+    const eu = h('a', { class: 'cabecalho-conta', href: '#/voce', 'aria-label': 'Você: sua conta' },
+        avatar(pessoa, 'pessoa-avatar cabecalho-avatar'));
+    if (conta.e_administrador) contadorDePedidos(eu, 'cabecalho-contador');
+    return h('header', { class: 'cabecalho' }, esquerda, eu);
+}
+
+// Barra de abas (redesign, etapa 2): a mesma em TODAS as telas de quem já
+// entrou, como num app do iPhone. Cinco abas fixas, iguais para todo mundo,
+// para a barra não mudar de forma conforme o papel. O que depende de papel
+// fica fora dela: "Montar" é um seletor dentro da Escala (só para o líder,
+// RN-02) e as áreas (Pessoas, Financeiro, Eventos) abrem pelo Início e pela
+// tela Você. main.js coloca a barra; as telas não precisam chamar.
+const ABA_DA_ROTA = {
+    '#/montar': '#/escala',
+    '#/eventos': '#/inicio', '#/financeiro': '#/inicio', '#/pessoas': '#/inicio',
+    '#/privacidade': '#/voce', '#/termos': '#/voce',
+};
+export function barraAbas(conta, rota) {
+    const atual = ABA_DA_ROTA[rota] ?? rota;
+    const aba = (destino, nome, nomeIcone) => h('a', {
+        class: 'aba', href: destino,
+        'aria-current': atual === destino ? 'page' : null,
+    }, icone(nomeIcone), h('span', { class: 'aba-nome' }, nome));
+
+    const voce = aba('#/voce', 'Você', 'pessoa');
+    if (conta.e_administrador) contadorDePedidos(voce, 'aba-contador');
+    return h('nav', { class: 'barra-abas', 'aria-label': 'Menu principal' },
+        aba('#/inicio', 'Início', 'casa'),
+        aba('#/escala', 'Escala', 'calendario'),
+        aba('#/repertorios', 'Repertórios', 'musica'),
+        aba('#/equipe', 'Equipe', 'pessoas'),
+        voce,
     );
 }
 
-// Abas do módulo Louvor, fixas embaixo (Escala | Montar | Repertórios | Equipe),
-// como num app do iPhone. "Montar" só aparece para o líder de louvor (RN-02).
-// Os outros módulos (Eventos...) abrem pelo Início e não têm abas.
-// O número vermelho em "Equipe" mostra pedidos de acesso esperando o admin.
-export function barraAbas(conta, atual) {
-    const aba = (rota, nome, nomeIcone) => h('a', {
-        class: 'aba', href: rota,
-        'aria-current': atual === rota ? 'page' : null,
-    }, icone(nomeIcone), h('span', null, nome));
-
-    const equipe = aba('#/equipe', 'Equipe', 'pessoas');
-    const montar = eLiderDeLouvor(conta) ? aba('#/montar', 'Montar', 'montar') : null;
-    const barra = h('nav', { class: 'barra-abas', 'aria-label': 'Seções' },
-        aba('#/escala', 'Escala', 'calendario'),
-        montar,
-        aba('#/repertorios', 'Repertórios', 'musica'),
-        equipe,
-    );
-
-    return barra;
+// "Ver escala | Montar" no topo da Escala e do Montar, só para o líder de
+// louvor (RN-02). São links (cada lado é uma rota), com a mesma pílula
+// deslizante dos segmentos da Equipe.
+export function seletorEscala(conta, atual) {
+    if (!eLiderDeLouvor(conta)) return null;
+    const lado = (rota, nome) => h('a', { href: rota, 'aria-current': atual === rota ? 'page' : null }, nome);
+    return h('nav', { class: 'segmentos segmentos-escala', 'aria-label': 'Escala',
+        style: { '--n': 2, '--ativo': atual === '#/montar' ? 1 : 0 } },
+    lado('#/escala', 'Ver escala'), lado('#/montar', 'Montar'));
 }
 
 export { iniciais, avatar } from '../util/foto.js';

@@ -15,7 +15,7 @@ import { comemorar } from '../../util/comemorar.js';
 import { mensagemDoBanco } from '../../util/erros.js';
 import { partesDaData, formatarHorario, somarDias, hojeEmBrasilia } from '../../util/datas.js';
 import { nomeCurto } from '../../sessao.js';
-import { cabecalhoApp, barraAbas } from '../moldura.js';
+import { cabecalhoApp, seletorEscala } from '../moldura.js';
 import { carregarMontagem, somarMes, nomeDoMes, mesSugerido, nomesDosGrupos, textoDoMes } from './dados.js';
 import { abrirCulto, folhaAdicionarCulto, grupoVazio, avisarGrupoVazio } from './culto.js';
 
@@ -41,13 +41,13 @@ export function telaMontar(conta) {
     const tela = h('div', { class: 'tela tela-app tela-montar' },
         cabecalhoApp(conta, { modulo: 'Louvor' }),
         h('main', { id: 'conteudo', class: 'app-conteudo' },
+            seletorEscala(conta, '#/montar'),
             h('div', { class: 'escala-topo' }, h('h1', { tabindex: -1, class: 'titulo-tela' }, 'Montar escala'), whatsapp),
             h('div', { class: 'mes-navegacao' }, anterior, tituloMes, proximo),
             resumo,
             area,
         ),
         barraAcoes,
-        barraAbas(conta, '#/montar'),
     );
 
     // Contexto para a folha de cada culto

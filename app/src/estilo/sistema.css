@@ -1,0 +1,282 @@
+/* ==========================================================================
+   Design System: componentes e padrões novos (redesign, etapas 1 a 3)
+   Carregado por ÚLTIMO (main.js): o que está aqui vale sobre as regras
+   antigas de mesmo peso. Usa só os tokens semânticos de tokens.css.
+   Documento: planejamento/REDESIGN-E-DESIGN-SYSTEM.md
+   ========================================================================== */
+
+:root {
+    /* Altura da barra de abas, para o conteúdo e o que flutua não ficarem atrás dela */
+    --altura-abas: calc(58px + env(safe-area-inset-bottom));
+}
+
+/* --- Tipografia de tela ---------------------------------------------------- */
+.titulo-tela { font: var(--texto-display); color: var(--cor-titulo); letter-spacing: -0.01em; }
+.subtitulo-tela { font: var(--texto-corpo); color: var(--cor-texto-2); margin-top: var(--esp-1); }
+
+/* Rótulo de seção ("VEM AÍ", "SUAS ÁREAS"): pequeno, maiúsculo, discreto.
+   Pode ter uma ação à direita (.rotulo-secao-linha). */
+.rotulo-secao,
+.titulo-secao,
+.inicio-secao {
+    margin: var(--esp-8) 0 var(--esp-2);
+    padding-inline: var(--esp-1);
+    font: var(--texto-rotulo);
+    letter-spacing: var(--rotulo-espaco);
+    text-transform: uppercase;
+    color: var(--cor-texto-2);
+}
+.rotulo-secao-linha { display: flex; align-items: baseline; justify-content: space-between; gap: var(--esp-3); margin: var(--esp-8) 0 var(--esp-2); }
+.rotulo-secao-linha .rotulo-secao { margin: 0; }
+.rotulo-secao-acao {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    margin-block: -14px;
+    padding-inline: var(--esp-1);
+    font: 600 14px/1 var(--fonte-texto);
+    color: var(--cor-marca);
+    text-decoration: none;
+}
+
+/* --- Grupo de lista (padrão "Ajustes" do iPhone) ---------------------------
+   Um cartão branco com linhas separadas por uma divisória fina. Substitui
+   os cartões soltos com sombra. */
+.grupo-lista {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    background: var(--cor-superficie);
+    border: 1px solid var(--cor-borda);
+    border-radius: var(--raio-3);
+    overflow: hidden;
+}
+.grupo-lista > li + li { border-top: 1px solid var(--cor-borda); }
+.grupo-lista > li { animation: subir 0.45s calc(min(var(--i, 0), 6) * 0.04s) var(--ease-out) backwards; }
+
+.item-lista {
+    display: flex;
+    align-items: center;
+    gap: var(--esp-3);
+    width: 100%;
+    min-height: 60px;
+    padding: var(--esp-3) var(--esp-4);
+    border: none;
+    background: none;
+    color: var(--cor-texto);
+    font: inherit;
+    text-align: left;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color var(--dur-media) ease;
+}
+.item-lista:active { background: var(--cor-superficie-rebaixada); transition-duration: 0s; }
+@media (hover: hover) { .item-lista:hover { background: var(--cor-marca-sutil-2); } }
+.item-icone {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: var(--raio-2);
+    background: var(--cor-marca-sutil);
+    color: var(--cor-marca);
+}
+.item-textos { flex: 1; min-width: 0; display: grid; gap: 1px; }
+.item-nome { display: flex; align-items: center; gap: var(--esp-2); font: 600 17px/1.3 var(--fonte-texto); color: var(--cor-texto); }
+.item-apoio { font: var(--texto-apoio); font-size: 14px; color: var(--cor-texto-2); }
+.item-seta { flex: none; color: var(--cor-texto-3); }
+.item-contador,
+.cabecalho-contador {
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    display: inline-grid;
+    place-items: center;
+    border-radius: var(--raio-pilula);
+    background: var(--cor-perigo);
+    color: #fff;
+    font: 700 12px/1 var(--fonte-texto);
+    font-variant-numeric: tabular-nums;
+}
+
+/* --- Cabeçalho ------------------------------------------------------------
+   Barra simples e baixa, presa no topo, no lugar da cápsula flutuante. */
+.cabecalho {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--esp-3);
+    width: 100%;
+    min-height: calc(56px + env(safe-area-inset-top));
+    margin: 0;
+    padding: env(safe-area-inset-top) max(var(--esp-4), (100% - 720px) / 2) 0;
+    background: rgba(253, 250, 245, 0.88);
+    -webkit-backdrop-filter: var(--desfoque);
+    backdrop-filter: var(--desfoque);
+    border-bottom: 1px solid var(--cor-borda);
+}
+.cabecalho::before { content: none; }
+html.leve .cabecalho { -webkit-backdrop-filter: none; backdrop-filter: none; background: var(--cor-fundo); }
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .cabecalho { background: var(--cor-fundo); }
+}
+a.cabecalho-marca { text-decoration: none; min-height: 44px; border-radius: var(--raio-1); }
+.cabecalho-marca img { height: 28px; }
+.cabecalho-nome { font-size: 19px; }
+.cabecalho-conta {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    text-decoration: none;
+}
+.cabecalho-avatar { width: 34px; height: 34px; font-size: 13px; }
+.cabecalho-contador { position: absolute; top: 0; right: -4px; min-width: 18px; height: 18px; font-size: 11px; box-shadow: 0 0 0 2px var(--cor-fundo); }
+.cabecalho-titulo-modulo { font: 600 17px/1.2 var(--fonte-texto); color: var(--cor-texto); }
+
+/* --- Barra de abas -------------------------------------------------------
+   Presa embaixo, da largura da tela (era uma cápsula flutuante). Ícone 24 +
+   rótulo; a aba atual fica vermelha. Some no computador (computador.css). */
+.barra-abas {
+    left: 0;
+    right: 0;
+    bottom: 0;
+    translate: none;
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 0;
+    padding: 6px max(4px, (100% - 560px) / 2) calc(env(safe-area-inset-bottom) + 4px);
+    border: none;
+    border-top: 1px solid var(--cor-borda);
+    border-radius: 0;
+    background: rgba(253, 250, 245, 0.9);
+    box-shadow: none;
+    animation: none;
+}
+html.leve .barra-abas { -webkit-backdrop-filter: none; backdrop-filter: none; background: var(--cor-fundo); }
+.barra-abas .aba,
+.barra-abas:has(.aba:nth-child(4)) .aba {
+    min-width: 0;
+    min-height: 48px;
+    padding: 4px 0 2px;
+    gap: 3px;
+    border-radius: var(--raio-2);
+    background: none;
+    color: var(--cor-texto-3);
+    font: 600 11px/1.2 var(--fonte-texto);
+}
+.barra-abas .aba .icone { width: var(--icone-g); height: var(--icone-g); }
+.barra-abas .aba[aria-current="page"] { color: var(--cor-marca); background: none; }
+.barra-abas .aba[aria-current="page"] .icone { stroke-width: 2.1; }
+.aba-nome { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.barra-abas .aba-contador,
+.barra-abas:has(.aba:nth-child(4)) .aba-contador { top: 0; right: calc(50% - 22px); }
+
+/* Conteúdo e o que flutua ficam acima da barra */
+.tela-app { padding-bottom: calc(var(--altura-abas) + var(--esp-8)); }
+.tela-inicio .app-conteudo { padding-bottom: 0; }
+.tela-montar { padding-bottom: calc(var(--altura-abas) + 110px); }
+.toast { bottom: calc(var(--altura-abas) + var(--esp-3)); }
+.montar-acoes { bottom: calc(var(--altura-abas) + var(--esp-3)); }
+.fin-barra { bottom: calc(var(--altura-abas) + var(--esp-3)); }
+.tela-financeiro .app-conteudo { padding-bottom: 72px; }
+
+/* --- Segmentos (Ver escala | Montar, Pessoas | Grupos) -------------------- */
+.segmentos { border-radius: var(--raio-2); background: var(--cor-superficie-rebaixada); margin: var(--esp-2) 0 var(--esp-5); }
+.segmentos::before { border-radius: 9px; box-shadow: var(--elev-1), 0 0 0 1px var(--cor-borda); }
+.segmentos :is(button, a) {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: 40px;
+    border-radius: 9px;
+    color: var(--cor-texto-2);
+    font: 600 15px/1.2 var(--fonte-texto);
+    text-decoration: none;
+    transition: color var(--dur-media) ease;
+}
+.segmentos button[aria-selected="true"],
+.segmentos a[aria-current="page"] { color: var(--cor-texto); }
+.segmentos-escala { margin: 0 0 var(--esp-5); }
+/* O seletor é o 1º elemento da tela: a pílula já nasce no lado certo */
+.segmentos-escala::before { transition: none; }
+
+/* --- Tela Você ----------------------------------------------------------- */
+.voce-perfil {
+    display: flex;
+    align-items: center;
+    gap: var(--esp-4);
+    padding: var(--esp-2) var(--esp-1) 0;
+    animation: subir 0.5s var(--ease-out) backwards;
+}
+.voce-avatar { width: 64px; height: 64px; flex: none; font-size: 22px; }
+.voce-nome { font: var(--texto-titulo-1); color: var(--cor-titulo); }
+.voce-papel { font: 600 15px/1.4 var(--fonte-texto); color: var(--cor-marca); }
+.voce-login { font: var(--texto-apoio); color: var(--cor-texto-2); }
+.voce-rodape { display: grid; justify-items: center; gap: var(--esp-2); margin-top: var(--esp-8); }
+.voce-sair { min-width: 200px; }
+.voce-igreja { font: var(--texto-apoio); color: var(--cor-texto-3); }
+
+/* --- Estados: vazio e erro (padrão único) --------------------------------- */
+.estado {
+    display: grid;
+    justify-items: center;
+    gap: var(--esp-2);
+    padding: var(--esp-8) var(--esp-6);
+    text-align: center;
+    background: var(--cor-superficie);
+    border: 1px dashed var(--cor-borda-forte);
+    border-radius: var(--raio-3);
+}
+.estado-icone {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--cor-superficie-rebaixada);
+    color: var(--cor-texto-2);
+}
+.estado-titulo { font: 600 17px/1.3 var(--fonte-texto); color: var(--cor-texto); }
+.estado-texto { font: var(--texto-corpo); color: var(--cor-texto-2); max-width: 32ch; }
+.estado.erro .estado-icone { background: var(--cor-perigo-sutil); color: var(--cor-perigo); }
+
+/* --- Computador ------------------------------------------------------------ */
+@media (min-width: 1024px) {
+    .tela-app { padding-bottom: 56px; }
+    .lateral {
+        background: var(--cor-superficie);
+        -webkit-backdrop-filter: none;
+        backdrop-filter: none;
+        border: 1px solid var(--cor-borda);
+        box-shadow: none;
+    }
+    .lateral-pilula { background: var(--cor-marca-sutil); box-shadow: none; }
+    .lateral-item { color: var(--cor-texto-2); }
+    .lateral-item[aria-current="page"] { color: var(--cor-marca); }
+    .lateral-conta {
+        margin-top: auto;
+        min-height: 56px;
+        padding: 10px 8px;
+        border-top: 1px solid var(--cor-borda);
+        border-radius: var(--raio-2);
+        color: inherit;
+        text-decoration: none;
+        transition: background-color var(--dur-media) ease;
+    }
+    .lateral-conta:hover,
+    .lateral-conta[aria-current="page"] { background: var(--cor-marca-sutil-2); }
+    .lateral-conta-seta { color: var(--cor-texto-3); }
+    .toast { bottom: 32px; }
+    .tela-montar { padding-bottom: 120px; }
+    .montar-acoes { bottom: 24px; }
+    .fin-barra { bottom: 24px; }
+}

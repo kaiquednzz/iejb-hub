@@ -21,6 +21,7 @@ import './estilo/inicio.css';
 import './estilo/financeiro.css';
 import './estilo/computador.css';
 import './estilo/toques.css';
+import './estilo/sistema.css';
 
 import { supabase } from './supabase.js';
 import { carregarConta } from './sessao.js';
@@ -42,7 +43,8 @@ import { limparRetornoDoGoogle } from './util/google.js';
 import { telaErro } from './telas/erro.js';
 import { telaTestemunha } from './telas/testemunha.js';
 import { telaDocumento } from './telas/documentos.js';
-import { barraLateral } from './telas/moldura.js';
+import { barraLateral, barraAbas } from './telas/moldura.js';
+import { telaVoce } from './telas/voce.js';
 import { telaInstalar } from './telas/instalar.js';
 import { precisaInstalar, registrarServiceWorker } from './pwa.js';
 import { apagarCopiasLocais } from './offline.js';
@@ -68,6 +70,7 @@ const ROTAS_DA_CONTA = {
     '#/eventos': (conta) => (cuidaDosEventos(conta) ? telaEventos(conta) : telaInicio(conta)),
     '#/financeiro': (conta) => (veFinanceiro(conta) ? telaFinanceiro(conta) : telaInicio(conta)),
     '#/pessoas': (conta) => (conta.e_administrador ? telaEquipe(conta, { area: 'pessoas' }) : telaInicio(conta)),
+    '#/voce': telaVoce,
     '#/privacidade': (conta) => telaDocumento('privacidade', conta),
     '#/termos': (conta) => telaDocumento('termos', conta),
 };
@@ -80,10 +83,13 @@ function rotaAberta(conta) {
         || (h === '#/pessoas' && !conta.e_administrador)) return '#/inicio';
     return ROTAS_DA_CONTA[h] ? h : '#/inicio';
 }
-// Toda tela de quem já entrou leva a barra lateral (o CSS só a mostra no computador)
+// Toda tela de quem já entrou leva a barra lateral (o CSS só a mostra no
+// computador) e a barra de abas (só no celular e no tablet)
 function telaDaConta(conta) {
     const tela = (ROTAS_DA_CONTA[location.hash] ?? telaInicio)(conta);
-    tela.prepend(barraLateral(conta, rotaAberta(conta)));
+    const rota = rotaAberta(conta);
+    tela.prepend(barraLateral(conta, rota));
+    tela.append(barraAbas(conta, rota));
     return tela;
 }
 // Sem login, além de entrar só dá para pedir acesso e ler os documentos
