@@ -49,7 +49,7 @@ import { telaAgenda } from './telas/agenda.js';
 import { corDoTopo } from './util/tema.js';
 import { ligarTituloCompacto, ligarPuxarParaAtualizar } from './util/rolagem.js';
 import { telaMinisterios } from './telas/ministerios.js';
-import { telaInstalar } from './telas/instalar.js';
+import { telaInstalar, telaAbrirNoApp } from './telas/instalar.js';
 import { precisaInstalar, registrarServiceWorker } from './pwa.js';
 import { apagarCopiasLocais } from './offline.js';
 import { ligarToques } from './util/toques.js';
@@ -127,7 +127,8 @@ async function decidirTela() {
     // login: no iPhone o app da tela de início não enxerga a sessão do Safari,
     // então quem entrasse pelo Safari cairia deslogado ao abrir o ícone.
     if (precisaInstalar()) {
-        mostrar(telaInstalar());
+        // Veio pelo link de um culto (WhatsApp): explica como abrir pelo app
+        mostrar(LINK_DE_CULTO.test(location.hash) ? telaAbrirNoApp() : telaInstalar());
         return;
     }
 

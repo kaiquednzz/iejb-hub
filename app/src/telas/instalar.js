@@ -101,3 +101,33 @@ function pronto() {
         h('p', null, h('strong', null, 'Instalado!'), ' Agora abra o IEJB Hub pelo ícone na tela inicial. Pode fechar esta aba.'),
     )];
 }
+
+// Quem abre o link de um culto (#/culto/<id>, o da mensagem do repertório
+// no WhatsApp) fora do app. No iPhone, links SEMPRE abrem no Safari (o iOS
+// não deixa um link abrir o app da tela de início), e o Safari não tem o
+// login do app. Então, em vez de "instale o app" (a pessoa provavelmente já
+// tem), explica o caminho pelo ícone. Quem ainda não tem segue para a trava.
+export function telaAbrirNoApp() {
+    const naoTenho = h('button', { type: 'button', class: 'botao-texto botao-largo' }, 'Ainda não tenho o app');
+    const tela = h('div', { class: 'tela tela-entrada tela-instalar' },
+        h('main', { id: 'conteudo', class: 'entrada-palco' },
+            h('div', { class: 'instalar-icone-app', 'aria-hidden': 'true' },
+                h('img', { src: '/icone-192.png', alt: '', width: 96, height: 96 })),
+            h('section', { class: 'entrada-cartao', 'aria-labelledby': 'titulo-tela' },
+                h('h1', { id: 'titulo-tela', tabindex: -1 }, 'Abra pelo app'),
+                h('p', { class: 'entrada-subtitulo' },
+                    'Links do WhatsApp abrem aqui no navegador, e não no app. Pra ver este culto:'),
+                h('ol', { class: 'abrir-no-app-passos' },
+                    h('li', null, 'Feche esta página'),
+                    h('li', null, 'Toque no ícone do ', h('strong', null, 'IEJB Hub'), ' na tela de início'),
+                    h('li', null, 'O repertório está no seu ', h('strong', null, 'próximo compromisso'), ' ou em ', h('strong', null, 'Ministérios › Louvor'))),
+                h('p', { class: 'entrada-subtitulo abrir-no-app-dica' }, 'As músicas, os tons e o link do YouTube já estão na mensagem.'),
+                naoTenho),
+        ),
+    );
+    naoTenho.addEventListener('click', () => {
+        history.replaceState(null, '', location.pathname);
+        tela.replaceWith(telaInstalar());
+    });
+    return tela;
+}

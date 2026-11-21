@@ -1203,3 +1203,8 @@ html.leve .barra-fundo { -webkit-backdrop-filter: none; backdrop-filter: none; b
 .evento-linha .item-textos { gap: 2px; }
 .evento-linha { align-items: center; padding-block: var(--esp-3); }
 .evento-miniatura { flex: none; width: 56px; height: 56px; border-radius: var(--raio-2); object-fit: cover; background: var(--cor-superficie-rebaixada); }
+
+/* Link de culto aberto no navegador: passos para abrir pelo app */
+.abrir-no-app-passos { margin: var(--esp-4) 0 0; padding-left: 1.4em; display: grid; gap: var(--esp-2); font: 400 17px/1.4 var(--fonte-texto); color: var(--cor-texto); text-align: left; }
+.abrir-no-app-passos li::marker { font: 700 17px var(--fonte-titulo); color: var(--cor-marca); }
+.abrir-no-app-dica { margin-top: var(--esp-4); font-size: 15px; }
