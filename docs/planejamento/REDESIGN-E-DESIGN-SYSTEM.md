@@ -147,7 +147,9 @@ Sem modo escuro (decisão anterior mantida).
 
 ---
 
-## 5. Navegação (implementada)
+## 5. Navegação da v1 (substituída na v2: ver 13.1)
+
+> As abas abaixo eram as do Louvor. Desde 20/11 as abas são Início, Agenda, Ministérios e Você, e o Louvor tem a própria casa.
 
 ### 5.1 Barra de abas global (celular e tablet)
 `barraAbas()` em `telas/moldura.js`, colocada por `main.js` em toda tela de quem já entrou (as telas não chamam mais).
@@ -178,7 +180,7 @@ Abas embaixo com os ícones centralizados (máx. 560 px); conteúdo em 720 px.
 
 ---
 
-## 6. Tela inicial (implementada)
+## 6. Tela inicial da v1 (ampliada na v2: ver 13.3)
 
 1. Cabeçalho: marca + avatar.
 2. Data + "Boa noite, Kaique" (sem exclamação).
