@@ -46,12 +46,26 @@ export function secaoPessoas(dados, ctx) {
         novo,
         ativas.length === 0
             ? vazio('Ninguém cadastrado ainda.', papeis.gerePessoas ? 'Comece cadastrando quem toca e canta no Louvor.' : null)
-            : h('ul', { class: 'lista-linhas' }, ativas.map(linha)),
+            // Quem só vê contatos ganha o mural de rostos (anuário); quem
+            // administra fica com a lista, que tem os selos e as ações
+            : papeis.gerePessoas
+                ? h('ul', { class: 'lista-linhas' }, ativas.map(linha))
+                : h('ul', { class: 'mural' }, ativas.map((p, i) => cartaoMural(p, i, dados, ctx))),
         inativas.length > 0 && h('details', { class: 'grupo-recolhido' },
             h('summary', null, `Desativadas (${inativas.length})`),
             h('ul', { class: 'lista-linhas' }, inativas.map(linha)),
         ),
     );
+}
+
+function cartaoMural(pessoa, i, dados, ctx) {
+    const sou = pessoa.id === dados.minhaPessoa;
+    const b = h('button', { type: 'button', class: `mural-pessoa${sou ? ' sou' : ''}` },
+        avatar(pessoa, 'pessoa-avatar mural-rosto'),
+        h('span', { class: 'mural-nome' }, pessoa.apelido || pessoa.nome, sou ? h('span', { class: 'sr-only' }, ' (você)') : null),
+        h('span', { class: 'mural-instrumentos' }, pessoa.instrumentos.join(', ') || ' '));
+    b.addEventListener('click', () => (sou ? folhaMeuPerfil(pessoa, ctx) : folhaContato(pessoa)));
+    return h('li', { style: { '--i': Math.min(i, 12) } }, b);
 }
 
 function selosDaPessoa(pessoa, dados) {

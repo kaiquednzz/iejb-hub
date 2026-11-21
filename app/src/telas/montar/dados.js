@@ -127,6 +127,20 @@ export function nomesDosGrupos(culto, dados) {
     return culto.gruposIds.map((id) => dados.grupoPorId.get(id)?.nome).filter(Boolean);
 }
 
+// As linhas da imagem da escala (util/imagem-escala.js): os mesmos cultos da
+// mensagem (publicados ou cancelados), já com o texto de cada linha
+export function linhasDaImagem(dados) {
+    return dados.cultos.filter((c) => c.escala?.estado === 'publicada' || !c.ativo).map((c) => {
+        const grupos = nomesDosGrupos(c, dados);
+        const quem = grupos.length ? `Grupo ${grupos.join(' + ')}` : 'Equipe especial';
+        const mesa = c.mesa.length ? ` · Mesa: ${c.mesa.map((p) => nomeCurto(p)).join(', ')}` : '';
+        const titulo = `${c.nome}${c.rotulo ? ` · ${c.rotulo}` : ''}`;
+        return c.ativo
+            ? { data: c.data, titulo, detalhe: `${formatarHorario(c.horario)} · ${quem}${mesa}` }
+            : { data: c.data, titulo, detalhe: 'Cancelado', cancelado: true };
+    });
+}
+
 // ---------------------------------------------------------------------------
 // A mensagem do WhatsApp: o "PDF da planilha" em texto, com o link do app
 // ---------------------------------------------------------------------------

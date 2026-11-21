@@ -4,11 +4,12 @@
 // foi publicada; o líder de louvor e o admin, sempre. O banco confere isso em
 // privado.pode_editar_repertorio; aqui só decide se mostra o botão.
 // A música é cadastrada uma vez e reaproveitada (RN-52); o tom é do culto (RN-51).
+import { botaoWhatsRepertorio } from '../util/compartilhar.js';
 import { h, icone, comCarregando } from '../util/dom.js';
 import { supabase } from '../supabase.js';
 import { abrirFolha, avisar } from '../util/folha.js';
 import { mensagemDoBanco } from '../util/erros.js';
-import { rotuloDoDia, formatarHorario } from '../util/datas.js';
+import { rotuloDoDia, formatarHorario, diasEntre } from '../util/datas.js';
 import { linksDeBusca, buscarLinksDiretos, abrirComReserva, filaDoYoutube, idDoYoutube, linkSeguro, termoDeBusca, TONS } from '../util/musica.js';
 import { eLiderDeLouvor } from '../sessao.js';
 import { campo, caixaDeAviso } from './moldura.js';
@@ -57,10 +58,12 @@ export function blocoRepertorio(culto, conta, aoMudar, offline = false, anterior
         // Sem nenhum link do YouTube, o botão simplesmente não aparece (cada
         // música tem o fone para ouvir). As notas sobre "fila" eram detalhe
         // técnico demais para quem só quer ouvir; o líder vê isso no editor.
-        fila.url && h('div', { class: 'repertorio-acoes' },
-            h('a', { class: 'botao-youtube', href: fila.url, target: '_blank', rel: 'noopener noreferrer' },
+        itens.length > 0 && h('div', { class: 'repertorio-acoes' },
+            fila.url && h('a', { class: 'botao-youtube', href: fila.url, target: '_blank', rel: 'noopener noreferrer' },
                 icone('play', 'icone icone-p'),
-                fila.ids.length === itens.length ? 'Ouvir tudo no YouTube' : `Ouvir ${fila.ids.length} de ${itens.length} no YouTube`)),
+                fila.ids.length === itens.length ? 'Ouvir tudo no YouTube' : `Ouvir ${fila.ids.length} de ${itens.length} no YouTube`),
+            // Mandar o repertório (músicas, tons e links) numa conversa do WhatsApp
+            botaoWhatsRepertorio(culto)),
         repetir,
         editar && h('div', { class: 'repertorio-editar' }, editar),
     );
@@ -156,20 +159,34 @@ export async function abrirEditor(culto, aoMudar) {
     await recarregar();
 
     async function recarregar() {
-        const [itens, musicas, ministerio] = await Promise.all([
+        const [itens, musicas, ministerio, tocadas] = await Promise.all([
             supabase.from('repertorio_item')
                 .select('id, posicao, tom, musica:musica_id ( id, titulo, artista, link )')
                 .eq('culto_id', culto.id).order('posicao'),
             supabase.from('musica').select('id, titulo, artista, link').eq('ativa', true).order('titulo'),
             estado?.ministerioId ? Promise.resolve({ data: { id: estado.ministerioId } })
                 : supabase.from('ministerio').select('id').eq('nome', 'Louvor').maybeSingle(),
+            // Quando cada música foi tocada pela última vez antes deste culto
+            // ("tocada há 3 semanas"), para não repetir sem perceber
+            estado?.ultimaVez ? Promise.resolve(null)
+                : supabase.from('repertorio_item').select('musica_id, culto:culto_id!inner ( data, estado )')
+                    .lt('culto.data', culto.data).eq('culto.estado', 'ativo'),
         ]);
         const erro = itens.error || musicas.error || ministerio.error;
         if (erro) {
             folha.trocarConteudo(h('p', { class: 'aviso-form', 'data-tipo': 'erro' }, mensagemDoBanco(erro)));
             return;
         }
-        estado = { itens: itens.data, musicas: musicas.data, ministerioId: ministerio.data?.id };
+        let ultimaVez = estado?.ultimaVez;
+        if (!ultimaVez) {
+            ultimaVez = new Map();
+            // Se essa consulta falhar, o editor funciona igual, só sem a dica
+            for (const r of (tocadas && !tocadas.error ? tocadas.data : [])) {
+                const d = r.culto?.data;
+                if (d && (!ultimaVez.has(r.musica_id) || d > ultimaVez.get(r.musica_id))) ultimaVez.set(r.musica_id, d);
+            }
+        }
+        estado = { itens: itens.data, musicas: musicas.data, ministerioId: ministerio.data?.id, ultimaVez };
         desenhar();
     }
 
@@ -197,7 +214,8 @@ export async function abrirEditor(culto, aoMudar) {
                     h('span', { class: 'editor-numero' }, String(i + 1)),
                     h('span', { class: 'linha-textos' },
                         h('span', { class: 'linha-nome' }, item.musica.titulo),
-                        h('span', { class: 'linha-detalhe' }, [item.musica.artista, !idDoYoutube(item.musica.link) && 'sem link do YouTube'].filter(Boolean).join(' · ') || ' ')),
+                        h('span', { class: 'linha-detalhe' }, [item.musica.artista, !idDoYoutube(item.musica.link) && 'sem link do YouTube'].filter(Boolean).join(' · ') || ' ',
+                            dicaTocada(estado.ultimaVez.get(item.musica.id), culto.data))),
                     h('span', { class: `musica-tom${item.tom ? '' : ' sem-tom'}` }, item.tom || 'tom'));
                 abrir.addEventListener('click', () => folhaItem(item));
                 return h('li', { class: 'linha-editor' }, abrir, h('span', { class: 'mover-par' }, subir, descer));
@@ -224,7 +242,7 @@ export async function abrirEditor(culto, aoMudar) {
                 ...achadas.map((m) => {
                     const b = h('button', { type: 'button', class: 'resultado-musica' },
                         h('span', { class: 'linha-textos' }, h('span', { class: 'linha-nome' }, m.titulo),
-                            m.artista && h('span', { class: 'linha-detalhe' }, m.artista)),
+                            h('span', { class: 'linha-detalhe' }, m.artista || '', dicaTocada(estado.ultimaVez.get(m.id), culto.data, !m.artista))),
                         icone('mais', 'icone icone-p'));
                     b.addEventListener('click', () => comCarregando(b, async () => {
                         termo = '';
@@ -346,6 +364,19 @@ export async function abrirEditor(culto, aoMudar) {
         });
         const sub = abrirFolha({ titulo: nova ? 'Música nova' : 'Editar música', conteudo: form });
     }
+}
+
+// "tocada há 3 semanas" (âmbar se faz menos de um mês: talvez cedo demais
+// para repetir) ou "nunca tocada"
+function dicaTocada(ultima, dataDoCulto, sozinha = false) {
+    const sep = sozinha ? '' : ' · ';
+    if (!ultima) return h('span', { class: 'dica-tocada nova' }, `${sep}nunca tocada`);
+    const dias = diasEntre(ultima, dataDoCulto);
+    const texto = dias < 7 ? 'tocada nesta semana'
+        : dias < 14 ? 'tocada semana passada'
+        : dias < 60 ? `tocada há ${Math.round(dias / 7)} semanas`
+        : `tocada há ${Math.round(dias / 30)} meses`;
+    return h('span', { class: `dica-tocada${dias < 28 ? ' recente' : ''}` }, sep + texto);
 }
 
 function normalizar(texto) {

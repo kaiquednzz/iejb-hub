@@ -21,6 +21,7 @@ import { blocoConferir } from './financeiro/conferir.js';
 import { blocoEventos } from './inicio-eventos.js';
 import { filaDoYoutube } from '../util/musica.js';
 import { chama, marcarEscalado } from '../util/chama.js';
+import { botaoWhatsRepertorio } from '../util/compartilhar.js';
 import { corDoTopo } from '../util/tema.js';
 
 const DURACAO_DO_CULTO_MIN = 150; // depois disso o culto conta como encerrado
@@ -224,6 +225,7 @@ function cartaoDoDia(culto, meuId, modo) {
         h('div', { class: 'dia-acoes' },
             h('a', { class: 'dia-botao dia-botao-claro', href: '#/escala' }, icone('calendario', 'icone icone-p'), 'Ver a escala'),
             fila.url ? h('a', { class: 'dia-botao', href: fila.url, target: '_blank', rel: 'noopener noreferrer' }, icone('play', 'icone icone-p'), 'Ouvir tudo') : null),
+        itens.length ? botaoWhatsRepertorio(culto, 'dia-whats') : null,
     );
 }
 

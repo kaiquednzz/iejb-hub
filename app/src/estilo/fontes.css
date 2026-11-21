@@ -17,3 +17,19 @@
     font-display: swap;
     src: url('./fontes/playfair-display-latin-700-normal.woff2') format('woff2');
 }
+/* Itálico de verdade (redesign v2: "Louvor", "Novembro", o dia de culto).
+   Sem ele o navegador só inclinaria a letra normal (itálico falso). */
+@font-face {
+    font-family: 'Playfair Display';
+    font-style: italic;
+    font-weight: 600;
+    font-display: swap;
+    src: url('./fontes/playfair-display-latin-600-italic.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'Playfair Display';
+    font-style: italic;
+    font-weight: 700;
+    font-display: swap;
+    src: url('./fontes/playfair-display-latin-700-italic.woff2') format('woff2');
+}

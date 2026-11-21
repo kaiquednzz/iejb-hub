@@ -14,6 +14,7 @@ import { FUNCAO_MESA, separarMesa, naoVai, cultoJaComecou } from '../util/escala
 import { confirmar, avisar } from '../util/folha.js';
 import { mensagemDoBanco } from '../util/erros.js';
 import { blocoRepertorio } from './repertorio.js';
+import { chama } from '../util/chama.js';
 import { blocoAjustar } from './ajustar-escala.js';
 import { estadoDoPush, ativarPush } from '../util/push.js';
 import { guardarEscala, escalaGuardada, eErroDeRede } from '../offline.js';
@@ -228,10 +229,12 @@ function listaDaEscala(escala, meuId) {
         nomeCurto(a.pessoa).localeCompare(nomeCurto(b.pessoa), 'pt-BR'));
 
     return h('div', { class: 'cartao-escala' },
-        grupos.length > 0 && h('p', { class: 'cartao-grupos' }, grupos.length > 1 ? 'Grupos ' : 'Grupo ', grupos.join(' + ')),
+        grupos.length > 0 && h('p', { class: 'cartao-grupos' }, h('span', null, grupos.length > 1 ? 'Formação · grupos' : 'Formação · grupo'), h('strong', null, grupos.join(' + '))),
         h('ul', { class: 'lista-pessoas' },
-            pessoas.map((item) => h('li', { class: [item.pessoa_id === meuId && 'sou-eu', naoVai(item) && 'nao-vai'].filter(Boolean).join(' ') || null },
+            pessoas.map((item, n) => h('li', { style: { '--n': n }, class: [item.pessoa_id === meuId && 'sou-eu', naoVai(item) && 'nao-vai'].filter(Boolean).join(' ') || null },
                 avatar(item.pessoa),
+                // Cartaz: a chama marca você na formação
+                item.pessoa_id === meuId && !naoVai(item) ? chama('chama-cartaz') : null,
                 h('span', { class: 'pessoa-nome' },
                     nomeCurto(item.pessoa, 'Pessoa'),
                     item.pessoa_id === meuId && h('span', { class: 'sr-only' }, ' (você)')),

@@ -688,6 +688,150 @@ html.leve .chama-fora, html.leve .chama-dentro { animation: none; }
 .puxar.carregando { transform: translateY(24px) scale(1); transition: transform 0.3s var(--mola); }
 .puxar:not(.visivel):not(.carregando) { transition: transform 0.3s var(--ease-ios), opacity 0.2s ease; }
 
+/* ==========================================================================
+   Fase 2: Louvor
+   ========================================================================== */
+
+/* --- Escala como cartaz de banda ------------------------------------------- */
+.cartao-escala { margin-top: var(--esp-4); }
+.cartao-grupos { display: grid; gap: 0; margin-bottom: var(--esp-3); padding-bottom: var(--esp-2); border-bottom: 1px solid var(--cor-borda); }
+.cartao-grupos span { font: var(--texto-rotulo); letter-spacing: var(--rotulo-espaco); text-transform: uppercase; color: var(--cor-texto-2); }
+.cartao-grupos strong { font: 700 24px/1.15 var(--fonte-titulo); font-style: italic; color: var(--cor-titulo); }
+.cartao-escala .lista-pessoas { grid-template-columns: repeat(auto-fill, minmax(86px, 1fr)); gap: var(--esp-4) var(--esp-2); }
+.cartao-escala .lista-pessoas li {
+    position: relative;
+    grid-template-columns: 1fr;
+    justify-items: center;
+    gap: 6px;
+    padding: var(--esp-1) 2px;
+    text-align: center;
+    background: none;
+    animation: subir 0.45s calc(min(var(--n, 0), 10) * 0.03s) var(--ease-out) backwards;
+}
+.cartao-escala .lista-pessoas li.sou-eu { background: none; }
+.cartao-escala .lista-pessoas .pessoa-avatar { width: 60px; height: 60px; font-size: 18px; box-shadow: 0 0 0 1px var(--cor-borda); }
+.cartao-escala .lista-pessoas li.sou-eu .pessoa-avatar { box-shadow: 0 0 0 2px var(--cor-fundo), 0 0 0 4px var(--cor-marca); }
+.cartao-escala .pessoa-nome { max-width: 100%; font: 600 15px/1.2 var(--fonte-texto); color: var(--cor-texto); }
+.cartao-escala .pessoa-instrumento { text-align: center; font: 400 13px/1.3 var(--fonte-texto); color: var(--cor-texto-2); }
+.chama-cartaz { position: absolute; top: 44px; left: calc(50% + 16px); width: 22px; height: 22px; }
+.cartao-mesa { margin-top: var(--esp-3); }
+
+/* --- Compartilhar no WhatsApp ---------------------------------------------- */
+.botao-whatsapp {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 44px;
+    padding: 0 16px;
+    border: 1px solid #BFE6CC;
+    border-radius: var(--raio-2);
+    background: #EAF7EF;
+    color: #136B3A;
+    font: 600 15px/1.2 var(--fonte-texto);
+    cursor: pointer;
+}
+.botao-whatsapp:active { transform: scale(0.97); }
+.repertorio-acoes { display: flex; flex-wrap: wrap; gap: var(--esp-2); }
+.historico-topo { position: relative; }
+.historico-whats { margin-left: auto; align-self: start; color: #136B3A; background: #EAF7EF; }
+.dia-whats {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    min-height: 46px;
+    margin-top: var(--esp-2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: var(--raio-2);
+    background: none;
+    color: #fff;
+    font: 600 15px/1.2 var(--fonte-texto);
+    cursor: pointer;
+}
+
+/* --- Montar: mês completo --------------------------------------------------- */
+.mes-progresso { display: grid; gap: 6px; margin: var(--esp-2) var(--esp-1) var(--esp-3); }
+.mes-progresso-trilho { position: relative; height: 8px; border-radius: var(--raio-pilula); background: var(--cor-superficie-rebaixada); overflow: hidden; }
+.mes-progresso-montado, .mes-progresso-publicado {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    transform-origin: left;
+    transition: transform 0.7s var(--ease-ios);
+}
+.mes-progresso-montado { background: #E3B5B0; transform: scaleX(var(--montado, 0)); }
+.mes-progresso-publicado { background: var(--cor-marca); transform: scaleX(var(--publicado, 0)); }
+.mes-progresso.completo .mes-progresso-publicado { background: var(--cor-sucesso); }
+.mes-progresso-texto { font: 600 13px/1.3 var(--fonte-texto); color: var(--cor-texto-2); font-variant-numeric: tabular-nums; }
+.mes-progresso.completo .mes-progresso-texto { color: var(--cor-sucesso); }
+.mes-nome { font-style: italic; }
+
+/* --- Repertórios: capas de encarte, mais tocadas, "tocada há" ------------ */
+.historico-topo .mini-data {
+    flex: none;
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    width: 60px;
+    height: 60px;
+    border-radius: var(--raio-2);
+    background: var(--cor-marca);
+    color: #fff;
+}
+.historico-topo .mini-data span { font: 600 11px/1 var(--fonte-texto); letter-spacing: 0.06em; text-transform: uppercase; color: rgba(255, 255, 255, 0.85); }
+.historico-topo .mini-data strong { font: 700 28px/1 var(--fonte-titulo); color: #fff; font-variant-numeric: lining-nums; }
+.historico-titulos h3 { font: 700 20px/1.2 var(--fonte-titulo); font-style: italic; color: var(--cor-titulo); }
+.historico-mes-titulo { font: 700 26px/1.1 var(--fonte-titulo); font-style: italic; color: var(--cor-titulo); padding-top: var(--esp-3); border-top: 1px solid var(--cor-borda); }
+.mais-tocadas-lista { list-style: none; margin: 0; padding: 0; background: var(--cor-superficie); border: 1px solid var(--cor-borda); border-radius: var(--raio-3); overflow: hidden; }
+.mais-tocadas-lista li + li { border-top: 1px solid var(--cor-borda); }
+.mais-tocada {
+    display: grid;
+    grid-template-columns: 32px 1fr auto;
+    align-items: baseline;
+    gap: var(--esp-2);
+    width: 100%;
+    min-height: 52px;
+    padding: var(--esp-3) var(--esp-4);
+    border: none;
+    background: none;
+    text-align: left;
+    font: inherit;
+    color: var(--cor-texto);
+    cursor: pointer;
+}
+.mais-tocada-n { font: 700 22px/1 var(--fonte-titulo); color: var(--cor-marca); font-variant-numeric: lining-nums; }
+.mais-tocada-nome { font: 600 16px/1.3 var(--fonte-texto); }
+.mais-tocada-vezes { font: 600 14px/1 var(--fonte-texto); color: var(--cor-texto-2); font-variant-numeric: tabular-nums; }
+.dica-tocada { color: var(--cor-texto-3); }
+.dica-tocada.recente { color: var(--cor-atencao); font-weight: 600; }
+.dica-tocada.nova { color: var(--cor-sucesso); }
+
+/* --- Equipe: mural de rostos ----------------------------------------------- */
+.mural { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: var(--esp-3); }
+.mural li { animation: subir 0.45s calc(var(--i, 0) * 0.03s) var(--ease-out) backwards; }
+.mural-pessoa {
+    display: grid;
+    justify-items: center;
+    gap: 6px;
+    width: 100%;
+    padding: var(--esp-4) var(--esp-2) var(--esp-3);
+    border: 1px solid var(--cor-borda);
+    border-radius: var(--raio-3);
+    background: var(--cor-superficie);
+    font: inherit;
+    text-align: center;
+    color: var(--cor-texto);
+    cursor: pointer;
+    transition: transform 0.4s var(--mola);
+}
+.mural-pessoa:active { transform: scale(0.96); transition-duration: var(--dur-rapida); }
+.mural-pessoa.sou { border-color: var(--cor-marca); box-shadow: inset 0 0 0 1px var(--cor-marca); }
+.mural-rosto { width: 64px; height: 64px; font-size: 20px; }
+.mural-nome { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 600 15px/1.2 var(--fonte-texto); }
+.mural-instrumentos { font: 400 13px/1.3 var(--fonte-texto); color: var(--cor-texto-2); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
 /* --- Computador ------------------------------------------------------------ */
 @media (min-width: 1024px) {
     .tela-app { padding-bottom: 56px; }
@@ -719,3 +863,8 @@ html.leve .chama-fora, html.leve .chama-dentro { animation: none; }
     .montar-acoes { bottom: 24px; }
     .fin-barra { bottom: 24px; }
 }
+
+/* Ações do repertório: Ouvir (YouTube) e Mandar (WhatsApp), mesma forma */
+.repertorio-acoes { display: grid; gap: var(--esp-2); }
+.repertorio-acoes > * { width: 100%; min-height: 46px; border-radius: var(--raio-2); box-shadow: none; font-size: 15px; }
+.repertorio-acoes .botao-youtube { justify-content: center; }

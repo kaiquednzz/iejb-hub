@@ -16,7 +16,8 @@ import { mensagemDoBanco } from '../../util/erros.js';
 import { partesDaData, formatarHorario, somarDias, hojeEmBrasilia } from '../../util/datas.js';
 import { nomeCurto } from '../../sessao.js';
 import { cabecalhoApp, navLouvor } from '../moldura.js';
-import { carregarMontagem, somarMes, nomeDoMes, mesSugerido, nomesDosGrupos, textoDoMes } from './dados.js';
+import { carregarMontagem, somarMes, nomeDoMes, mesSugerido, nomesDosGrupos, textoDoMes, linhasDaImagem } from './dados.js';
+import { desenharEscalaDoMes, compartilharImagem } from '../../util/imagem-escala.js';
 import { abrirCulto, folhaAdicionarCulto, grupoVazio, avisarGrupoVazio } from './culto.js';
 
 const LEMBRAR = 'iejb-hub-montar-mes';
@@ -32,6 +33,11 @@ export function telaMontar(conta) {
     proximo.addEventListener('click', () => trocarMes(1));
 
     const resumo = h('p', { class: 'mes-resumo', 'aria-live': 'polite' });
+    const progressoTexto = h('span', { class: 'mes-progresso-texto' });
+    const progresso = h('div', { class: 'mes-progresso', role: 'img', hidden: true },
+        h('span', { class: 'mes-progresso-trilho', 'aria-hidden': 'true' },
+            h('span', { class: 'mes-progresso-montado' }), h('span', { class: 'mes-progresso-publicado' })),
+        progressoTexto);
     // Mandar no WhatsApp: botão redondo no canto do título (como a agenda na Escala)
     const whatsapp = h('button', { type: 'button', class: 'botao-icone montar-whatsapp', 'aria-label': 'Mandar a escala do mês no WhatsApp' }, icone('whatsapp'));
     whatsapp.addEventListener('click', () => dados && folhaWhatsApp(dados, dados.cultos.filter((c) => c.ativo && c.escala?.estado === 'rascunho' && c.itens.length > 0).length));
@@ -43,6 +49,7 @@ export function telaMontar(conta) {
         h('main', { id: 'conteudo', class: 'app-conteudo' },
             navLouvor(conta, '#/montar', whatsapp),
             h('div', { class: 'mes-navegacao' }, anterior, tituloMes, proximo),
+            progresso,
             resumo,
             area,
         ),
@@ -95,6 +102,19 @@ export function telaMontar(conta) {
 
         // replaceChildren não achata listas nem ignora false: filtra antes
         // Só fala quando tem algo a fazer (o resto os cartões já mostram)
+        // Mês completo: barra que enche com o que já foi montado e publicado
+        const futuros = ativos.filter((c) => !c.passou);
+        const base = futuros.length || 1;
+        const montados = futuros.filter((c) => c.itens.length > 0).length;
+        const publicadosFuturos = futuros.filter((c) => c.escala?.estado === 'publicada' && c.itens.length > 0).length;
+        progresso.hidden = futuros.length === 0;
+        progresso.style.setProperty('--montado', (montados / base).toFixed(3));
+        progresso.style.setProperty('--publicado', (publicadosFuturos / base).toFixed(3));
+        progresso.setAttribute('aria-label', `${montados} de ${futuros.length} cultos montados, ${publicadosFuturos} publicados`);
+        progresso.classList.toggle('completo', publicadosFuturos === futuros.length && futuros.length > 0);
+        progressoTexto.textContent = publicadosFuturos === futuros.length && futuros.length > 0
+            ? 'Mês completo' : `${montados} de ${futuros.length} montados · ${publicadosFuturos} publicados`;
+
         resumo.replaceChildren(...(ativos.length === 0 ? ['Nenhum culto com louvor neste mês.']
             : semGrupo > 0 ? [h('span', { class: 'resumo-falta' }, `${semGrupo} ${semGrupo === 1 ? 'culto sem ninguém' : 'cultos sem ninguém'}`)]
             : publicadas === ativos.length ? [h('span', { class: 'resumo-ok' }, 'Mês todo publicado')] : []));
@@ -209,6 +229,14 @@ export function telaMontar(conta) {
 
 function folhaWhatsApp(dados, emRascunho) {
     const texto = textoDoMes(dados);
+    // A mesma escala como imagem de boletim, para o grupo ou o status
+    const linhas = linhasDaImagem(dados);
+    const imagem = linhas.length > 0 && h('button', { type: 'button', class: 'botao-secundario botao-largo' }, icone('imagem'), 'Mandar como imagem');
+    if (imagem) imagem.addEventListener('click', () => comCarregando(imagem, async () => {
+        const blob = await desenharEscalaDoMes({ mes: nomeDoMes(dados.mes).split(' ')[0], linhas });
+        const r = await compartilharImagem(blob, `escala-louvor-${dados.mes}.png`, `Escala do Louvor · ${nomeDoMes(dados.mes)}`);
+        if (r === 'baixada') anunciar('Imagem salva.');
+    }));
     const copiar = h('button', { type: 'button', class: 'botao-secundario botao-largo' }, icone('copiar'), 'Copiar');
     copiar.addEventListener('click', async () => {
         try { await navigator.clipboard.writeText(texto); marcarCopiado(copiar); anunciar('Escala copiada.'); } catch { avisar('Não deu para copiar.'); }
@@ -219,6 +247,7 @@ function folhaWhatsApp(dados, emRascunho) {
             emRascunho > 0 && h('p', { class: 'aviso-form', 'data-tipo': 'erro' },
                 `${emRascunho} ${emRascunho === 1 ? 'culto ainda está' : 'cultos ainda estão'} em rascunho e não entra${emRascunho === 1 ? '' : 'm'} na mensagem. Publique antes.`),
             h('pre', { class: 'previa-whatsapp' }, texto),
+            imagem,
             h('a', {
                 class: 'botao-principal botao-largo', target: '_blank', rel: 'noopener noreferrer',
                 href: `https://wa.me/?text=${encodeURIComponent(texto)}`,

@@ -6,6 +6,7 @@
 //   * "quando tocamos essa música?"         -> busca por música ou artista
 //   * "o que o G2 costuma tocar?"           -> filtro por grupo
 // Tocar numa música abre o "ouvir" (streamings), como na escala.
+import { abrirWhatsApp, textoDoRepertorio } from '../util/compartilhar.js';
 import { h, icone, comCarregando } from '../util/dom.js';
 import { supabase } from '../supabase.js';
 import { mensagemDoBanco } from '../util/erros.js';
@@ -131,7 +132,7 @@ export function telaRepertorios(conta) {
                 return b;
             }));
         } else {
-            resumo.replaceChildren();
+            resumo.replaceChildren(...maisTocadas(doGrupo));
         }
 
         if (!visiveis.length) {
@@ -167,7 +168,9 @@ export function telaRepertorios(conta) {
                     h('h3', null, culto.nome, culto.rotulo && h('span', { class: 'rotulo-culto' }, culto.rotulo)),
                     h('p', { class: 'historico-detalhe' },
                         `${dataCurta(culto.data)} · ${formatarHorario(culto.horario)}`,
-                        grupos.length ? h('strong', null, ` · ${grupos.join(' + ')}`) : ''))),
+                        grupos.length ? h('strong', null, ` · ${grupos.join(' + ')}`) : '')),
+                // Mandar este repertório no WhatsApp (ícone no canto da capa)
+                whatsCulto(culto)),
             h('ol', { class: 'historico-musicas' }, culto.repertorio_item.map((item) => {
                 const b = h('button', { type: 'button', class: `historico-musica${t && combina(item.musica) ? ' achada' : ''}` },
                     h('span', { class: 'linha-textos' },
@@ -179,6 +182,36 @@ export function telaRepertorios(conta) {
                 return h('li', null, b);
             })));
     }
+}
+
+// As mais tocadas (dos cultos já carregados): um ranking de boletim, só
+// quando já existe histórico suficiente para dizer algo
+function maisTocadas(cultos) {
+    if (cultos.length < 3) return [];
+    const conta = new Map();
+    for (const c of cultos) for (const i of c.repertorio_item) {
+        const r = conta.get(i.musica.id) ?? { musica: i.musica, vezes: 0 };
+        r.vezes++;
+        conta.set(i.musica.id, r);
+    }
+    const top = [...conta.values()].filter((r) => r.vezes > 1).sort((a, b) => b.vezes - a.vezes).slice(0, 5);
+    if (top.length < 2) return [];
+    return [h('section', { class: 'mais-tocadas', 'aria-labelledby': 'titulo-mais-tocadas' },
+        h('h2', { id: 'titulo-mais-tocadas', class: 'rotulo-secao' }, 'As mais tocadas'),
+        h('ol', { class: 'mais-tocadas-lista' }, top.map((r, i) => {
+            const b = h('button', { type: 'button', class: 'mais-tocada' },
+                h('span', { class: 'mais-tocada-n', 'aria-hidden': 'true' }, i + 1),
+                h('span', { class: 'mais-tocada-nome' }, r.musica.titulo),
+                h('span', { class: 'mais-tocada-vezes' }, `${r.vezes}×`, h('span', { class: 'sr-only' }, ' tocada')));
+            b.addEventListener('click', () => folhaOuvir(r.musica));
+            return h('li', null, b);
+        })))];
+}
+
+function whatsCulto(culto) {
+    const b = h('button', { type: 'button', class: 'botao-icone historico-whats', 'aria-label': `Mandar o repertório de ${culto.nome} no WhatsApp` }, icone('whatsapp'));
+    b.addEventListener('click', () => abrirWhatsApp(textoDoRepertorio(culto)));
+    return b;
 }
 
 function esqueleto() {
