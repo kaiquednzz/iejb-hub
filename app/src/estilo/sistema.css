@@ -1010,7 +1010,7 @@ html.leve .chama-fora, html.leve .chama-dentro { animation: none; }
     box-shadow: var(--elev-2);
 }
 .carteirinha-topo { display: flex; align-items: center; gap: 8px; font: 600 12px/1 var(--fonte-texto); letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255, 255, 255, 0.85); }
-.carteirinha-topo img { width: 24px; height: 24px; }
+.carteirinha-topo img { width: auto; height: 30px; } /* o logo é alto (160×365): só a altura é fixa */
 .carteirinha-meio { display: flex; align-items: center; gap: var(--esp-4); align-self: center; }
 .carteirinha-foto { width: 72px; height: 72px; flex: none; font-size: 24px; box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.9); }
 .carteirinha-nome { font: italic 700 28px/1.1 var(--fonte-titulo); }

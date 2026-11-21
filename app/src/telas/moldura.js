@@ -13,7 +13,7 @@ export function molduraEntrada({ titulo, subtitulo, conteudo, rodape }) {
     return h('div', { class: 'tela tela-entrada' },
         h('main', { id: 'conteudo', class: 'entrada-palco' },
             h('div', { class: 'entrada-marca' },
-                h('img', { src: '/logo-iejb-pequeno.png', alt: '', width: 64, height: 64 }),
+                h('img', { src: '/logo-iejb-pequeno.png', alt: '', width: 28, height: 64 }),
                 h('p', { class: 'entrada-marca-nome' }, 'IEJB ', h('span', null, 'Hub')),
             ),
             h('section', { class: 'entrada-cartao', 'aria-labelledby': 'titulo-tela' },
@@ -87,7 +87,7 @@ export function barraLateral(conta, atual) {
 
     return h('aside', { class: classe },
         h('a', { class: 'lateral-marca', href: '#/inicio', 'aria-label': 'IEJB Hub, ir para o Início' },
-            h('img', { src: '/logo-iejb-pequeno.png', alt: '', width: 32, height: 32 }),
+            h('img', { src: '/logo-iejb-pequeno.png', alt: '', width: 14, height: 32 }),
             h('span', { class: 'cabecalho-nome' }, 'IEJB ', h('span', null, 'Hub'))),
         h('nav', { class: 'lateral-nav', 'aria-label': 'Menu principal' },
             item('#/inicio', 'Início', 'casa'),
@@ -129,7 +129,7 @@ export function cabecalhoApp(conta, opcoes = {}) {
         ? h('div', { class: 'cabecalho-marca cabecalho-modulo' },
             h('a', { class: 'botao-voltar', href: destino, 'aria-label': `Voltar para ${rotulo}` }, icone('seta', 'icone icone-p seta-esquerda'), h('span', null, rotulo)))
         : h('a', { class: 'cabecalho-marca', href: '#/inicio', 'aria-label': 'IEJB Hub, ir para o Início' },
-            h('img', { src: '/logo-iejb-pequeno.png', alt: '', width: 32, height: 32 }),
+            h('img', { src: '/logo-iejb-pequeno.png', alt: '', width: 14, height: 32 }),
             h('span', { class: 'cabecalho-nome' }, 'IEJB ', h('span', null, 'Hub')));
     // Título compacto: aparece no meio quando o título grande da tela sai de
     // vista ao rolar (main.js liga isso). Nas áreas começa com o nome da área.
