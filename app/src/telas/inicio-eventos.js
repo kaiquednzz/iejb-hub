@@ -25,7 +25,7 @@ export function blocoEventos() {
         }
         if (!eventos.length) return;
         // Lista vertical (redesign): título inteiro, sem rolagem para o lado
-        const itens = eventos.map((e, i) => h('li', { style: { '--i': i }, hidden: i >= VISIVEIS }, linha(e)));
+        const itens = eventos.map((e, i) => h('li', { style: { '--i': i }, hidden: i >= VISIVEIS }, linhaDoEvento(e)));
         const cabeca = h('div', { class: 'rotulo-secao-linha' }, h('h2', { id: 'titulo-eventos', class: 'rotulo-secao' }, 'Vem aí'));
         if (eventos.length > VISIVEIS) {
             const lista = h('ul', { class: 'grupo-lista eventos-lista', id: 'lista-eventos' });
@@ -54,7 +54,7 @@ export function blocoData(dataISO) {
         h('span', { class: 'bloco-data-mes' }, p.mes));
 }
 
-function linha(e) {
+export function linhaDoEvento(e) {
     const p = partesDaData(e.data);
     const agora = e.situacao === 'agora';
     const b = h('button', { type: 'button', class: `item-lista evento-linha${agora ? ' agora' : ''}` },
@@ -66,11 +66,11 @@ function linha(e) {
         icone('seta', 'icone icone-p item-seta'),
     );
     b.setAttribute('aria-label', `${e.titulo}, ${agora ? 'acontecendo agora' : `${rotuloDoDia(e.data)}, ${formatarHorario(e.horario)}`}`);
-    b.addEventListener('click', () => detalhes(e));
+    b.addEventListener("click", () => detalhesDoEvento(e));
     return b;
 }
 
-function detalhes(e) {
+export function detalhesDoEvento(e) {
     const imagem = urlDaImagem(e.imagem);
     const quando = e.data_fim
         ? `${rotuloDoDia(e.data)} a ${rotuloDoDia(e.data_fim)} · ${formatarHorario(e.horario)}`

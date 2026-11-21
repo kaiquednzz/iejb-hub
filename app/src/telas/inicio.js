@@ -1,34 +1,29 @@
-// Início (D40): a porta de entrada do Hub. O app vai ter vários módulos
-// (Louvor hoje; Pregações, Kids, Financeiro depois), então ao entrar a pessoa
-// vê primeiro o que importa para ELA (o próximo compromisso, pedidos
-// esperando) e depois a grade de módulos.
+// Início (D40, redesign v2): a porta de entrada do Hub. Mostra o que importa
+// para a pessoa HOJE, e muda com o ritmo da semana da igreja:
+//   * semana normal: o próximo compromisso, num cartão vermelho;
+//   * véspera ("Amanhã você toca") e dia de culto ("Hoje você toca"): o
+//     cartão vira uma capa com a contagem, a ordem do louvor com os tons e
+//     os rostos de quem toca junto (a cor do topo do celular fica vermelha);
+//   * depois do culto: um agradecimento e o que vocês tocaram.
+// Não há dado novo: é a mesma escala e o mesmo repertório da tela Escala.
 //
-// Módulos:
-//   * cada um declara quem vê (pode) e para onde vai (rota);
-//   * "em breve" vira uma linha discreta no fim (decisão de Kaique: mostrar
-//     para onde o Hub vai, mas sem pesar como o que já funciona).
-//     Um módulo novo é uma linha em MODULOS.
+// Ordem da tela: saudação → "precisa da sua atenção" (só se houver: contagem
+// para conferir, pedidos de acesso) → compromisso → Vem aí (eventos do site).
+// Ministérios e áreas ficam na aba Ministérios.
 import { h, icone } from '../util/dom.js';
 import { supabase } from '../supabase.js';
 import { hojeEmBrasilia, rotuloDoDia, formatarHorario, diasEntre } from '../util/datas.js';
 import { escalaGuardada } from '../offline.js';
 import { naoVai, FUNCAO_MESA } from '../util/escala.js';
-import { cabecalhoApp } from './moldura.js';
-import { linhaLista } from './voce.js';
-import { veFinanceiro, cuidaDosEventos } from '../sessao.js';
-import { contadorDePedidos } from './moldura.js';
+import { cabecalhoApp, avatar } from './moldura.js';
+import { nomeCurto } from '../sessao.js';
 import { blocoConferir } from './financeiro/conferir.js';
 import { blocoEventos } from './inicio-eventos.js';
+import { filaDoYoutube } from '../util/musica.js';
+import { chama, marcarEscalado } from '../util/chama.js';
+import { corDoTopo } from '../util/tema.js';
 
-const MODULOS = [
-    { id: 'louvor', nome: 'Louvor', texto: 'Escala, repertórios e equipe', icone: 'musica', rota: '#/escala', pode: () => true },
-    { id: 'eventos', nome: 'Eventos do site', texto: 'Agenda de iejb.com.br', icone: 'megafone', rota: '#/eventos', pode: cuidaDosEventos },
-    { id: 'pregacoes', nome: 'Pregações', texto: 'Mensagens e acervo', icone: 'livro', emBreve: true },
-    { id: 'kids', nome: 'Kids', texto: 'Turmas e escalas', icone: 'crianca', emBreve: true },
-    { id: 'financeiro', nome: 'Financeiro', texto: 'Caixa da igreja', icone: 'moeda', rota: '#/financeiro', pode: veFinanceiro },
-    // Só o admin: aprovar acessos, cadastro, cargos (antes ficava escondido dentro do Louvor)
-    { id: 'pessoas', nome: 'Pessoas', texto: 'Acessos e cadastro', icone: 'chave', rota: '#/pessoas', pode: (c) => c.e_administrador },
-];
+const DURACAO_DO_CULTO_MIN = 150; // depois disso o culto conta como encerrado
 
 function saudacao() {
     const hora = Number(new Intl.DateTimeFormat('pt-BR', { hour: 'numeric', hourCycle: 'h23', timeZone: 'America/Sao_Paulo' }).format(new Date()));
@@ -40,28 +35,11 @@ function dataDeHoje() {
     return t.charAt(0).toUpperCase() + t.slice(1);
 }
 
-// Ordem da tela (redesign, etapa 3), do mais pessoal para o mais geral:
-//   1. saudação;
-//   2. "precisa da sua atenção": só aparece se houver algo (contagem para
-//      conferir, pedidos de acesso para o admin). É aqui que o admin vê a
-//      diferença, e não num selo;
-//   3. o próximo compromisso (o único destaque vermelho da tela);
-//   4. Vem aí (eventos do site, em lista);
-//   5. suas áreas (só as que a pessoa pode abrir) e, numa linha, as que vêm aí.
 export function telaInicio(conta) {
     const primeiroNome = (conta.pessoa?.apelido || conta.pessoa?.nome || conta.nome_informado || '').split(' ')[0];
     const destaque = h('div', { class: 'inicio-destaque', 'aria-live': 'polite' }, h('div', { class: 'inicio-compromisso esqueleto' }));
     const avisosAdmin = h('div', { class: 'inicio-avisos' });
-    // Contagem do culto esperando a conferência desta pessoa (D48)
-    const conferir = blocoConferir(conta);
-
-    const ativos = MODULOS.filter((m) => !m.emBreve && m.pode(conta));
-    const emBreve = MODULOS.filter((m) => m.emBreve).map((m) => m.nome);
-    const areas = ativos.map((m) => linhaLista({ href: m.rota, nome: m.nome, texto: m.texto, nomeIcone: m.icone }));
-    ativos.forEach((m, i) => {
-        areas[i].style.setProperty('--i', i);
-        if (m.id === 'pessoas') contadorDePedidos(areas[i].querySelector('.item-nome'), 'item-contador');
-    });
+    const conferir = blocoConferir(conta); // contagem esperando esta pessoa conferir (D48)
 
     const tela = h('div', { class: 'tela tela-app tela-inicio' },
         cabecalhoApp(conta),
@@ -73,9 +51,6 @@ export function telaInicio(conta) {
             avisosAdmin,
             destaque,
             blocoEventos(),
-            h('h2', { class: 'rotulo-secao' }, 'Suas áreas'),
-            h('ul', { class: 'grupo-lista inicio-areas' }, areas),
-            emBreve.length ? h('p', { class: 'inicio-em-breve' }, `Em breve no Hub: ${listaNatural(emBreve)}`) : null,
         ),
     );
 
@@ -84,9 +59,24 @@ export function telaInicio(conta) {
     return tela;
 }
 
-// ['Pregações', 'Kids'] → 'Pregações e Kids'
-function listaNatural(itens) {
-    return itens.length < 2 ? itens.join('') : `${itens.slice(0, -1).join(', ')} e ${itens.at(-1)}`;
+// --- Tempo -------------------------------------------------------------------
+// Minutos de agora até o começo do culto (negativo: já começou), no relógio
+// de Brasília, para o celular em outro fuso não errar a contagem.
+function minutosAte(culto) {
+    const agora = new Intl.DateTimeFormat('sv-SE', {
+        timeZone: 'America/Sao_Paulo', year: 'numeric', month: '2-digit', day: '2-digit',
+        hour: '2-digit', minute: '2-digit', hourCycle: 'h23',
+    }).format(new Date()).replace(' ', 'T');
+    return Math.round((Date.parse(`${culto.data}T${culto.horario.slice(0, 5)}Z`) - Date.parse(`${agora}Z`)) / 60000);
+}
+
+function textoContagem(min) {
+    if (min <= 0) return null;
+    const horas = Math.floor(min / 60);
+    const resto = min % 60;
+    if (horas === 0) return `${resto} min`;
+    if (horas < 24) return `${horas}h ${String(resto).padStart(2, '0')}min`;
+    return null;
 }
 
 // "em 5 dias" (hoje e amanhã já aparecem na própria data)
@@ -98,7 +88,13 @@ function quantoFalta(dataISO) {
     return semanas === 1 ? 'semana que vem' : `em ${semanas} semanas`;
 }
 
-// Próximo culto em que a pessoa toca (publicado, não marcou "não vou")
+// --- Compromisso -------------------------------------------------------------
+const CONSULTA_DO_DIA = `
+    id, nome, rotulo, data, horario, estado,
+    escala ( estado, escala_item ( pessoa_id, instrumento_exibido, saiu_em, pessoa:pessoa_id ( nome, apelido, foto ) ) ),
+    repertorio_item ( posicao, tom, musica:musica_id ( id, titulo, artista, link, links_streaming ) )
+`;
+
 async function carregarCompromisso(conta, destaque) {
     const meuId = conta.pessoa?.id;
     const hoje = hojeEmBrasilia();
@@ -108,33 +104,137 @@ async function carregarCompromisso(conta, destaque) {
         .eq('estado', 'ativo').gte('data', hoje)
         .eq('escala.estado', 'publicada').eq('escala.escala_item.pessoa_id', meuId)
         .order('data').order('horario').limit(3);
-    if (!error) cultos = data;
-    else cultos = escalaGuardada(conta.id)?.cultos ?? [];   // sem internet: usa a cópia da escala
+    const offline = Boolean(error);
+    cultos = offline ? (escalaGuardada(conta.id)?.cultos ?? []) : data;
 
-    const proximo = cultos.find((c) => c.data >= hoje && c.escala?.some((e) => e.estado === 'publicada' &&
+    const meus = cultos.filter((c) => c.data >= hoje && c.escala?.some((e) => e.estado === 'publicada' &&
         e.escala_item.some((i) => i.pessoa_id === meuId && !naoVai(i))));
-    if (!proximo) {
-        destaque.replaceChildren(h('a', { class: 'inicio-compromisso vazio', href: '#/escala' },
-            h('span', { class: 'compromisso-rotulo' }, 'Sua agenda'),
-            h('span', { class: 'compromisso-titulo' }, 'Nenhuma escala sua pela frente'),
-            h('span', { class: 'compromisso-acao' }, 'Ver a escala do Louvor', icone('seta', 'icone icone-p'))));
+    // O culto de hoje que já acabou não é mais "o próximo": vira o "obrigado"
+    const encerradoHoje = meus.find((c) => c.data === hoje && minutosAte(c) < -DURACAO_DO_CULTO_MIN);
+    const proximo = meus.find((c) => c !== encerradoHoje);
+    marcarEscalado(proximo?.data ?? null);
+
+    if (encerradoHoje) {
+        const completo = await cultoCompleto(conta, encerradoHoje, offline);
+        destaque.replaceChildren(cartaoDepois(completo));
+        if (proximo) destaque.append(cartaoNormal(proximo, meuId));
         return;
     }
-    const eu = proximo.escala.flatMap((e) => e.escala_item).find((i) => i.pessoa_id === meuId);
-    const instrumentos = eu.instrumento_exibido.filter((x) => x !== FUNCAO_MESA);
-    const naMesa = eu.instrumento_exibido.includes(FUNCAO_MESA);
+    if (!proximo) {
+        destaque.replaceChildren(h('a', { class: 'inicio-compromisso vazio', href: '#/agenda' },
+            h('span', { class: 'compromisso-rotulo' }, 'Sua agenda'),
+            h('span', { class: 'compromisso-titulo' }, 'Nenhuma escala sua pela frente'),
+            h('span', { class: 'compromisso-acao' }, 'Ver a agenda', icone('seta', 'icone icone-p'))));
+        return;
+    }
+    const dias = diasEntre(hoje, proximo.data);
+    if (dias <= 1) {
+        const completo = await cultoCompleto(conta, proximo, offline);
+        destaque.replaceChildren(cartaoDoDia(completo, meuId, dias === 0 ? 'dia' : 'vespera'));
+        corDoTopo('#8F0D0B'); // o topo do celular acompanha a capa vermelha
+        return;
+    }
+    destaque.replaceChildren(cartaoNormal(proximo, meuId));
+}
+
+// O culto com todo mundo da escala e o repertório (a consulta de cima só traz
+// a linha da própria pessoa). Sem internet, usa a cópia guardada da Escala.
+async function cultoCompleto(conta, culto, offline) {
+    if (!offline) {
+        const { data, error } = await supabase.from('culto').select(CONSULTA_DO_DIA).eq('id', culto.id)
+            .order('posicao', { referencedTable: 'repertorio_item' }).maybeSingle();
+        if (!error && data) return data;
+    }
+    return escalaGuardada(conta.id)?.cultos.find((c) => c.id === culto.id) ?? culto;
+}
+
+function meusInstrumentos(culto, meuId) {
+    const eu = culto.escala.flatMap((e) => e.escala_item).find((i) => i.pessoa_id === meuId);
+    const lista = eu ? eu.instrumento_exibido.filter((x) => x !== FUNCAO_MESA) : [];
+    if (eu?.instrumento_exibido.includes(FUNCAO_MESA)) lista.push('Mesa de som');
+    return lista;
+}
+
+function cartaoNormal(proximo, meuId) {
     const falta = quantoFalta(proximo.data);
-    // O nome do culto é o título; a data vem numa linha só, embaixo
-    // (antes ela aparecia duas vezes: no bloco "DOM 22 NOV" e no título).
-    destaque.replaceChildren(h('a', { class: 'inicio-compromisso', href: '#/escala' },
+    return h('a', { class: 'inicio-compromisso', href: '#/escala' },
         h('span', { class: 'compromisso-rotulo' },
             h('span', null, 'Próximo compromisso'),
             falta && h('span', { class: 'compromisso-falta' }, falta)),
         h('span', { class: 'compromisso-titulo' }, proximo.nome, proximo.rotulo ? ` · ${proximo.rotulo}` : ''),
         h('span', { class: 'compromisso-quando' }, `${rotuloDoDia(proximo.data)} · ${formatarHorario(proximo.horario)}`),
-        h('span', { class: 'compromisso-chips' },
-            [...instrumentos, ...(naMesa ? ['Mesa de som'] : [])].map((x) => h('span', { class: 'compromisso-chip' }, x))),
-        h('span', { class: 'compromisso-acao' }, 'Ver escala e repertório', icone('seta', 'icone icone-p'))));
+        h('span', { class: 'compromisso-chips' }, meusInstrumentos(proximo, meuId).map((x) => h('span', { class: 'compromisso-chip' }, x))),
+        h('span', { class: 'compromisso-acao' }, 'Ver escala e repertório', icone('seta', 'icone icone-p')));
+}
+
+// A capa do dia de culto (e da véspera): o momento mais importante da semana
+// de quem toca. Linguagem de boletim: seções numeradas, filetes, tons grandes.
+function cartaoDoDia(culto, meuId, modo) {
+    const itens = culto.repertorio_item ?? [];
+    const pessoas = culto.escala.filter((e) => e.estado === 'publicada').flatMap((e) => e.escala_item)
+        .filter((i) => !naoVai(i) && i.pessoa_id !== meuId);
+    const fila = filaDoYoutube(itens.map((i) => i.musica));
+
+    const contagem = h('p', { class: 'dia-contagem', 'aria-live': 'off' });
+    const estado = h('p', { class: 'dia-estado' });
+    const atualizar = () => {
+        const min = minutosAte(culto);
+        if (modo === 'vespera') {
+            estado.replaceChildren('Amanhã às ', formatarHorario(culto.horario));
+            contagem.textContent = '';
+            return;
+        }
+        if (min > 0) {
+            estado.replaceChildren(h('span', { class: 'dia-ponto', 'aria-hidden': 'true' }), 'Começa em');
+            contagem.textContent = textoContagem(min) ?? formatarHorario(culto.horario);
+        } else {
+            estado.replaceChildren(h('span', { class: 'dia-ponto agora', 'aria-hidden': 'true' }), 'Acontecendo agora');
+            contagem.textContent = '';
+        }
+    };
+    atualizar();
+    // Atualiza a cada 30 s enquanto a tela está aberta; para sozinho ao sair
+    const relogio = setInterval(() => (contagem.isConnected ? atualizar() : clearInterval(relogio)), 30000);
+
+    const instrumentos = meusInstrumentos(culto, meuId);
+    const MAX_ROSTOS = 6;
+    return h('article', { class: `inicio-compromisso inicio-dia${modo === 'vespera' ? ' vespera' : ''}`, 'aria-label': `${modo === 'dia' ? 'Hoje' : 'Amanhã'} você toca: ${culto.nome}` },
+        h('p', { class: 'dia-rotulo' }, chama('chama-dia'), modo === 'dia' ? 'Hoje você toca' : 'Amanhã você toca'),
+        h('h2', { class: 'dia-titulo' }, culto.nome, culto.rotulo ? h('span', null, ` · ${culto.rotulo}`) : null),
+        instrumentos.length ? h('p', { class: 'dia-voce' }, `Você: ${instrumentos.join(', ')}`) : null,
+        estado,
+        contagem,
+
+        h('h3', { class: 'dia-secao' }, h('span', { 'aria-hidden': 'true' }, 'I. '), 'Ordem do louvor'),
+        itens.length
+            ? h('ol', { class: 'dia-musicas' }, itens.map((item, i) => h('li', null,
+                h('span', { class: 'dia-musica-n', 'aria-hidden': 'true' }, i + 1),
+                h('span', { class: 'dia-musica-titulo' }, item.musica.titulo,
+                    item.musica.artista ? h('span', { class: 'dia-musica-artista' }, item.musica.artista) : null),
+                item.tom ? h('span', { class: 'dia-musica-tom' }, h('span', { class: 'sr-only' }, 'tom '), item.tom) : null)))
+            : h('p', { class: 'dia-vazio' }, 'O repertório ainda não foi montado.'),
+
+        pessoas.length ? h('h3', { class: 'dia-secao' }, h('span', { 'aria-hidden': 'true' }, 'II. '), 'Quem toca com você') : null,
+        pessoas.length ? h('ul', { class: 'dia-rostos' },
+            pessoas.slice(0, MAX_ROSTOS).map((i) => h('li', { title: nomeCurto(i.pessoa, 'Pessoa') },
+                avatar(i.pessoa, 'pessoa-avatar dia-rosto'),
+                h('span', { class: 'dia-rosto-nome' }, nomeCurto(i.pessoa, 'Pessoa')))),
+            pessoas.length > MAX_ROSTOS ? h('li', { class: 'dia-rostos-mais' }, `+${pessoas.length - MAX_ROSTOS}`) : null) : null,
+
+        h('div', { class: 'dia-acoes' },
+            h('a', { class: 'dia-botao dia-botao-claro', href: '#/escala' }, icone('calendario', 'icone icone-p'), 'Ver a escala'),
+            fila.url ? h('a', { class: 'dia-botao', href: fila.url, target: '_blank', rel: 'noopener noreferrer' }, icone('play', 'icone icone-p'), 'Ouvir tudo') : null),
+    );
+}
+
+// Depois do culto: um obrigado e o que foi tocado, como lembrança
+function cartaoDepois(culto) {
+    const itens = culto.repertorio_item ?? [];
+    return h('article', { class: 'inicio-depois' },
+        h('p', { class: 'depois-rotulo' }, chama('chama-depois'), 'Culto encerrado'),
+        h('h2', { class: 'depois-titulo' }, 'Obrigado por tocar hoje.'),
+        h('p', { class: 'depois-texto' }, `${culto.nome} · ${formatarHorario(culto.horario)}`),
+        itens.length ? h('ol', { class: 'depois-musicas' }, itens.map((i) => h('li', null, i.musica.titulo, i.tom ? h('span', null, ` · ${i.tom}`) : null))) : null);
 }
 
 async function carregarPedidos(lugar) {

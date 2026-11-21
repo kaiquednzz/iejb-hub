@@ -45,6 +45,10 @@ import { telaTestemunha } from './telas/testemunha.js';
 import { telaDocumento } from './telas/documentos.js';
 import { barraLateral, barraAbas } from './telas/moldura.js';
 import { telaVoce } from './telas/voce.js';
+import { telaAgenda } from './telas/agenda.js';
+import { corDoTopo } from './util/tema.js';
+import { ligarTituloCompacto, ligarPuxarParaAtualizar } from './util/rolagem.js';
+import { telaMinisterios } from './telas/ministerios.js';
 import { telaInstalar } from './telas/instalar.js';
 import { precisaInstalar, registrarServiceWorker } from './pwa.js';
 import { apagarCopiasLocais } from './offline.js';
@@ -71,6 +75,8 @@ const ROTAS_DA_CONTA = {
     '#/financeiro': (conta) => (veFinanceiro(conta) ? telaFinanceiro(conta) : telaInicio(conta)),
     '#/pessoas': (conta) => (conta.e_administrador ? telaEquipe(conta, { area: 'pessoas' }) : telaInicio(conta)),
     '#/voce': telaVoce,
+    '#/agenda': telaAgenda,
+    '#/ministerios': telaMinisterios,
     '#/privacidade': (conta) => telaDocumento('privacidade', conta),
     '#/termos': (conta) => telaDocumento('termos', conta),
 };
@@ -153,7 +159,9 @@ async function decidirTela() {
 // o navegador faz o cruzamento suave entre a tela velha e a nova.
 function mostrar(tela) {
     const trocar = () => {
+        corDoTopo(null); // cada tela começa com a cor padrão do topo
         raiz.replaceChildren(tela);
+        ligarTituloCompacto(tela);
         // Leitor de tela: anuncia a tela nova lendo o título dela
         tela.querySelector('h1')?.focus({ preventScroll: true });
         window.scrollTo(0, 0);
@@ -190,4 +198,6 @@ window.addEventListener('hashchange', () => {
 });
 
 registrarServiceWorker();
+// Puxar para atualizar (só no app instalado: no Safari a página já faz isso)
+ligarPuxarParaAtualizar(() => { if (contaPronta) mostrar(telaDaConta(contaPronta)); });
 decidirTela();

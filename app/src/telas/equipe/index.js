@@ -4,7 +4,7 @@
 // Os botões de mexer aparecem conforme o papel, mas quem garante a regra é o
 // banco: se alguém forçar um botão escondido, o RLS recusa.
 import { h } from '../../util/dom.js';
-import { cabecalhoApp } from '../moldura.js';
+import { cabecalhoApp, navLouvor } from '../moldura.js';
 import { carregarEquipe } from './dados.js';
 import { secaoPedidos } from './pedidos.js';
 import { secaoPessoas } from './pessoas.js';
@@ -27,7 +27,7 @@ export function telaEquipe(conta, { area = 'louvor' } = {}) {
     const tela = h('div', { class: 'tela tela-app' },
         cabecalhoApp(conta, { modulo: ePessoas ? 'Pessoas' : 'Louvor' }),
         h('main', { id: 'conteudo', class: 'app-conteudo' },
-            h('h1', { tabindex: -1, class: 'titulo-tela' }, ePessoas ? 'Pessoas' : 'Equipe'),
+            ePessoas ? h('h1', { tabindex: -1, class: 'titulo-tela' }, 'Pessoas') : navLouvor(conta, '#/equipe'),
             abas,
             lugar,
         ),

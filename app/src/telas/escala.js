@@ -9,7 +9,7 @@ import { h, icone, comCarregando } from '../util/dom.js';
 import { supabase } from '../supabase.js';
 import { nomeCurto } from '../sessao.js';
 import { hojeEmBrasilia, somarDias, rotuloDoDia, partesDaData, formatarHorario } from '../util/datas.js';
-import { cabecalhoApp, avatar, seletorEscala } from './moldura.js';
+import { cabecalhoApp, avatar, navLouvor } from './moldura.js';
 import { FUNCAO_MESA, separarMesa, naoVai, cultoJaComecou } from '../util/escala.js';
 import { confirmar, avisar } from '../util/folha.js';
 import { mensagemDoBanco } from '../util/erros.js';
@@ -35,14 +35,11 @@ export function telaEscala(conta) {
     const lista = h('div', { class: 'lista-cultos', 'aria-busy': 'true' }, esqueleto());
     const destaque = h('div', { class: 'destaque-area' });
     const faixaOffline = h('div', { class: 'faixa-offline-area', role: 'status' });
-    const titulo = h('h1', { tabindex: -1, class: 'titulo-tela' }, `Oi, ${nomeCurto(conta.pessoa, 'tudo bem')}!`);
 
     const tela = h('div', { class: 'tela tela-app' },
         cabecalhoApp(conta, { modulo: 'Louvor' }),
         h('main', { id: 'conteudo', class: 'app-conteudo' },
-            seletorEscala(conta, '#/escala'),
-            h('div', { class: 'escala-topo' }, titulo, botaoAgenda()),
-            h('p', { class: 'subtitulo-tela' }, 'Aqui estão os próximos cultos do Louvor.'),
+            navLouvor(conta, '#/escala', botaoAgenda()),
             faixaOffline,
             cartaoAvisos(),
             destaque,

@@ -10,7 +10,7 @@ import { h, icone, comCarregando } from '../util/dom.js';
 import { supabase } from '../supabase.js';
 import { mensagemDoBanco } from '../util/erros.js';
 import { hojeEmBrasilia, formatarHorario, partesDaData } from '../util/datas.js';
-import { cabecalhoApp } from './moldura.js';
+import { cabecalhoApp, navLouvor } from './moldura.js';
 import { folhaOuvir } from './repertorio.js';
 
 const POR_PAGINA = 40;   // cultos por vez; "Ver mais antigos" busca os próximos
@@ -46,8 +46,7 @@ export function telaRepertorios(conta) {
     const tela = h('div', { class: 'tela tela-app tela-repertorios' },
         cabecalhoApp(conta, { modulo: 'Louvor' }),
         h('main', { id: 'conteudo', class: 'app-conteudo' },
-            h('h1', { tabindex: -1, class: 'titulo-tela' }, 'Repertórios'),
-            h('p', { class: 'subtitulo-tela' }, 'O que o Louvor já tocou. Procure uma música para ver quando ela foi tocada.'),
+            navLouvor(conta, '#/repertorios'),
             h('div', { class: 'historico-busca' }, icone('lupa', 'icone icone-p'), busca),
             filtros,
             resumo,
