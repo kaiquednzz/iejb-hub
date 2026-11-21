@@ -7,15 +7,16 @@ import { h, icone } from '../../util/dom.js';
 import { abrirFolha, anunciar } from '../../util/folha.js';
 
 // Cores aproximadas das cédulas do Real (2ª família), para reconhecer de
-// relance; o valor escrito é o que vale.
+// relance, escurecidas para o texto branco ter contraste AA (>= 4,5:1).
+// O valor escrito é o que vale.
 const NOTAS = [
-    { c: 20000, rotulo: '200', cor: '#9C7C5A' },
-    { c: 10000, rotulo: '100', cor: '#3E7CB1' },
-    { c: 5000, rotulo: '50', cor: '#C77B30' },
-    { c: 2000, rotulo: '20', cor: '#D9A520' },
-    { c: 1000, rotulo: '10', cor: '#B8433A' },
-    { c: 500, rotulo: '5', cor: '#7B5A9E' },
-    { c: 200, rotulo: '2', cor: '#4D7F8C' },
+    { c: 20000, rotulo: '200', cor: '#7A5C3E' },
+    { c: 10000, rotulo: '100', cor: '#2F6A9E' },
+    { c: 5000, rotulo: '50', cor: '#A3561A' },
+    { c: 2000, rotulo: '20', cor: '#8C6400' },
+    { c: 1000, rotulo: '10', cor: '#A8352D' },
+    { c: 500, rotulo: '5', cor: '#6B4A8E' },
+    { c: 200, rotulo: '2', cor: '#3D6874' },
 ];
 const MOEDAS = [
     { c: 100, rotulo: '1' },

@@ -622,7 +622,7 @@ html.leve .chama-fora, html.leve .chama-dentro { animation: none; }
     border-top: 1px solid rgba(255, 255, 255, 0.14);
 }
 .dia-musicas li:first-child { border-top: none; }
-.dia-musica-n { font: 700 17px/1 var(--fonte-titulo); color: rgba(255, 255, 255, 0.6); }
+.dia-musica-n { font: 700 17px/1 var(--fonte-titulo); color: rgba(255, 255, 255, 0.75); }
 .dia-musica-titulo { display: grid; font: 600 17px/1.3 var(--fonte-texto); color: #fff; }
 .dia-musica-artista { font: 400 13px/1.3 var(--fonte-texto); color: rgba(255, 255, 255, 0.72); }
 .dia-musica-tom { min-width: 34px; text-align: center; font: 700 20px/1 var(--fonte-titulo); color: #fff; }
@@ -1071,3 +1071,11 @@ html.leve .chama-fora, html.leve .chama-dentro { animation: none; }
 .repertorio-acoes { display: grid; gap: var(--esp-2); }
 .repertorio-acoes > * { width: 100%; min-height: 46px; border-radius: var(--raio-2); box-shadow: none; font-size: 15px; }
 .repertorio-acoes .botao-youtube { justify-content: center; }
+
+/* Celular pequeno (iPhone SE, 320-359 px): as 4 partes do Louvor cabem sem
+   rolar para o lado */
+@media (max-width: 359px) {
+    .subnav { gap: 14px; }
+    .subnav a { font-size: 15px; }
+    .casa-nome { font-size: 34px; }
+}
