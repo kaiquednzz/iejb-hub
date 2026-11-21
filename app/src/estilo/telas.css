@@ -788,7 +788,6 @@
     border-radius: 50%;
     background: var(--principal-brighter);
     box-shadow: 0 0 0 2px var(--background);
-    animation: surgir 0.5s 0.6s var(--mola) backwards;
 }
 .agenda-folha a.botao-largo { display: inline-flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; }
 .agenda-mais { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; }

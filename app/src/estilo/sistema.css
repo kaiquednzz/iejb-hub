@@ -166,7 +166,7 @@ a.cabecalho-marca { text-decoration: none; min-height: 44px; border-radius: var(
     box-shadow: none;
     animation: none;
 }
-html.leve .barra-abas { -webkit-backdrop-filter: none; backdrop-filter: none; background: var(--cor-fundo); }
+html.leve .barra-abas { -webkit-backdrop-filter: none; backdrop-filter: none; background: none; }
 .barra-abas .aba,
 .barra-abas:has(.aba:nth-child(4)) .aba {
     min-width: 0;
@@ -455,27 +455,56 @@ html.leve .chama-fora, html.leve .chama-dentro { animation: none; }
 .cabecalho.com-area .cabecalho-modulo .cabecalho-titulo-modulo { display: none; }
 
 /* --- Barra de abas: a "gota" que desliza entre as abas ----------------------
-   A gota só existe na aba atual; como tem view-transition-name, na troca de
-   tela o navegador a anima da aba velha até a nova (Safari 18+, Chrome). */
+   Três camadas com view-transition-name próprio, para a troca de tela:
+   fundo (embaixo) → gota (no meio) → ícones e nomes (por cima). Antes a gota
+   era desenhada por cima dos ícones durante a troca e o ícone sumia. */
+.barra-abas {
+    view-transition-name: barra-abas;
+    background: none;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    isolation: isolate;
+}
+.barra-fundo {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    border-top: 1px solid var(--cor-borda);
+    background: rgba(253, 250, 245, 0.9);
+    -webkit-backdrop-filter: var(--desfoque);
+    backdrop-filter: var(--desfoque);
+    view-transition-name: barra-fundo;
+    pointer-events: none;
+}
+.barra-abas { border-top: none; }
+html.leve .barra-fundo { -webkit-backdrop-filter: none; backdrop-filter: none; background: var(--cor-fundo); }
 .barra-abas .aba { position: relative; }
 .aba-gota {
     position: absolute;
     top: 2px;
     left: 50%;
-    width: 52px;
-    height: 30px;
-    margin-left: -26px;
+    width: 56px;
+    height: 32px;
+    margin-left: -28px;
     border-radius: var(--raio-pilula);
     background: var(--cor-marca-sutil);
     view-transition-name: aba-gota;
     z-index: -1;
 }
-.barra-abas .aba .icone { position: relative; margin-top: 5px; }
-::view-transition-group(aba-gota) { animation-duration: 0.5s; animation-timing-function: var(--mola); }
-.barra-abas { view-transition-name: barra-abas; isolation: isolate; }
+.barra-abas .aba .icone { position: relative; margin-top: 6px; }
+.barra-abas .aba[aria-current="page"] .icone { color: var(--cor-marca); }
+::view-transition-group(barra-fundo) { z-index: 1; }
+::view-transition-group(aba-gota) { z-index: 2; animation-duration: 0.45s; animation-timing-function: var(--ease-ios); }
+::view-transition-group(barra-abas) { z-index: 3; }
 .cabecalho { view-transition-name: cabecalho; }
 ::view-transition-old(barra-abas), ::view-transition-new(barra-abas),
+::view-transition-old(barra-fundo), ::view-transition-new(barra-fundo),
 ::view-transition-old(cabecalho), ::view-transition-new(cabecalho) { animation: none; }
+/* Os ícones trocam de cor (cinza ↔ vermelho) num cruzamento rápido */
+::view-transition-old(barra-abas) { animation: sair-icones 0.2s ease both; }
+::view-transition-new(barra-abas) { animation: entrar-icones 0.2s ease both; }
+@keyframes sair-icones { to { opacity: 0; } }
+@keyframes entrar-icones { from { opacity: 0; } }
 
 /* O cartão do compromisso "vira" o da Escala (mesmo nome nas duas telas) */
 .inicio-destaque > .inicio-compromisso:first-child,
@@ -1078,4 +1107,22 @@ html.leve .chama-fora, html.leve .chama-dentro { animation: none; }
     .subnav { gap: 14px; }
     .subnav a { font-size: 15px; }
     .casa-nome { font-size: 34px; }
+}
+
+/* Botão de ícone carregando (ex.: agenda): o ícone continua visível e um
+   anel gira em volta do botão. O "carregando" comum escondia o ícone e
+   usava o ::after, que nesse botão já é a bolinha de novidade. */
+.botao-icone.carregando { color: inherit !important; }
+.botao-icone.carregando::after {
+    inset: -3px;
+    width: auto;
+    height: auto;
+    margin: 0;
+    top: -3px;
+    right: -3px;
+    border: 2px solid transparent;
+    border-top-color: var(--cor-marca);
+    background: none;
+    box-shadow: none;
+    animation: girar 0.7s linear infinite;
 }

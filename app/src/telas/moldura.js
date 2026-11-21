@@ -164,6 +164,9 @@ export function barraAbas(conta, rota) {
     const ministerios = aba('#/ministerios', 'Ministérios', 'igreja');
     if (conta.e_administrador) contadorDePedidos(ministerios, 'aba-contador');
     return h('nav', { class: 'barra-abas', 'aria-label': 'Menu principal' },
+        // Fundo separado dos ícones: na troca de tela a "gota" passa ENTRE os
+        // dois (fundo embaixo, gota no meio, ícones por cima). Ver sistema.css.
+        h('span', { class: 'barra-fundo', 'aria-hidden': 'true' }),
         aba('#/inicio', 'Início', 'casa'),
         aba('#/agenda', 'Agenda', 'calendario'),
         ministerios,
