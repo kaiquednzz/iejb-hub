@@ -1,6 +1,6 @@
 # IEJB Hub: Redesign e Design System
 
-Status: **implementado (v1)** em 17/11/2026. As cinco decisões da proposta foram aprovadas pelo Kaique ("permito tudo"). Ver seção 9 (decisões), 11 (o que foi feito) e 12 (o que ficou para depois).
+Status: **v1 implementada** em 17/11/2026; **v2 (identidade) implementada** em 20/11/2026, ver seção 13. As cinco decisões da proposta foram aprovadas pelo Kaique ("permito tudo"). Ver seção 9 (decisões), 11 (o que foi feito) e 12 (o que ficou para depois).
 Decisão registrada como **D66** em `VISAO-GERAL-IEJB-HUB.md`.
 Direção: Editorial + Institucional moderno + Minimalismo.
 Restrições: não remove funcionalidades, não muda regras de negócio nem permissões, preserva a identidade da IEJB (vermelho institucional, creme, Playfair Display).
@@ -247,3 +247,45 @@ Abas embaixo com os ícones centralizados (máx. 560 px); conteúdo em 720 px.
 - **Texto que acompanha o tamanho de letra do iPhone** (Dynamic Type, `-apple-system-body`): não feito; precisa de teste no aparelho.
 - **Esqueleto que vira erro depois de 8 s:** não feito.
 - **Financeiro** foi revisado só no layout (o simulador de testes não tem dados do caixa); conferir no app de verdade.
+
+---
+
+## 13. Redesign v2: identidade (20/11/2026, D67)
+
+Motivo: a v1 deixou o app organizado, mas neutro ("só mais um app"). A v2 dá personalidade com propósito, seguindo uma regra: **ousadia na apresentação, convenção nos controles** (voltar, ação principal e confirmação ficam sempre no mesmo lugar, por causa do público mais velho).
+
+### 13.1 Arquitetura: abas da pessoa, casa por ministério
+- Abas: **Início · Agenda · Ministérios · Você** (antes eram as abas do Louvor, o que não deixava o Hub crescer).
+- **Agenda** (`telas/agenda.js`): cultos em que a pessoa toca + eventos da igreja, por mês.
+- **Ministérios** (`telas/ministerios.js`): capa do Louvor, "em breve" (Kids, Pregações) e Administração (Pessoas, Eventos, Financeiro, mesmas regras de antes).
+- **Casa do Louvor** (`navLouvor` em `moldura.js`): "Ministério de *Louvor*" + abas de texto com traço (Escala, Montar só para o líder, Repertórios, Equipe). O `h1` de cada tela é "Louvor" (o leitor de tela ouve também a parte).
+
+### 13.2 Linguagem visual
+- **Boletim de culto:** todo `.rotulo-secao` dentro do `main` ganha numeração romana (I., II.) e filete fino; meses e títulos de destaque em Playfair itálica.
+- **Playfair itálica de verdade** (600/700, `estilo/fontes/`, via pacote @fontsource, licença OFL).
+- **A chama** (`util/chama.js`): acende no avatar de quem toca nos próximos 7 dias, aparece no dia de culto, no puxar para atualizar, no cartaz da formação e nas boas-vindas. Tremula só com transform; parada no modo leve e com movimento reduzido.
+
+### 13.3 O ritmo da semana (Início)
+Semana normal → cartão vermelho. **Véspera** e **dia de culto** → capa com contagem (relógio de Brasília), ordem do louvor numerada com tons, rostos de quem toca junto, Ver a escala / Ouvir tudo / Mandar no WhatsApp. **Depois do culto** (2h30 após o início) → "Obrigado por tocar hoje" + o que foi tocado. `theme-color` vermelho no dia de culto (vale no Android; no iPhone instalado a barra de status segue o fundo da página).
+
+### 13.4 Acabamento
+Transição do cartão do compromisso para a Escala (View Transitions, `view-transition-name: compromisso`); "gota" que desliza entre as abas; traço que desliza na casa do Louvor; título compacto no cabeçalho ao rolar (`util/rolagem.js`); puxar para atualizar com a chama (só no app instalado).
+
+### 13.5 Por módulo
+| Onde | O quê |
+|---|---|
+| Escala | Formação como cartaz de banda (rostos grandes, você com anel e chama) |
+| Montar | Barra "mês completo" (montados x publicados); **imagem da escala do mês** em layout de boletim, 1080×1350, pelo compartilhamento do celular (`util/imagem-escala.js`) |
+| Repertórios | Capas de encarte; "As mais tocadas" (com 3+ cultos no histórico); **mandar no WhatsApp** (músicas, tons, links e "ouvir tudo", `util/compartilhar.js`) também na Escala e no dia de culto |
+| Editor de repertório | "tocada há N semanas" (âmbar se < 4 semanas) / "nunca tocada" |
+| Equipe | Mural de rostos para quem só vê contatos; lista com selos para quem administra |
+| Financeiro | **Contar pelas notas** (`telas/financeiro/cedulas.js`, opcional, só preenche o campo); **Prestação de contas (PDF)** pela impressão do sistema (`relatorio.js`) |
+| Eventos | Detalhe como capa de revista (imagem + data, ou capa tipográfica) |
+| Você | **Carteirinha digital** com reflexo em faixa lisa (sem degradê) que segue o dedo ou a inclinação (pede permissão no iPhone) |
+| Primeiro acesso | "Que bom que você chegou", perguntas em tom de conversa, chama no título |
+
+### 13.6 Verificação
+Sem vazamento horizontal em 320, 820 e 1366 px em 11 telas; contraste AA calculado (cédulas escurecidas para o branco passar de 4,5:1); um `h1` por tela; aba e parte do Louvor certas com `aria-current`; folha encosta no rodapé; cédulas somam certo (teste: 3×100 + 50 + 0,50 = 350,50); prestação de contas confere com os lançamentos de teste.
+
+### 13.7 Fica para depois
+Modo palco (descartado: sem cifra não ajuda); retrospectiva "Seu ano no louvor" (dezembro de 2027, os dados foram zerados em 16/11); arrastar grupos no Montar (o toque já resolve e é melhor para quem tem a mão menos firme); backup (próximo item).
