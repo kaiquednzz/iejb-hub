@@ -21,7 +21,7 @@ export async function carregarConta(idUsuario) {
 async function buscarConta(idUsuario) {
     const { data, error } = await supabase
         .from('conta')
-        .select(`id, login, estado, e_administrador, senha_temporaria, nome_informado, apresentou_em, foto_informada,
+        .select(`id, login, estado, e_administrador, senha_temporaria, nome_informado, apresentou_em, foto_informada, criado_em,
                  pessoa:pessoa_id ( id, nome, apelido, foto, membro_ministerio ( e_lider, ativo ), cargo_pessoa ( cargo ) )`)
         .eq('id', idUsuario)
         .maybeSingle()

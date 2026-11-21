@@ -15,6 +15,59 @@ export function linhaLista({ href, nome, texto, nomeIcone }) {
         icone('seta', 'icone icone-p item-seta')));
 }
 
+const MESES = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
+
+// Carteirinha digital (redesign v2, fase 3): o cartão da pessoa no Hub, com
+// foto, nome, papel e ministério. O reflexo é uma faixa de luz lisa (sem
+// degradê) que anda quando a pessoa arrasta o dedo sobre o cartão ou, se
+// ela permitir, quando inclina o celular.
+function carteirinha(conta, pessoa, nome) {
+    const ministerios = (pessoa.membro_ministerio ?? []).some((m) => m.ativo) ? 'Ministério de Louvor' : null;
+    const desde = conta.criado_em ? `${MESES[Number(conta.criado_em.slice(5, 7)) - 1]} de ${conta.criado_em.slice(0, 4)}` : null;
+    const cartao = h('section', { class: 'carteirinha', 'aria-label': `Carteirinha de ${nome}` },
+        h('div', { class: 'carteirinha-topo' },
+            h('img', { src: '/logo-iejb-pequeno.png', alt: '', width: 28, height: 28 }),
+            h('span', null, 'IEJB · Membro')),
+        h('div', { class: 'carteirinha-meio' },
+            avatar(pessoa, 'pessoa-avatar carteirinha-foto'),
+            h('div', null,
+                h('p', { class: 'carteirinha-nome' }, nome),
+                h('p', { class: 'carteirinha-papel' }, papelPrincipal(conta)),
+                ministerios && h('p', { class: 'carteirinha-ministerio' }, ministerios))),
+        desde && h('p', { class: 'carteirinha-desde' }, `No IEJB Hub desde ${desde}`),
+        h('span', { class: 'carteirinha-brilho', 'aria-hidden': 'true' }));
+
+    const mover = (px, py) => {
+        cartao.style.setProperty('--brilho', `${(px * 160 - 40).toFixed(1)}%`);
+        cartao.style.setProperty('--incl-x', `${((py - 0.5) * -8).toFixed(2)}deg`);
+        cartao.style.setProperty('--incl-y', `${((px - 0.5) * 10).toFixed(2)}deg`);
+    };
+    cartao.addEventListener('pointermove', (e) => {
+        const r = cartao.getBoundingClientRect();
+        mover((e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height);
+    });
+    cartao.addEventListener('pointerleave', () => mover(0.5, 0.5));
+    // Inclinar o celular: no iPhone precisa pedir permissão (no primeiro toque)
+    let ouvindo = false;
+    cartao.addEventListener('click', async () => {
+        if (ouvindo || !('DeviceOrientationEvent' in window)) return;
+        try {
+            if (typeof DeviceOrientationEvent.requestPermission === 'function'
+                && await DeviceOrientationEvent.requestPermission() !== 'granted') return;
+        } catch { return; }
+        ouvindo = true;
+        const girar = (e) => {
+            if (!cartao.isConnected) return window.removeEventListener('deviceorientation', girar);
+            const gx = Math.max(-30, Math.min(30, e.gamma ?? 0));
+            const by = Math.max(10, Math.min(70, e.beta ?? 40));
+            mover((gx + 30) / 60, (by - 10) / 60);
+        };
+        window.addEventListener('deviceorientation', girar);
+    });
+    mover(0.5, 0.5);
+    return cartao;
+}
+
 export function telaVoce(conta) {
     const pessoa = conta.pessoa ?? { nome: conta.nome_informado };
     const nome = pessoa.apelido || pessoa.nome || conta.nome_informado || 'Você';
@@ -26,12 +79,8 @@ export function telaVoce(conta) {
         cabecalhoApp(conta),
         h('main', { id: 'conteudo', class: 'app-conteudo' },
             h('h1', { class: 'sr-only', tabindex: -1 }, 'Você'),
-            h('section', { class: 'voce-perfil', 'aria-label': 'Seu perfil' },
-                avatar(pessoa, 'pessoa-avatar voce-avatar'),
-                h('div', null,
-                    h('p', { class: 'voce-nome' }, nome),
-                    h('p', { class: 'voce-papel' }, papelPrincipal(conta)),
-                    conta.login && h('p', { class: 'voce-login' }, conta.login))),
+            carteirinha(conta, pessoa, nome),
+            conta.login && h('p', { class: 'voce-login' }, `Você entra com ${conta.login}`),
             h('h2', { class: 'rotulo-secao' }, 'Sobre o app'),
             h('ul', { class: 'grupo-lista' },
                 linhaLista({ href: '#/privacidade', nome: 'Política de privacidade', nomeIcone: 'escudo' }),

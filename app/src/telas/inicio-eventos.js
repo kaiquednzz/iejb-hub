@@ -79,7 +79,14 @@ export function detalhesDoEvento(e) {
     abrirFolha({
         titulo: e.titulo,
         conteudo: h('div', { class: 'form evento-detalhe' },
-            imagem && h('img', { class: 'evento-detalhe-img', src: imagem, alt: '', decoding: 'async', width: 800, height: 450 }),
+            // Capa de revista: a imagem grande com a data em cima; sem imagem,
+            // uma capa tipográfica com a mesma data
+            h('div', { class: `evento-capa${imagem ? ' com-imagem' : ''}` },
+                imagem && h('img', { class: 'evento-detalhe-img', src: imagem, alt: '', decoding: 'async', width: 800, height: 450 }),
+                h('div', { class: 'evento-capa-data', 'aria-hidden': 'true' },
+                    h('span', { class: 'evento-capa-dia' }, partesDaData(e.data).dia),
+                    h('span', { class: 'evento-capa-mes' }, partesDaData(e.data).mes),
+                    h('span', { class: 'evento-capa-semana' }, partesDaData(e.data).semana))),
             h('p', { class: 'evento-detalhe-categoria' }, e.categoria),
             h('ul', { class: 'evento-detalhe-fatos' },
                 h('li', null, icone('calendario', 'icone icone-p'), quando),

@@ -1,5 +1,6 @@
 // Folhas do financeiro: lançar (entrada, saída, depósito), contagem do culto,
 // detalhe com histórico, cancelar e ajustes (saldo inicial e categorias).
+import { botaoCedulas } from './cedulas.js';
 import { h, icone, comCarregando } from '../../util/dom.js';
 import { supabase } from '../../supabase.js';
 import { abrirFolha, avisar } from '../../util/folha.js';
@@ -230,6 +231,8 @@ export async function folhaContagem(dados, conta, recarregar, inicial = {}) {
         h('p', { class: 'folha-texto folha-texto-pequeno' }, `Vai para ${caixa?.nome ?? 'o caixa'} depois da conferência.`),
         data.elemento, culto.elemento,
         h('div', { class: 'fin-dois' }, dizimos.elemento, ofertas.elemento),
+        // Opcional: contar tocando nas figuras das notas em vez de digitar
+        h('div', { class: 'fin-dois fin-cedulas' }, botaoCedulas(dizimos, 'Dízimos pelas notas'), botaoCedulas(ofertas, 'Ofertas pelas notas')),
         total, modo.elemento, areaModo, obs.elemento, aviso.elemento, salvar);
     form.addEventListener('submit', (evento) => {
         evento.preventDefault();

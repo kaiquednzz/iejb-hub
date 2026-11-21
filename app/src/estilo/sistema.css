@@ -832,6 +832,209 @@ html.leve .chama-fora, html.leve .chama-dentro { animation: none; }
 .mural-nome { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 600 15px/1.2 var(--fonte-texto); }
 .mural-instrumentos { font: 400 13px/1.3 var(--fonte-texto); color: var(--cor-texto-2); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 
+/* ==========================================================================
+   Fase 3: resto da igreja
+   ========================================================================== */
+
+/* --- Contar pelas notas (Financeiro) -------------------------------------- */
+.fin-cedulas { margin-top: calc(var(--esp-2) * -1); }
+.botao-cedulas {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 40px;
+    padding: 0 var(--esp-1);
+    border: none;
+    background: none;
+    color: var(--cor-marca);
+    font: 600 14px/1.2 var(--fonte-texto);
+    cursor: pointer;
+}
+.cedulas { display: grid; gap: var(--esp-3); }
+.cedulas-topo {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    padding: var(--esp-2) 0;
+    background: var(--cor-fundo);
+    border-bottom: 1px solid var(--cor-borda);
+}
+.cedulas-total { font: 700 36px/1 var(--fonte-titulo); font-variant-numeric: lining-nums tabular-nums; color: var(--cor-titulo); }
+.cedulas-total.pulou { animation: pulou 0.35s var(--mola); }
+@keyframes pulou { 40% { transform: scale(1.06); } }
+.cedulas-grupo { font: var(--texto-rotulo); letter-spacing: var(--rotulo-espaco); text-transform: uppercase; color: var(--cor-texto-2); }
+.cedulas-notas, .cedulas-moedas { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--esp-3); }
+.cedulas-notas { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.cedulas-moedas { grid-template-columns: repeat(auto-fill, minmax(76px, 1fr)); }
+.cedula-lugar { position: relative; }
+.cedula {
+    position: relative;
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+    width: 100%;
+    border: none;
+    cursor: pointer;
+    font: inherit;
+    transition: transform 0.35s var(--mola);
+}
+.cedula-nota {
+    height: 72px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: var(--cor);
+    color: #fff;
+    /* "Pilha": cada nota a mais mostra uma borda atrás (até 3) */
+    box-shadow: 0 0 0 0 transparent;
+}
+.cedula-nota[data-pilha="1"] { box-shadow: 4px 4px 0 -1px color-mix(in srgb, var(--cor) 70%, white); }
+.cedula-nota[data-pilha="2"] { box-shadow: 4px 4px 0 -1px color-mix(in srgb, var(--cor) 70%, white), 8px 8px 0 -2px color-mix(in srgb, var(--cor) 45%, white); }
+.cedula-nota[data-pilha="3"] { box-shadow: 4px 4px 0 -1px color-mix(in srgb, var(--cor) 70%, white), 8px 8px 0 -2px color-mix(in srgb, var(--cor) 45%, white), 12px 12px 0 -3px color-mix(in srgb, var(--cor) 25%, white); }
+.cedula-nota::after { content: ''; position: absolute; right: 10px; top: 10px; width: 26px; height: 26px; border-radius: 50%; border: 2px solid rgba(255, 255, 255, 0.35); }
+.cedula-moeda {
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: #D8C48A;
+    color: #4A3A10;
+    box-shadow: inset 0 0 0 4px #C4AE6E;
+}
+.cedula-rs { font: 600 13px/1 var(--fonte-texto); opacity: 0.85; }
+.cedula-valor { font: 700 28px/1 var(--fonte-titulo); font-variant-numeric: lining-nums; }
+.cedula-moeda .cedula-valor { font-size: 18px; }
+.cedula-n {
+    position: absolute;
+    left: 12px;
+    bottom: 8px;
+    font: 700 15px/1 var(--fonte-texto);
+    font-variant-numeric: tabular-nums;
+}
+.cedula-moeda .cedula-n { position: static; font-size: 13px; }
+.cedula.tocou { animation: tocouNota 0.32s var(--mola); }
+@keyframes tocouNota { 35% { transform: translateY(-4px) scale(1.03); } }
+.cedula-menos {
+    position: absolute;
+    top: -8px;
+    right: -6px;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 2px solid var(--cor-fundo);
+    background: var(--cor-texto);
+    color: #fff;
+    font: 700 18px/1 var(--fonte-texto);
+    cursor: pointer;
+}
+.cedulas .botao-principal { margin-top: var(--esp-2); }
+
+/* --- Prestação de contas (só na impressão) -------------------------------- */
+.impressao { display: none; }
+.fin-relatorio-botao { margin-top: var(--esp-6); }
+@media print {
+    html.imprimindo body > *:not(.impressao) { display: none !important; }
+    html.imprimindo .impressao { display: block; color: #1F1513; font: 11pt/1.45 var(--fonte-texto); }
+    @page { size: A4; margin: 18mm 16mm; }
+    .rel-capa { padding-bottom: 10mm; border-bottom: 2px solid #8F0D0B; }
+    .rel-igreja { font: 600 9pt/1.3 var(--fonte-texto); letter-spacing: 0.12em; text-transform: uppercase; color: #8F0D0B; }
+    .rel-capa h1 { margin: 4mm 0 1mm; font: italic 700 30pt/1.05 var(--fonte-titulo); color: #3A0A09; }
+    .rel-mes { font: 400 13pt/1.3 var(--fonte-texto); color: #5C5150; }
+    .rel-resultado { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6mm; margin: 8mm 0; }
+    .rel-resultado div { display: grid; padding: 4mm; border: 1px solid #E6DACB; border-radius: 3mm; }
+    .rel-resultado span { font: 600 8.5pt/1.3 var(--fonte-texto); letter-spacing: 0.08em; text-transform: uppercase; color: #5C5150; }
+    .rel-resultado strong { font: 700 17pt/1.2 var(--fonte-titulo); font-variant-numeric: lining-nums; }
+    .rel-positivo strong { color: #1F7A4D; }
+    .rel-negativo strong { color: #8F0D0B; }
+    .rel-bloco { margin-top: 7mm; break-inside: avoid; }
+    .rel-bloco h2 { margin-bottom: 2mm; font: 600 9pt/1.3 var(--fonte-texto); letter-spacing: 0.1em; text-transform: uppercase; color: #8F0D0B; }
+    .rel-bloco table { width: 100%; border-collapse: collapse; }
+    .rel-bloco td { padding: 2mm 0; border-bottom: 1px solid #EFE6DA; }
+    .rel-bloco tfoot td { font-weight: 700; border-bottom: none; border-top: 1.5px solid #1F1513; }
+    .rel-pct { width: 16mm; text-align: right; color: #5C5150; }
+    .rel-valor { width: 40mm; text-align: right; font-variant-numeric: tabular-nums; }
+    .rel-rodape { margin-top: 12mm; font-size: 8.5pt; color: #5C5150; }
+    .rel-assinaturas { display: grid; grid-template-columns: 1fr 1fr; gap: 16mm; margin-top: 18mm; }
+    .rel-assinaturas span { padding-top: 2mm; border-top: 1px solid #1F1513; text-align: center; color: #1F1513; }
+}
+
+/* --- Evento como capa de revista ------------------------------------------ */
+.evento-capa {
+    position: relative;
+    display: grid;
+    min-height: 150px;
+    margin: 0 0 var(--esp-2);
+    padding: var(--esp-5);
+    border-radius: var(--raio-3);
+    background: var(--cor-marca);
+    overflow: hidden;
+    align-content: end;
+}
+.evento-capa.com-imagem { padding: 0; min-height: 0; background: var(--cor-superficie-rebaixada); }
+.evento-capa .evento-detalhe-img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 0; margin: 0; }
+.evento-capa-data { display: grid; justify-items: start; color: #fff; }
+.evento-capa.com-imagem .evento-capa-data {
+    position: absolute;
+    left: var(--esp-3);
+    bottom: var(--esp-3);
+    padding: 8px 12px;
+    border-radius: var(--raio-2);
+    background: var(--cor-marca);
+}
+.evento-capa-dia { font: 700 44px/1 var(--fonte-titulo); font-variant-numeric: lining-nums; }
+.evento-capa.com-imagem .evento-capa-dia { font-size: 30px; }
+.evento-capa-mes { font: 600 13px/1.2 var(--fonte-texto); letter-spacing: 0.08em; text-transform: uppercase; }
+.evento-capa-semana { font: italic 600 18px/1.2 var(--fonte-titulo); opacity: 0.9; }
+.evento-capa.com-imagem .evento-capa-semana { display: none; }
+
+/* --- Carteirinha (Você) ---------------------------------------------------- */
+.carteirinha {
+    position: relative;
+    display: grid;
+    gap: var(--esp-4);
+    aspect-ratio: 1.586;
+    max-width: 440px;
+    padding: var(--esp-5);
+    border-radius: var(--raio-3);
+    background: var(--cor-marca);
+    color: #fff;
+    overflow: hidden;
+    isolation: isolate;
+    transform: perspective(900px) rotateX(var(--incl-x, 0deg)) rotateY(var(--incl-y, 0deg));
+    transition: transform 0.4s var(--ease-out);
+    touch-action: pan-y;
+    animation: subir 0.55s var(--ease-out) backwards;
+    box-shadow: var(--elev-2);
+}
+.carteirinha-topo { display: flex; align-items: center; gap: 8px; font: 600 12px/1 var(--fonte-texto); letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255, 255, 255, 0.85); }
+.carteirinha-topo img { width: 24px; height: 24px; }
+.carteirinha-meio { display: flex; align-items: center; gap: var(--esp-4); align-self: center; }
+.carteirinha-foto { width: 72px; height: 72px; flex: none; font-size: 24px; box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.9); }
+.carteirinha-nome { font: italic 700 28px/1.1 var(--fonte-titulo); }
+.carteirinha-papel { margin-top: 2px; font: 600 15px/1.3 var(--fonte-texto); color: rgba(255, 255, 255, 0.92); }
+.carteirinha-ministerio { font: 400 13px/1.3 var(--fonte-texto); color: rgba(255, 255, 255, 0.8); }
+.carteirinha-desde { align-self: end; font: 400 12px/1.3 var(--fonte-texto); letter-spacing: 0.04em; color: rgba(255, 255, 255, 0.75); }
+/* O reflexo: uma faixa de luz lisa e inclinada que anda com o dedo */
+.carteirinha-brilho {
+    position: absolute;
+    top: -30%;
+    bottom: -30%;
+    left: var(--brilho, 40%);
+    width: 26%;
+    background: rgba(255, 255, 255, 0.09);
+    transform: skewX(-22deg);
+    pointer-events: none;
+    transition: left 0.35s var(--ease-out);
+}
+.carteirinha-brilho::after { content: ''; position: absolute; inset: 0 auto 0 110%; width: 18%; background: rgba(255, 255, 255, 0.06); }
+.voce-login { margin-top: var(--esp-3); padding-inline: var(--esp-1); }
+
+/* --- Boas-vindas (primeiro acesso) ----------------------------------------- */
+.chama-boas-vindas { width: 30px; height: 30px; margin-right: 6px; vertical-align: -4px; }
+
 /* --- Computador ------------------------------------------------------------ */
 @media (min-width: 1024px) {
     .tela-app { padding-bottom: 56px; }

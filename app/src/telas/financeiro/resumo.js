@@ -14,6 +14,7 @@ import { h, icone } from '../../util/dom.js';
 import { supabase } from '../../supabase.js';
 import { hojeEmBrasilia } from '../../util/datas.js';
 import { reais, MESES, nomeDoMes, primeiroDoMes, somarMeses } from './util.js';
+import { botaoRelatorio } from './relatorio.js';
 
 const PCT = new Intl.NumberFormat('pt-BR', { style: 'percent', maximumFractionDigits: 0 });
 const MESES_CURTOS = MESES.map((m) => m.slice(0, 3));
@@ -162,6 +163,8 @@ function montar(r, dados, irParaMes) {
         listaCategorias('Para onde foi', 'saida', r.saidas, saidas, r.base),
         // No mês em andamento as entradas ainda não chegaram todas: comparar só assusta
         listaCategorias('De onde veio', 'entrada', r.entradas, entradas, r.emAndamento ? [] : r.base),
+        // Relatório para o pastor / a assembleia
+        botaoRelatorio(r, dados),
     ];
 }
 

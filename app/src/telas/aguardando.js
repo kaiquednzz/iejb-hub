@@ -4,11 +4,12 @@ import { supabase } from '../supabase.js';
 import { molduraEntrada, campo, caixaDeAviso } from './moldura.js';
 import { blocoFoto } from './equipe/pecas.js';
 import { avisar } from '../util/folha.js';
+import { chama } from '../util/chama.js';
 
 const TEXTOS = {
     pendente: {
         titulo: 'Pedido enviado',
-        corpo: 'Agora é só esperar a liberação. Depois, abra o Hub de novo.',
+        corpo: 'Recebemos você. Assim que a liderança liberar, é só abrir o Hub de novo.',
     },
     recusada: {
         titulo: 'Acesso não liberado',
@@ -44,10 +45,10 @@ function telaApresentar(conta, depois) {
     const aviso = caixaDeAviso();
     const nome = campo({ rotulo: 'Como quer ser chamado?', nome: 'nome', autocomplete: 'name', maxlength: 60, value: conta.nome_informado ?? '' });
     const destino = { pasta: `contas/${conta.id}`, definir: async (caminho) => { foto = caminho; return { error: null }; } };
-    const continuar = h('button', { type: 'submit', class: 'botao-principal botao-largo' }, 'Continuar');
+    const continuar = h('button', { type: 'submit', class: 'botao-principal botao-largo' }, 'Enviar e entrar na fila');
 
     // O que faz na igreja (opcional). É só um pedido: o admin aprova.
-    const funcoes = fichasMultiplas('O que você faz na igreja?', FUNCOES);
+    const funcoes = fichasMultiplas('Você serve em alguma dessas áreas?', FUNCOES);
     const instrumentos = fichasMultiplas('Toca ou canta o quê?', INSTRUMENTOS);
     instrumentos.elemento.hidden = true;
     funcoes.aoMudar(() => { instrumentos.elemento.hidden = !funcoes.valores().includes('louvor'); });
@@ -74,7 +75,13 @@ function telaApresentar(conta, depois) {
         });
     });
 
-    return molduraEntrada({ titulo: 'Quase lá!', conteudo: form });
+    // Acolhimento (redesign v2): a pessoa é recebida como quem chega na
+    // igreja, não como quem preenche cadastro. A chama acende no título.
+    return molduraEntrada({
+        titulo: [chama('chama-boas-vindas'), 'Que bom que você chegou'],
+        subtitulo: 'Conta pra gente quem é você. A liderança confere e libera o seu acesso.',
+        conteudo: form,
+    });
 }
 
 const FUNCOES = [['louvor', 'Louvor'], ['tesouraria', 'Tesouraria'], ['comunicacao', 'Comunicação'], ['pastor', 'Pastor']];
