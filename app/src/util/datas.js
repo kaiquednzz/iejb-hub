@@ -20,10 +20,12 @@ export function diasEntre(a, b) {
 }
 
 // "Hoje", "Amanhã" ou "Domingo, 15 de nov."
-export function rotuloDoDia(dataISO) {
+// absoluto = true: sempre "Domingo, 22 de nov." (para mensagens, que podem
+// ser lidas em outro dia; "Amanhã" ficaria errado)
+export function rotuloDoDia(dataISO, absoluto = false) {
     const diferenca = diasEntre(hojeEmBrasilia(), dataISO);
-    if (diferenca === 0) return 'Hoje';
-    if (diferenca === 1) return 'Amanhã';
+    if (!absoluto && diferenca === 0) return 'Hoje';
+    if (!absoluto && diferenca === 1) return 'Amanhã';
     const texto = new Intl.DateTimeFormat('pt-BR', {
         weekday: 'long', day: 'numeric', month: 'short', timeZone: 'UTC',
     }).format(new Date(`${dataISO}T12:00:00Z`));

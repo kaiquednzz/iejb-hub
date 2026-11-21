@@ -62,7 +62,8 @@ export function telaRepertorios(conta) {
         const ultimo = cultos.at(-1);
         let consulta = supabase.from('culto')
             .select(`id, nome, rotulo, data, horario,
-                escala ( escala_grupo ( grupo:grupo_id ( id, nome ) ) ),
+                escala ( escala_grupo ( grupo:grupo_id ( id, nome ) ),
+                    escala_item ( instrumento_exibido, saiu_em, pessoa:pessoa_id ( nome, apelido ) ) ),
                 repertorio_item!inner ( id, posicao, tom, musica:musica_id ( id, titulo, artista, link, links_streaming ) )`)
             .eq('estado', 'ativo').lte('data', hojeEmBrasilia())
             .order('data', { ascending: false }).order('horario', { ascending: false })

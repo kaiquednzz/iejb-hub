@@ -115,15 +115,31 @@ export function telaEscala(conta) {
             focarCulto(evento.currentTarget.getAttribute('href').slice(7));
         });
         if (location.hash.startsWith('#culto-')) focarCulto(location.hash.slice(7));
+        // Veio pelo link do WhatsApp (#/culto/<id>): abre o culto e o repertório.
+        // Culto que já saiu da escala (passou): manda para o histórico.
+        if (location.hash.startsWith('#/culto/')) {
+            const id = location.hash.slice(8);
+            history.replaceState(null, '', '#/escala');
+            if (!focarCulto(id, true)) location.hash = '#/repertorios';
+        }
     }
 
-    function focarCulto(id) {
+    function focarCulto(id, comRepertorio = false) {
         const abrir = seletores.get(id);
-        if (!abrir) return;
+        if (!abrir) return false;
         abrir(true);
         const bloco = lista.querySelector(`[data-culto="${CSS.escape(id)}"]`);
-        bloco?.closest('.semana-escala')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        // O cartão do culto fica no palco da semana (o primeiro [data-culto]
+        // é o botão do dia, que não tem repertório)
+        const cartao = lista.querySelector(`.palco-semana [data-culto="${CSS.escape(id)}"]`);
+        const repertorio = comRepertorio && cartao?.querySelector('details.repertorio');
+        if (repertorio) repertorio.open = true;
+        // Pelo link do repertório, rola até as músicas; senão, até a semana
+        // (espera o painel do culto terminar de abrir, senão a posição muda)
+        const ir = () => (repertorio || bloco?.closest('.semana-escala'))?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        if (repertorio) setTimeout(ir, 500); else ir();
         bloco?.focus({ preventScroll: true });
+        return true;
     }
 
     async function gerarCultos() {

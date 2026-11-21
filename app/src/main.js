@@ -82,8 +82,12 @@ const ROTAS_DA_CONTA = {
 };
 // Que item da barra lateral acende: a rota que de fato abriu (quem não pode
 // montar escala cai na Escala, quem não vê o financeiro cai no Início...)
+// Link de um culto (#/culto/<id>, o que vai na mensagem do repertório no
+// WhatsApp): abre a Escala, que procura o culto e abre o repertório dele
+const LINK_DE_CULTO = /^#\/culto\/[\w-]+$/;
 function rotaAberta(conta) {
     const h = location.hash;
+    if (LINK_DE_CULTO.test(h)) return '#/escala';
     if (h === '#/montar' && !eLiderDeLouvor(conta)) return '#/escala';
     if ((h === '#/eventos' && !cuidaDosEventos(conta)) || (h === '#/financeiro' && !veFinanceiro(conta))
         || (h === '#/pessoas' && !conta.e_administrador)) return '#/inicio';
@@ -92,7 +96,7 @@ function rotaAberta(conta) {
 // Toda tela de quem já entrou leva a barra lateral (o CSS só a mostra no
 // computador) e a barra de abas (só no celular e no tablet)
 function telaDaConta(conta) {
-    const tela = (ROTAS_DA_CONTA[location.hash] ?? telaInicio)(conta);
+    const tela = (ROTAS_DA_CONTA[rotaAberta(conta)] ?? telaInicio)(conta);
     const rota = rotaAberta(conta);
     tela.prepend(barraLateral(conta, rota));
     tela.append(barraAbas(conta, rota));
@@ -138,7 +142,8 @@ async function decidirTela() {
         tela = (ROTAS_SEM_CONTA[location.hash] ?? telaEntrar)();
     } else {
         // Logado: o #/pedir-acesso não faz mais sentido (e voltaria ao sair)
-        if (location.hash && !ROTAS_DA_CONTA[location.hash]) history.replaceState(null, '', location.pathname);
+        // (o link de um culto, #/culto/<id>, fica: a Escala usa)
+        if (location.hash && !ROTAS_DA_CONTA[location.hash] && !LINK_DE_CULTO.test(location.hash)) history.replaceState(null, '', location.pathname);
         const { conta, erro } = await carregarConta(session.user.id);
         if (erro) tela = telaErro(erro, decidirTela);
         // pendente, recusada ou desativada: a tela explica cada caso
