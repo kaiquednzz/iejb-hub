@@ -1126,3 +1126,80 @@ html.leve .barra-fundo { -webkit-backdrop-filter: none; backdrop-filter: none; b
     box-shadow: none;
     animation: girar 0.7s linear infinite;
 }
+
+/* --- Ícones dos instrumentos ------------------------------------------------ */
+.icone-instrumento { width: 16px; height: 16px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+.instrumentos, .pessoa-instrumento.instrumentos { display: inline-flex; flex-wrap: wrap; justify-content: center; gap: 2px 8px; }
+.instrumento { display: inline-flex; align-items: center; gap: 3px; }
+.cartao-escala .pessoa-instrumento .icone-instrumento { color: var(--cor-marca); }
+.compromisso-chip { display: inline-flex; align-items: center; gap: 5px; }
+.compromisso-chip .icone-instrumento { width: 15px; height: 15px; }
+.dia-voce { display: flex; flex-wrap: wrap; align-items: center; gap: var(--esp-2); }
+.dia-voce > span:first-child { font: var(--texto-rotulo); letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255, 255, 255, 0.8); }
+.dia-rosto-inst { display: flex; justify-content: center; gap: 2px; color: rgba(255, 255, 255, 0.85); }
+.dia-rosto-inst .icone-instrumento { width: 14px; height: 14px; }
+.dia-rostos li { width: 60px; }
+.mural-icones { display: flex; justify-content: center; gap: 6px; color: var(--cor-marca); }
+.mural-icones .icone-instrumento { width: 18px; height: 18px; }
+
+/* --- Folhinha: a folha do calendário de mesa ------------------------------- */
+.bloco-data.folhinha {
+    position: relative;
+    display: grid;
+    grid-template-rows: 16px 1fr;
+    place-content: stretch;
+    justify-items: stretch;
+    width: 50px;
+    height: 56px;
+    margin-top: 4px;
+    padding: 0;
+    border-radius: 9px;
+    background: var(--cor-superficie);
+    border: 1px solid var(--cor-borda);
+    box-shadow: 0 2px 0 -1px var(--cor-superficie), 0 2px 0 0 var(--cor-borda), 0 4px 0 -1px var(--cor-superficie), 0 4px 0 0 var(--cor-borda);
+    overflow: visible;
+}
+.folhinha-mes {
+    display: grid;
+    place-items: center;
+    margin: -1px -1px 0;
+    border-radius: 9px 9px 0 0;
+    background: var(--cor-marca);
+    color: #fff !important;
+    font: 700 10px/1 var(--fonte-texto) !important;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+.folhinha-dia {
+    display: grid;
+    place-items: center;
+    font: 700 24px/1 var(--fonte-titulo) !important;
+    font-variant-numeric: lining-nums;
+    color: var(--cor-titulo) !important;
+}
+/* As duas argolas que prendem a folha */
+.folhinha-argolas::before, .folhinha-argolas::after {
+    content: '';
+    position: absolute;
+    top: -4px;
+    width: 4px;
+    height: 9px;
+    border-radius: 3px;
+    background: var(--cor-texto-2);
+    box-shadow: 0 0 0 1.5px var(--cor-superficie);
+}
+.folhinha-argolas::before { left: 13px; }
+.folhinha-argolas::after { right: 13px; }
+/* Culto em que você toca (Agenda): folha toda vermelha */
+.agenda-culto .bloco-data.folhinha { background: var(--cor-marca-sutil); border-color: #E7C6C2; }
+.agenda-culto .folhinha-dia { color: var(--cor-marca) !important; }
+.agenda-culto.nao-vai .folhinha-mes { background: var(--cor-texto-3); }
+.agenda-culto.nao-vai .folhinha-dia { color: var(--cor-texto-3) !important; }
+.agenda-culto .bloco-data-mes { color: #fff; }
+.evento-linha.agora .bloco-data.folhinha { background: var(--cor-sucesso-sutil); }
+.evento-linha.agora .folhinha-mes { background: var(--cor-sucesso); }
+
+.evento-chapeu { font: 700 11px/1.2 var(--fonte-texto); letter-spacing: 0.08em; text-transform: uppercase; color: var(--cor-marca); }
+.evento-linha .item-textos { gap: 2px; }
+.evento-linha { align-items: center; padding-block: var(--esp-3); }
+.evento-miniatura { flex: none; width: 56px; height: 56px; border-radius: var(--raio-2); object-fit: cover; background: var(--cor-superficie-rebaixada); }

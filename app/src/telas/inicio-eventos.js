@@ -46,27 +46,38 @@ export function blocoEventos() {
     }
 }
 
-// Bloco de data (componente do design system): dia grande, mês pequeno
+// Folhinha (componente do design system): a folha de um calendário de mesa,
+// com as duas argolas, a faixa do mês em cima e o dia grande no papel.
+// Usada nos eventos, na Agenda e onde mais houver uma data.
 export function blocoData(dataISO) {
     const p = partesDaData(dataISO);
-    return h('span', { class: 'bloco-data', 'aria-hidden': 'true' },
-        h('span', { class: 'bloco-data-dia' }, p.dia),
-        h('span', { class: 'bloco-data-mes' }, p.mes));
+    return h('span', { class: 'bloco-data folhinha', 'aria-hidden': 'true' },
+        h('span', { class: 'folhinha-argolas' }),
+        h('span', { class: 'bloco-data-mes folhinha-mes' }, p.mes),
+        h('span', { class: 'bloco-data-dia folhinha-dia' }, p.dia));
 }
 
+// Linha do evento como uma notinha de agenda: folhinha, a categoria como
+// "chapéu" de revista, o título, quando e onde, e a miniatura se houver foto
 export function linhaDoEvento(e) {
     const p = partesDaData(e.data);
     const agora = e.situacao === 'agora';
-    const b = h('button', { type: 'button', class: `item-lista evento-linha${agora ? ' agora' : ''}` },
+    const semana = `${p.semana.charAt(0).toUpperCase()}${p.semana.slice(1)}`;
+    const onde = e.local_nome || 'Na IEJB';
+    const imagem = urlDaImagem(e.imagem);
+    const b = h('button', { type: 'button', class: `item-lista evento-linha${agora ? ' agora' : ''}${imagem ? ' com-foto' : ''}` },
         blocoData(e.data),
         h('span', { class: 'item-textos' },
+            e.categoria && h('span', { class: 'evento-chapeu' }, e.categoria),
             h('span', { class: 'item-nome' }, e.titulo),
             h('span', { class: 'item-apoio' },
-                agora ? h('span', { class: 'evento-agora' }, 'Acontecendo agora') : `${p.semana.charAt(0).toUpperCase()}${p.semana.slice(1)} · ${formatarHorario(e.horario)}`)),
-        icone('seta', 'icone icone-p item-seta'),
+                agora ? h('span', { class: 'evento-agora' }, 'Acontecendo agora') : `${semana} · ${formatarHorario(e.horario)} · ${onde}`)),
+        imagem
+            ? h('img', { class: 'evento-miniatura', src: imagem, alt: '', loading: 'lazy', decoding: 'async', width: 56, height: 56 })
+            : icone('seta', 'icone icone-p item-seta'),
     );
-    b.setAttribute('aria-label', `${e.titulo}, ${agora ? 'acontecendo agora' : `${rotuloDoDia(e.data)}, ${formatarHorario(e.horario)}`}`);
-    b.addEventListener("click", () => detalhesDoEvento(e));
+    b.setAttribute('aria-label', `${e.categoria ? `${e.categoria}: ` : ''}${e.titulo}, ${agora ? 'acontecendo agora' : `${rotuloDoDia(e.data)}, ${formatarHorario(e.horario)}, ${onde}`}`);
+    b.addEventListener('click', () => detalhesDoEvento(e));
     return b;
 }
 

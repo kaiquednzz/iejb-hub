@@ -1,6 +1,7 @@
 // Pessoas do Louvor. Admin e líder de louvor cadastram e editam (RN-14);
 // o admin também cuida do acesso ao Hub de cada um (RN-10, RN-65).
 // Os demais veem a lista com o contato (Q22).
+import { instrumentosComIcone } from '../../util/instrumentos.js';
 import { h, icone, comCarregando, marcarCopiado } from '../../util/dom.js';
 import { supabase } from '../../supabase.js';
 import { abrirFolha, confirmar, avisar, anunciar } from '../../util/folha.js';
@@ -63,6 +64,7 @@ function cartaoMural(pessoa, i, dados, ctx) {
     const b = h('button', { type: 'button', class: `mural-pessoa${sou ? ' sou' : ''}` },
         avatar(pessoa, 'pessoa-avatar mural-rosto'),
         h('span', { class: 'mural-nome' }, pessoa.apelido || pessoa.nome, sou ? h('span', { class: 'sr-only' }, ' (você)') : null),
+        pessoa.instrumentos.length ? instrumentosComIcone(pessoa.instrumentos, { classe: 'mural-icones', soIcones: true }) : null,
         h('span', { class: 'mural-instrumentos' }, pessoa.instrumentos.join(', ') || ' '));
     b.addEventListener('click', () => (sou ? folhaMeuPerfil(pessoa, ctx) : folhaContato(pessoa)));
     return h('li', { style: { '--i': Math.min(i, 12) } }, b);

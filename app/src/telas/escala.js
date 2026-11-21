@@ -4,6 +4,7 @@
 // usando os relacionamentos das chaves estrangeiras (o "embed" do PostgREST).
 // A RLS já filtra no banco: rascunho só aparece para o líder de louvor, e
 // quem não é do ministério não recebe nada. A tela só desenha o que chegou.
+import { iconeInstrumento, instrumentosComIcone } from '../util/instrumentos.js';
 import { botaoAgenda } from '../util/agenda.js';
 import { h, icone, comCarregando } from '../util/dom.js';
 import { supabase } from '../supabase.js';
@@ -159,7 +160,7 @@ function cartaoDestaque(cultos, meuId) {
             h('span', { class: 'compromisso-titulo' }, culto.nome),
             h('span', { class: 'compromisso-quando' }, `${rotuloDoDia(culto.data)} · ${formatarHorario(culto.horario)}`),
             h('span', { class: 'compromisso-chips' },
-                eu.instrumento_exibido.map((x) => h('span', { class: 'compromisso-chip' }, x))),
+                eu.instrumento_exibido.map((x) => h('span', { class: 'compromisso-chip' }, iconeInstrumento(x), x))),
         )];
     }
     return [];
@@ -240,8 +241,9 @@ function listaDaEscala(escala, meuId) {
                     item.pessoa_id === meuId && h('span', { class: 'sr-only' }, ' (você)')),
                 naoVai(item)
                     ? h('span', { class: 'pessoa-instrumento pessoa-nao-vai' }, 'Não vai')
-                    : h('span', { class: 'pessoa-instrumento' },
-                        item.instrumento_exibido.filter((i) => i !== FUNCAO_MESA).join(' · ') || '—'),
+                    : item.instrumento_exibido.some((i) => i !== FUNCAO_MESA)
+                        ? instrumentosComIcone(item.instrumento_exibido.filter((i) => i !== FUNCAO_MESA), { classe: 'pessoa-instrumento' })
+                        : h('span', { class: 'pessoa-instrumento' }, '—'),
             )),
         ),
         mesa.length > 0 && h('p', { class: 'cartao-mesa' },

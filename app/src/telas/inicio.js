@@ -10,6 +10,7 @@
 // Ordem da tela: saudação → "precisa da sua atenção" (só se houver: contagem
 // para conferir, pedidos de acesso) → compromisso → Vem aí (eventos do site).
 // Ministérios e áreas ficam na aba Ministérios.
+import { iconeInstrumento, instrumentosComIcone } from '../util/instrumentos.js';
 import { h, icone } from '../util/dom.js';
 import { supabase } from '../supabase.js';
 import { hojeEmBrasilia, rotuloDoDia, formatarHorario, diasEntre } from '../util/datas.js';
@@ -164,7 +165,7 @@ function cartaoNormal(proximo, meuId) {
             falta && h('span', { class: 'compromisso-falta' }, falta)),
         h('span', { class: 'compromisso-titulo' }, proximo.nome, proximo.rotulo ? ` · ${proximo.rotulo}` : ''),
         h('span', { class: 'compromisso-quando' }, `${rotuloDoDia(proximo.data)} · ${formatarHorario(proximo.horario)}`),
-        h('span', { class: 'compromisso-chips' }, meusInstrumentos(proximo, meuId).map((x) => h('span', { class: 'compromisso-chip' }, x))),
+        h('span', { class: 'compromisso-chips' }, meusInstrumentos(proximo, meuId).map((x) => h('span', { class: 'compromisso-chip' }, iconeInstrumento(x), x))),
         h('span', { class: 'compromisso-acao' }, 'Ver escala e repertório', icone('seta', 'icone icone-p')));
 }
 
@@ -202,7 +203,7 @@ function cartaoDoDia(culto, meuId, modo) {
     return h('article', { class: `inicio-compromisso inicio-dia${modo === 'vespera' ? ' vespera' : ''}`, 'aria-label': `${modo === 'dia' ? 'Hoje' : 'Amanhã'} você toca: ${culto.nome}` },
         h('p', { class: 'dia-rotulo' }, chama('chama-dia'), modo === 'dia' ? 'Hoje você toca' : 'Amanhã você toca'),
         h('h2', { class: 'dia-titulo' }, culto.nome, culto.rotulo ? h('span', null, ` · ${culto.rotulo}`) : null),
-        instrumentos.length ? h('p', { class: 'dia-voce' }, `Você: ${instrumentos.join(', ')}`) : null,
+        instrumentos.length ? h('p', { class: 'dia-voce' }, h('span', null, 'Você'), instrumentos.map((x) => h('span', { class: 'compromisso-chip' }, iconeInstrumento(x), x))) : null,
         estado,
         contagem,
 
@@ -219,7 +220,9 @@ function cartaoDoDia(culto, meuId, modo) {
         pessoas.length ? h('ul', { class: 'dia-rostos' },
             pessoas.slice(0, MAX_ROSTOS).map((i) => h('li', { title: nomeCurto(i.pessoa, 'Pessoa') },
                 avatar(i.pessoa, 'pessoa-avatar dia-rosto'),
-                h('span', { class: 'dia-rosto-nome' }, nomeCurto(i.pessoa, 'Pessoa')))),
+                h('span', { class: 'dia-rosto-nome' }, nomeCurto(i.pessoa, 'Pessoa')),
+                // o que a pessoa toca, só em ícones (o nome vai no title e no leitor de tela)
+                instrumentosComIcone(i.instrumento_exibido, { classe: 'dia-rosto-inst', soIcones: true }))),
             pessoas.length > MAX_ROSTOS ? h('li', { class: 'dia-rostos-mais' }, `+${pessoas.length - MAX_ROSTOS}`) : null) : null,
 
         h('div', { class: 'dia-acoes' },
