@@ -35,8 +35,14 @@ export async function carregarEquipe(conta) {
         supabase.rpc('contatos_da_equipe'),
     ]);
 
-    const erro = pessoas.error || grupos.error || ministerio.error || pedidos.error || contatos.error;
+    const erro = pessoas.error || grupos.error || ministerio.error || pedidos.error;
     if (erro) return { erro };
+    // Enquanto a migração do D68 não estiver no banco, a função não existe:
+    // lê o contato direto da tabela, como antes (some quando ela for aplicada)
+    if (contatos.error) {
+        const antigo = await supabase.from('pessoa').select('id, contato');
+        contatos.data = (antigo.data ?? []).map((c) => ({ pessoa_id: c.id, contato: c.contato }));
+    }
 
     const contatoDe = new Map((contatos.data ?? []).map((c) => [c.pessoa_id, c.contato]));
     const listaPessoas = pessoas.data.map((p) => ({
