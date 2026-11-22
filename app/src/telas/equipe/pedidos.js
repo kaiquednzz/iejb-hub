@@ -99,7 +99,8 @@ function folhaAprovar(pedido, dados, ctx) {
     const cargos = (pedido.cargos_pedidos ?? []).map((c) => ({ id: c, ...marcar(NOME_CARGO[c], true) }));
     const blocoPediu = h('fieldset', { class: 'opcoes' },
         h('legend', { class: 'bloco-subtitulo' }, 'Aprovar também'),
-        louvor.elemento, cargos.map((c) => c.elemento));
+        louvor.elemento, cargos.map((c) => c.elemento),
+        h('p', { class: 'campo-dica' }, 'Sem nada marcado, a pessoa entra como membro: vê o mural e os eventos.'));
 
     const form = h('form', { class: 'form', novalidate: true },
         h('p', { class: 'folha-texto' },

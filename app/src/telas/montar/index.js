@@ -9,6 +9,7 @@
 // Nada aparece para os outros até "Publicar". Depois de publicada, cada
 // mudança avisa só quem foi afetado (os gatilhos do banco cuidam disso).
 import { h, icone, comCarregando, marcarCopiado } from '../../util/dom.js';
+import { botaoWhats, linkDoWhatsApp, logoWhatsApp } from '../../util/compartilhar.js';
 import { supabase } from '../../supabase.js';
 import { abrirFolha, avisar, anunciar } from '../../util/folha.js';
 import { comemorar } from '../../util/comemorar.js';
@@ -39,7 +40,8 @@ export function telaMontar(conta) {
             h('span', { class: 'mes-progresso-montado' }), h('span', { class: 'mes-progresso-publicado' })),
         progressoTexto);
     // Mandar no WhatsApp: botão redondo no canto do título (como a agenda na Escala)
-    const whatsapp = h('button', { type: 'button', class: 'botao-icone montar-whatsapp', 'aria-label': 'Mandar a escala do mês no WhatsApp' }, icone('whatsapp'));
+    // Abre a folha com a prévia (não manda direto): por isso não usa o botaoWhats
+    const whatsapp = h('button', { type: 'button', class: 'botao-whats montar-whatsapp', 'aria-label': 'Mandar a escala do mês no WhatsApp', title: 'Mandar a escala do mês no WhatsApp' }, logoWhatsApp());
     whatsapp.addEventListener('click', () => dados && folhaWhatsApp(dados, dados.cultos.filter((c) => c.ativo && c.escala?.estado === 'rascunho' && c.itens.length > 0).length));
     const area = h('div', { class: 'montar-area', 'aria-busy': 'true' }, esqueleto());
     const barraAcoes = h('div', { class: 'montar-acoes' });
@@ -248,11 +250,9 @@ function folhaWhatsApp(dados, emRascunho) {
                 `${emRascunho} ${emRascunho === 1 ? 'culto ainda está' : 'cultos ainda estão'} em rascunho e não entra${emRascunho === 1 ? '' : 'm'} na mensagem. Publique antes.`),
             h('pre', { class: 'previa-whatsapp' }, texto),
             imagem,
-            h('a', {
-                class: 'botao-principal botao-largo', target: '_blank', rel: 'noopener noreferrer',
-                href: `https://wa.me/?text=${encodeURIComponent(texto)}`,
-            }, icone('whatsapp'), 'Abrir no WhatsApp'),
-            copiar,
+            h('div', { class: 'acoes-compartilhar' },
+                botaoWhats({ rotulo: 'Abrir no WhatsApp', href: linkDoWhatsApp(texto), classe: 'botao-whats-grande' }),
+                copiar),
         ),
     });
 }

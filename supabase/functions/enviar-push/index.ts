@@ -34,6 +34,7 @@ const TITULOS: Record<string, string> = {
     presenca_alterada: 'Escala do Louvor',
     contagem_para_conferir: 'Conferir contagem',
     contagem_decidida: 'Contagem do culto',
+    mural_publicacao: 'Mural da IEJB',
 };
 
 // Para onde o toque na notificação leva
@@ -41,6 +42,7 @@ const DESTINO: Record<string, string> = {
     solicitacao_nova: '/#/montar',
     contagem_para_conferir: '/#/inicio',
     contagem_decidida: '/#/financeiro',
+    mural_publicacao: '/#/inicio',
 };
 
 // Lê o par de chaves; se ainda não existe, cria e guarda (uma vez na vida)

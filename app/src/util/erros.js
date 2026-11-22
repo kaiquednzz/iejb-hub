@@ -5,7 +5,7 @@
 // ("duplicate key value violates...") não: essas viram um texto genérico.
 import { eErroDeRede } from '../offline.js';
 
-const NOSSAS = new Set(['P0001', '23514', '42501']); // raise exception, check_violation, insufficient_privilege
+const NOSSAS = new Set(['P0001', '23514', '42501', '22023']); // raise exception, check_violation, insufficient_privilege, valor inválido (nossos)
 
 export function mensagemDoBanco(erro, reserva = 'Não deu certo. Tente de novo.') {
     if (!erro) return reserva;

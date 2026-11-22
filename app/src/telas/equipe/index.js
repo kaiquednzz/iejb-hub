@@ -1,6 +1,6 @@
 // Tela "Equipe": pedidos de acesso, pessoas e grupos do Louvor.
 //
-// Todo integrante entra aqui (para ver quem é quem e o contato de todos, Q22).
+// Todo integrante entra aqui (para ver quem é quem; o contato, só quem serve: D68).
 // Os botões de mexer aparecem conforme o papel, mas quem garante a regra é o
 // banco: se alguém forçar um botão escondido, o RLS recusa.
 import { h } from '../../util/dom.js';

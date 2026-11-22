@@ -18,7 +18,7 @@ const email = () => h('a', { href: `mailto:${EMAIL}` }, EMAIL);
 
 function privacidade() {
     return [
-        p('O IEJB Hub é o aplicativo interno da IEJB - Igreja Evangélica do Jardim Brasil (Araçariguama - SP) para organizar escalas, repertórios, eventos e o caixa da igreja. Esta página explica quais dados ele guarda, por que, quem vê e o que você pode pedir.'),
+        p('O IEJB Hub é o aplicativo interno da IEJB - Igreja Evangélica do Jardim Brasil (Araçariguama - SP) para organizar escalas, repertórios, eventos, o mural de avisos e o caixa da igreja. Esta página explica quais dados ele guarda, por que, quem vê e o que você pode pedir.'),
         s('Quem cuida dos dados',
             p('A IEJB é a responsável pelos dados (controladora, na linguagem da LGPD). Para qualquer pedido sobre os seus dados, fale com a liderança ou escreva para ', email(), '.')),
         s('O que o Hub guarda',
@@ -26,6 +26,7 @@ function privacidade() {
                 [b('Conta: '), 'e-mail de login, o nome que você informou ao pedir acesso, a situação da conta e quem a aprovou. A senha fica com o serviço de login e nunca é vista por ninguém da igreja.'],
                 [b('Cadastro: '), 'nome, apelido, telefone de contato (se você ou a liderança informar), instrumentos que toca e foto de perfil (se você enviar).'],
                 [b('Participação: '), 'grupos de que faz parte, escalas em que está, quando marca que não vai e funções na igreja (por exemplo Tesouraria ou Comunicação).'],
+                [b('Mural: '), 'os avisos, fotos e palavras publicados pelo pastor e pela Comunicação, com quem publicou, e quem deu Amém ou coração em cada um.'],
                 [b('Avisos no celular: '), 'se você ativar, um identificador do aparelho para mandar as notificações. Ele some quando você sai da conta naquele aparelho.'],
                 [b('Agenda do celular: '), 'se você colocar seus cultos na agenda, um link secreto que dá acesso só aos cultos em que você está escalado. Você pode trocá-lo a qualquer momento, e o antigo para de funcionar.'],
                 [b('Testemunha da contagem: '), 'quem ajuda a conferir o dinheiro pelo QR, sem conta no app, deixa só o nome e o valor que contou. Essa pessoa não vê nada do caixa.'],
@@ -36,7 +37,9 @@ function privacidade() {
             p('Para abrir mais rápido e funcionar sem internet, o app guarda no próprio celular a sua sessão de login e uma cópia da escala. Tudo isso é apagado quando você sai da conta. O Hub não usa propaganda, rastreadores nem ferramentas de análise de terceiros.')),
         s('Quem vê o quê',
             lista(
-                'Integrantes ativos veem nome, apelido, foto, instrumentos e contato uns dos outros, e as escalas e repertórios. Isso é o que permite combinar os cultos.',
+                'Toda conta aprovada vê nome, apelido, foto e instrumentos das pessoas, as escalas, os repertórios e o mural. Isso é o que permite combinar os cultos e saber o que acontece na igreja.',
+                'Telefone de contato: só quem serve em algum ministério ou função (e os administradores). Quem é só membro não vê o telefone de ninguém.',
+                'Fotos do mural: só contas aprovadas, por links que expiram em uma hora. Elas não ficam abertas na internet.',
                 'E-mails de login e pedidos de acesso: só administradores.',
                 'Financeiro: só quem tem a função Tesouraria (que edita) ou Pastor (que só lê). Ser administrador não dá acesso ao caixa.',
                 'Eventos marcados como publicados aparecem no site público iejb.com.br. Os demais ficam só no Hub.',
@@ -60,7 +63,8 @@ function termos() {
             p('Integrantes da IEJB que pediram acesso e foram aprovados por um administrador. A conta é pessoal: não empreste o login, e avise a liderança se perder o celular ou desconfiar que alguém entrou na sua conta.')),
         s('Uso combinado',
             lista(
-                'Use o Hub para as atividades da igreja: escalas, repertórios, eventos e caixa.',
+                'Use o Hub para as atividades da igreja: escalas, repertórios, eventos, mural e caixa.',
+                'Fotos do mural são da igreja e de quem aparece nelas. Não publique fora do Hub sem combinar com a Comunicação.',
                 'Os contatos e fotos dos irmãos são para combinar o serviço na igreja. Não repasse para fora nem use para venda ou propaganda.',
                 'Seja verdadeiro no que registra, principalmente no financeiro. Lançamentos não são apagados: um erro é cancelado com o motivo, e tudo fica no histórico.',
                 'Não tente acessar o que a sua função não permite nem atrapalhar o funcionamento do app.',

@@ -6,7 +6,7 @@
 //   * "quando tocamos essa música?"         -> busca por música ou artista
 //   * "o que o G2 costuma tocar?"           -> filtro por grupo
 // Tocar numa música abre o "ouvir" (streamings), como na escala.
-import { abrirWhatsApp, textoDoRepertorio } from '../util/compartilhar.js';
+import { botaoWhatsRepertorio } from '../util/compartilhar.js';
 import { h, icone, comCarregando } from '../util/dom.js';
 import { supabase } from '../supabase.js';
 import { mensagemDoBanco } from '../util/erros.js';
@@ -210,9 +210,7 @@ function maisTocadas(cultos) {
 }
 
 function whatsCulto(culto) {
-    const b = h('button', { type: 'button', class: 'botao-icone historico-whats', 'aria-label': `Mandar o repertório de ${culto.nome} no WhatsApp` }, icone('whatsapp'));
-    b.addEventListener('click', () => abrirWhatsApp(textoDoRepertorio(culto)));
-    return b;
+    return botaoWhatsRepertorio(culto, 'historico-whats');
 }
 
 function esqueleto() {

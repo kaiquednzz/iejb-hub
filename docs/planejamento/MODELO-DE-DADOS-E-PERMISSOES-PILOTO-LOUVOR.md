@@ -84,7 +84,7 @@ Todas as tabelas têm identificador próprio, `criado_em` e `atualizado_em`, que
 |---|---|
 | `nome` | Nome completo. |
 | `apelido` | Como é chamada no Louvor. |
-| `contato` | Meio de contato, **visível para todos os integrantes** (Q22). O login da conta não aparece para os outros. |
+| `contato` | Meio de contato, **visível só para quem serve** (ministério ou cargo) e o admin, por `contatos_da_equipe()` (D68; antes, todos os integrantes, Q22). O login da conta não aparece para os outros. |
 | `instrumentos` | 💡 O que a pessoa toca ou canta em geral (ex.: bateria, violão, canto). Serve de sugestão ao definir o padrão em cada grupo; não é uma trava. |
 | `ativa` | `falso` quando sai do Louvor (RN-13). Nunca se apaga. |
 

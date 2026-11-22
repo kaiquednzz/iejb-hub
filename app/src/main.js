@@ -83,11 +83,15 @@ const ROTAS_DA_CONTA = {
 // Que item da barra lateral acende: a rota que de fato abriu (quem não pode
 // montar escala cai na Escala, quem não vê o financeiro cai no Início...)
 // Link de um culto (#/culto/<id>, o que vai na mensagem do repertório no
-// WhatsApp): abre a Escala, que procura o culto e abre o repertório dele
+// WhatsApp): abre a Escala, que procura o culto e abre o repertório dele.
+// Link de um aviso do mural (#/mural/<id>): abre o Início no aviso.
 const LINK_DE_CULTO = /^#\/culto\/[\w-]+$/;
+const LINK_DO_MURAL = /^#\/mural\/[\w-]+$/;
+const linkCompartilhado = (hash) => LINK_DE_CULTO.test(hash) || LINK_DO_MURAL.test(hash);
 function rotaAberta(conta) {
     const h = location.hash;
     if (LINK_DE_CULTO.test(h)) return '#/escala';
+    if (LINK_DO_MURAL.test(h)) return '#/inicio';
     if (h === '#/montar' && !eLiderDeLouvor(conta)) return '#/escala';
     if ((h === '#/eventos' && !cuidaDosEventos(conta)) || (h === '#/financeiro' && !veFinanceiro(conta))
         || (h === '#/pessoas' && !conta.e_administrador)) return '#/inicio';
@@ -128,7 +132,7 @@ async function decidirTela() {
     // então quem entrasse pelo Safari cairia deslogado ao abrir o ícone.
     if (precisaInstalar()) {
         // Veio pelo link de um culto (WhatsApp): explica como abrir pelo app
-        mostrar(LINK_DE_CULTO.test(location.hash) ? telaAbrirNoApp() : telaInstalar());
+        mostrar(linkCompartilhado(location.hash) ? telaAbrirNoApp() : telaInstalar());
         return;
     }
 
@@ -143,8 +147,8 @@ async function decidirTela() {
         tela = (ROTAS_SEM_CONTA[location.hash] ?? telaEntrar)();
     } else {
         // Logado: o #/pedir-acesso não faz mais sentido (e voltaria ao sair)
-        // (o link de um culto, #/culto/<id>, fica: a Escala usa)
-        if (location.hash && !ROTAS_DA_CONTA[location.hash] && !LINK_DE_CULTO.test(location.hash)) history.replaceState(null, '', location.pathname);
+        // (o link de um culto ou do mural fica: a Escala e o Início usam)
+        if (location.hash && !ROTAS_DA_CONTA[location.hash] && !linkCompartilhado(location.hash)) history.replaceState(null, '', location.pathname);
         const { conta, erro } = await carregarConta(session.user.id);
         if (erro) tela = telaErro(erro, decidirTela);
         // pendente, recusada ou desativada: a tela explica cada caso

@@ -8,7 +8,8 @@
 // Não há dado novo: é a mesma escala e o mesmo repertório da tela Escala.
 //
 // Ordem da tela: saudação → "precisa da sua atenção" (só se houver: contagem
-// para conferir, pedidos de acesso) → compromisso → Vem aí (eventos do site).
+// para conferir, pedidos de acesso) → compromisso (só de quem serve) →
+// Mural (D68) → Vem aí (eventos do site).
 // Ministérios e áreas ficam na aba Ministérios.
 import { iconeInstrumento, instrumentosComIcone } from '../util/instrumentos.js';
 import { h, icone } from '../util/dom.js';
@@ -20,6 +21,7 @@ import { cabecalhoApp, avatar } from './moldura.js';
 import { nomeCurto } from '../sessao.js';
 import { blocoConferir } from './financeiro/conferir.js';
 import { blocoEventos } from './inicio-eventos.js';
+import { blocoMural } from './mural.js';
 import { filaDoYoutube } from '../util/musica.js';
 import { chama, marcarEscalado } from '../util/chama.js';
 import { botaoWhatsRepertorio } from '../util/compartilhar.js';
@@ -38,8 +40,13 @@ function dataDeHoje() {
 }
 
 export function telaInicio(conta) {
-    const primeiroNome = (conta.pessoa?.apelido || conta.pessoa?.nome || conta.nome_informado || '').split(' ')[0];
-    const destaque = h('div', { class: 'inicio-destaque', 'aria-live': 'polite' }, h('div', { class: 'inicio-compromisso esqueleto' }));
+    const primeiroNome = conta.pessoa?.apelido?.trim() || (conta.pessoa?.nome || conta.nome_informado || '').split(' ')[0];
+    // Quem não serve em nenhum ministério (D68: o Hub é da igreja toda) não
+    // tem escala: o Início dele começa direto no mural
+    const serve = !!conta.pessoa?.membro_ministerio?.some((m) => m.ativo);
+    const destaque = serve
+        ? h('div', { class: 'inicio-destaque', 'aria-live': 'polite' }, h('div', { class: 'inicio-compromisso esqueleto' }))
+        : null;
     const avisosAdmin = h('div', { class: 'inicio-avisos' });
     const conferir = blocoConferir(conta); // contagem esperando esta pessoa conferir (D48)
 
@@ -52,11 +59,12 @@ export function telaInicio(conta) {
             conferir,
             avisosAdmin,
             destaque,
+            blocoMural(conta),
             blocoEventos(),
         ),
     );
 
-    carregarCompromisso(conta, destaque);
+    if (destaque) carregarCompromisso(conta, destaque);
     if (conta.e_administrador) carregarPedidos(avisosAdmin);
     return tela;
 }
@@ -227,8 +235,8 @@ function cartaoDoDia(culto, meuId, modo) {
 
         h('div', { class: 'dia-acoes' },
             h('a', { class: 'dia-botao dia-botao-claro', href: '#/escala' }, icone('calendario', 'icone icone-p'), 'Ver a escala'),
-            fila.url ? h('a', { class: 'dia-botao', href: fila.url, target: '_blank', rel: 'noopener noreferrer' }, icone('play', 'icone icone-p'), 'Ouvir tudo') : null),
-        itens.length ? botaoWhatsRepertorio(culto, 'dia-whats') : null,
+            fila.url ? h('a', { class: 'dia-botao', href: fila.url, target: '_blank', rel: 'noopener noreferrer' }, icone('play', 'icone icone-p'), 'Ouvir tudo') : null,
+            itens.length ? botaoWhatsRepertorio(culto, 'dia-whats') : null),
     );
 }
 

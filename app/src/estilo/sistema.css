@@ -661,7 +661,8 @@ html.leve .barra-fundo { -webkit-backdrop-filter: none; backdrop-filter: none; b
 .dia-rosto { width: 48px; height: 48px; font-size: 15px; box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.85); }
 .dia-rosto-nome { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 500 12px/1.2 var(--fonte-texto); color: rgba(255, 255, 255, 0.88); }
 .dia-rostos-mais { align-self: start; display: grid !important; place-items: center; width: 48px !important; height: 48px; border-radius: 50%; background: rgba(255, 255, 255, 0.16); font: 600 14px/1 var(--fonte-texto); }
-.dia-acoes { display: grid; grid-template-columns: repeat(auto-fit, minmax(0, 1fr)); gap: var(--esp-2); margin-top: var(--esp-6); }
+.dia-acoes { display: flex; gap: var(--esp-2); margin-top: var(--esp-6); }
+.dia-acoes > .dia-botao { flex: 1; min-width: 0; }
 .dia-botao {
     display: inline-flex;
     align-items: center;
@@ -746,39 +747,40 @@ html.leve .barra-fundo { -webkit-backdrop-filter: none; backdrop-filter: none; b
 .cartao-mesa { margin-top: var(--esp-3); }
 
 /* --- Compartilhar no WhatsApp ---------------------------------------------- */
-.botao-whatsapp {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    min-height: 44px;
-    padding: 0 16px;
-    border: 1px solid #BFE6CC;
-    border-radius: var(--raio-2);
-    background: #EAF7EF;
-    color: #136B3A;
-    font: 600 15px/1.2 var(--fonte-texto);
-    cursor: pointer;
-}
-.botao-whatsapp:active { transform: scale(0.97); }
-.repertorio-acoes { display: flex; flex-wrap: wrap; gap: var(--esp-2); }
-.historico-topo { position: relative; }
-.historico-whats { margin-left: auto; align-self: start; color: #136B3A; background: #EAF7EF; }
-.dia-whats {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    width: 100%;
-    min-height: 46px;
-    margin-top: var(--esp-2);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: var(--raio-2);
-    background: none;
+/* Só o logo (pedido do Kaique): círculo verde da marca com o balão branco.
+   O verde #1FA855 (um tom abaixo do #25D366 oficial) dá 3:1 contra o creme,
+   para o botão não sumir no fundo claro (WCAG 1.4.11). */
+.botao-whats {
+    display: inline-grid;
+    place-items: center;
+    flex: none;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: #1FA855;
     color: #fff;
-    font: 600 15px/1.2 var(--fonte-texto);
     cursor: pointer;
+    text-decoration: none;
+    transition: transform 0.35s var(--mola, var(--ease-ios));
 }
+.botao-whats:active { transform: scale(0.9); transition-duration: 0.12s; }
+.botao-whats:focus-visible { outline: 3px solid var(--cor-foco, var(--cor-marca)); outline-offset: 3px; }
+.logo-whats { width: 24px; height: 24px; overflow: visible; }
+.logo-whats-balao { fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linejoin: round; }
+.logo-whats-fone { fill: currentColor; }
+.botao-whats-grande { width: 56px; height: 56px; }
+.botao-whats-grande .logo-whats { width: 30px; height: 30px; }
+/* Logo + "Copiar" lado a lado nas folhas de mandar mensagem */
+.acoes-compartilhar { display: flex; align-items: center; gap: var(--esp-3); }
+.acoes-compartilhar > :not(.botao-whats) { flex: 1; }
+.acoes-compartilhar.so-whats { justify-content: center; }
+.repertorio-acoes { display: flex; flex-wrap: wrap; align-items: center; gap: var(--esp-2); }
+.historico-topo { position: relative; }
+.historico-whats { margin-left: auto; align-self: start; }
+/* No cartão vermelho do dia: o mesmo círculo, ao lado dos dois botões */
+.dia-whats { width: 50px; height: 50px; box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.35); }
 
 /* --- Montar: mês completo --------------------------------------------------- */
 .mes-progresso { display: grid; gap: 6px; margin: var(--esp-2) var(--esp-1) var(--esp-3); }
@@ -1208,3 +1210,143 @@ html.leve .barra-fundo { -webkit-backdrop-filter: none; backdrop-filter: none; b
 .abrir-no-app-passos { margin: var(--esp-4) 0 0; padding-left: 1.4em; display: grid; gap: var(--esp-2); font: 400 17px/1.4 var(--fonte-texto); color: var(--cor-texto); text-align: left; }
 .abrir-no-app-passos li::marker { font: 700 17px var(--fonte-titulo); color: var(--cor-marca); }
 .abrir-no-app-dica { margin-top: var(--esp-4); font-size: 15px; }
+
+/* --- Mural da igreja (D68) ------------------------------------------------ */
+/* Cada publicação é um recorte do boletim: papel branco, chapéu em versalete,
+   título em Playfair. A Palavra é a exceção editorial: creme, itálico grande
+   e as aspas da marca. Amém e coração ficam embaixo, discretos até tocar. */
+.mural-secao { margin: 0; }
+.mural-lista { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--esp-3); margin: 0; padding: 0; list-style: none; }
+.mural-lista > li { animation: subir 0.5s calc(0.05s + var(--i, 0) * 0.06s) var(--ease-out) backwards; }
+.mural-vazio { margin: 0; padding: var(--esp-5); border: 1px dashed var(--cor-borda-forte); border-radius: var(--raio-3); font: var(--texto-corpo); color: var(--cor-texto-2); text-align: center; }
+.mural-mais { display: block; margin: var(--esp-2) auto 0; min-height: 44px; }
+.mural-publicar { gap: 4px; font-weight: 600; }
+
+.mural-cartao {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--esp-3);
+    padding: var(--esp-4) var(--esp-4) var(--esp-3);
+    border: 1px solid var(--cor-borda);
+    border-radius: var(--raio-3);
+    background: var(--cor-superficie);
+    outline: none;
+    transition: box-shadow var(--dur-lenta) var(--ease-out), border-color var(--dur-lenta) var(--ease-out);
+}
+.mural-cartao.fixado { border-color: var(--cor-marca-sutil); box-shadow: inset 3px 0 0 var(--cor-marca); }
+/* Chegou pelo link do WhatsApp: acende por um instante */
+.mural-cartao.destacado { animation: muralAcende 2.4s var(--ease-out); }
+@keyframes muralAcende { 0%, 40% { box-shadow: 0 0 0 3px var(--cor-marca-sutil), var(--elev-2); } }
+.mural-cartao:focus-visible { box-shadow: 0 0 0 3px var(--cor-foco); }
+
+.mural-topo { display: flex; align-items: center; gap: var(--esp-2); min-height: 24px; }
+.mural-chapeu { font: var(--texto-rotulo); letter-spacing: var(--rotulo-espaco); text-transform: uppercase; color: var(--cor-marca); }
+.mural-fixado { display: inline-flex; align-items: center; gap: 3px; font: var(--texto-apoio); font-weight: 600; color: var(--cor-texto-2); }
+.mural-fixado .icone { width: 14px; height: 14px; }
+.mural-opcoes { margin: -10px -8px -10px auto; background: none; color: var(--cor-texto-2); }
+
+.mural-titulo { margin: 0; font: var(--texto-titulo-1); font-size: 22px; color: var(--cor-titulo); text-wrap: balance; }
+.mural-texto { margin: 0; font: var(--texto-corpo-g); color: var(--cor-texto); white-space: pre-line; overflow-wrap: anywhere; }
+.mural-texto.cortado { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 5; overflow: hidden; }
+.mural-ler { justify-self: start; min-height: 36px; margin-top: calc(-1 * var(--esp-2)); padding: 0; }
+
+/* A Palavra */
+.mural-cartao.tipo-palavra { background: var(--creme-100, var(--cor-superficie-rebaixada)); }
+blockquote.mural-palavra { position: relative; margin: 0; padding: 30px 0 0 var(--esp-1); }
+.mural-aspas { position: absolute; top: -4px; left: 0; width: 36px; height: 36px; color: var(--cor-marca); opacity: 0.35; stroke-width: 2; }
+.mural-palavra-texto { position: relative; margin: 0; font: italic 600 22px/1.4 var(--fonte-titulo); color: var(--cor-titulo); white-space: pre-line; text-wrap: pretty; }
+.mural-referencia { display: block; margin-top: var(--esp-3); font: var(--texto-rotulo); font-style: normal; letter-spacing: var(--rotulo-espaco); text-transform: uppercase; color: var(--cor-texto-2); }
+
+/* Fotos: mosaico de até 4, o +N na última */
+.mural-fotos { display: grid; gap: 3px; margin: 0 calc(-1 * var(--esp-2)); border-radius: var(--raio-2); overflow: hidden; aspect-ratio: 4 / 3; }
+.mural-fotos.fotos-1 { aspect-ratio: 4 / 3; }
+.mural-fotos.fotos-2 { grid-template-columns: 1fr 1fr; }
+.mural-fotos.fotos-3 { grid-template-columns: 2fr 1fr; grid-template-rows: 1fr 1fr; }
+.mural-fotos.fotos-3 .mural-foto:first-child { grid-row: span 2; }
+.mural-fotos.fotos-4 { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; }
+.mural-foto { position: relative; min-height: 0; padding: 0; border: 0; background: var(--cor-superficie-rebaixada); cursor: zoom-in; overflow: hidden; }
+.mural-foto img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transform: scale(1.04); transition: opacity 0.5s var(--ease-out), transform 0.7s var(--ease-out); }
+.mural-foto.carregou img { opacity: 1; transform: none; }
+.mural-foto:active img { transform: scale(0.98); transition-duration: 0.12s; }
+.mural-foto-mais { position: absolute; inset: 0; display: grid; place-items: center; background: rgba(31, 21, 19, 0.5); color: #fff; font: 700 24px/1 var(--fonte-texto); }
+
+/* Rodapé: quem publicou, quando, e as reações */
+.mural-rodape { display: flex; align-items: center; gap: var(--esp-2); padding-top: var(--esp-3); border-top: 1px solid var(--cor-borda); }
+.mural-autor { display: flex; align-items: center; gap: var(--esp-2); min-width: 0; margin-right: auto; }
+.mural-autor-foto { width: 32px; height: 32px; font-size: 12px; flex: none; }
+.mural-autor-textos { display: grid; min-width: 0; }
+.mural-autor-nome { overflow: hidden; font: 600 14px/1.2 var(--fonte-texto); color: var(--cor-texto); text-overflow: ellipsis; white-space: nowrap; }
+.mural-quando { font: var(--texto-apoio); color: var(--cor-texto-2); }
+.mural-acoes { display: flex; align-items: center; gap: 6px; flex: none; }
+.mural-whats { width: 40px; height: 40px; }
+.mural-whats .logo-whats { width: 21px; height: 21px; }
+
+.reacao {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    min-width: 44px;
+    min-height: 40px;
+    padding: 0 12px;
+    border: 1px solid var(--cor-borda-forte);
+    border-radius: var(--raio-pilula);
+    background: var(--cor-superficie);
+    color: var(--cor-texto-2);
+    font: 600 14px/1 var(--fonte-texto);
+    font-variant-numeric: tabular-nums;
+    cursor: pointer;
+    transition: background var(--dur-media) ease, border-color var(--dur-media) ease, color var(--dur-media) ease, transform 0.35s var(--mola);
+}
+.reacao:active { transform: scale(0.92); transition-duration: 0.12s; }
+.reacao .icone { width: 19px; height: 19px; }
+.reacao-n:empty { display: none; }
+.reacao[aria-pressed="true"] { border-color: var(--cor-marca-sutil); background: var(--cor-marca-sutil-2); color: var(--cor-marca); }
+.reacao-coracao path { transition: fill var(--dur-media) ease; fill: transparent; }
+.reacao[aria-pressed="true"] .reacao-coracao path { fill: currentColor; }
+/* O "pulo" de quando a pessoa dá a reação: o coração enche e salta */
+.reacao.reagiu .icone, .reacao.reagiu .reacao-amem-texto { animation: reacaoPula 0.5s var(--mola); }
+.reacao.reagiu .reacao-n { animation: reacaoConta 0.4s var(--ease-out); }
+@keyframes reacaoPula { 0% { transform: scale(0.6); } 55% { transform: scale(1.25); } 100% { transform: scale(1); } }
+@keyframes reacaoConta { from { transform: translateY(6px); opacity: 0; } }
+.reacao-amem-texto { display: inline-block; }
+
+/* Publicar */
+.mural-tipos { margin: 0 0 var(--esp-2); }
+.mural-form .campo[hidden] { display: none; }
+.campo-rotulo { font-size: 15px; font-weight: 600; color: var(--cor-texto); }
+.mural-escolher { cursor: pointer; }
+.mural-escolher:has(+ input:focus-visible) { outline: 3px solid var(--cor-foco); outline-offset: 2px; }
+.mural-escolhidas { display: grid; grid-template-columns: repeat(auto-fill, minmax(76px, 1fr)); gap: 6px; margin: 0; padding: 0; list-style: none; }
+.mural-escolhidas:empty { display: none; }
+.mural-escolhida { position: relative; aspect-ratio: 1; border-radius: var(--raio-1); overflow: hidden; background: var(--cor-superficie-rebaixada); animation: reacaoPula 0.45s var(--mola); }
+.mural-escolhida img { width: 100%; height: 100%; object-fit: cover; }
+.mural-escolhida-tirar { position: absolute; top: 4px; right: 4px; display: grid; place-items: center; width: 28px; height: 28px; padding: 0; border: 0; border-radius: 50%; background: rgba(31, 21, 19, 0.6); color: #fff; cursor: pointer; }
+.mural-escolhida-tirar::before { content: ''; position: absolute; inset: -8px; } /* área de toque de 44 px */
+.mural-separador { width: 100%; margin: var(--esp-2) 0; border: 0; border-top: 1px solid var(--cor-borda); }
+
+/* Visor de fotos: tela cheia escura, desliza para o lado, puxa para fechar */
+.visor { width: 100vw; max-width: none; height: 100dvh; max-height: none; margin: 0; padding: 0; border: 0; background: #0E0B0A; color: #fff; animation: visorEntra 0.32s var(--ease-out); }
+.visor::backdrop { background: #0E0B0A; }
+.visor.saindo { animation: visorSai 0.28s var(--ease-ios) forwards; }
+@keyframes visorEntra { from { opacity: 0; transform: scale(0.96); } }
+@keyframes visorSai { to { opacity: 0; transform: scale(0.96); } }
+.visor-topo { position: absolute; inset: 0 0 auto; z-index: 2; display: flex; align-items: center; gap: var(--esp-3); padding: calc(env(safe-area-inset-top) + var(--esp-2)) var(--esp-3) var(--esp-2) var(--esp-5); background: rgba(14, 11, 10, 0.6); }
+.visor-titulo { flex: 1; min-width: 0; margin: 0; overflow: hidden; font: 600 16px/1.2 var(--fonte-texto); text-overflow: ellipsis; white-space: nowrap; }
+.visor-contador { margin: 0; font: 600 14px/1 var(--fonte-texto); color: rgba(255, 255, 255, 0.75); font-variant-numeric: tabular-nums; }
+.visor-fechar { display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 0; border-radius: 50%; background: rgba(255, 255, 255, 0.14); color: #fff; cursor: pointer; }
+.visor-trilho { display: flex; height: 100%; overflow-x: auto; scroll-snap-type: x mandatory; overscroll-behavior: contain; scrollbar-width: none; }
+.visor-trilho::-webkit-scrollbar { display: none; }
+.visor-quadro { flex: 0 0 100%; display: grid; place-items: center; margin: 0; scroll-snap-align: center; scroll-snap-stop: always; }
+.visor-quadro img { max-width: 100%; max-height: 100%; object-fit: contain; }
+.visor-seta { position: absolute; top: 50%; z-index: 2; display: none; place-items: center; width: 48px; height: 48px; margin-top: -24px; padding: 0; border: 0; border-radius: 50%; background: rgba(255, 255, 255, 0.14); color: #fff; cursor: pointer; }
+.visor-seta:disabled { opacity: 0; pointer-events: none; }
+.visor-anterior { left: var(--esp-4); }
+.visor-anterior .icone { transform: scaleX(-1); }
+.visor-proxima { right: var(--esp-4); }
+@media (hover: hover) and (pointer: fine) { .visor-seta { display: grid; } }
+
+@media (prefers-reduced-motion: reduce) {
+    .mural-lista > li, .mural-cartao.destacado, .reacao.reagiu .icone, .reacao.reagiu .reacao-n, .mural-escolhida { animation: none; }
+}

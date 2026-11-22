@@ -1,5 +1,6 @@
 // Folhas da montagem: um culto em detalhe, a escolha da mesa, culto especial.
 import { h, icone, comCarregando } from '../../util/dom.js';
+import { botaoWhats, linkDoWhatsApp } from '../../util/compartilhar.js';
 import { supabase } from '../../supabase.js';
 import { abrirFolha, confirmar, avisar } from '../../util/folha.js';
 import { mensagemDoBanco } from '../../util/erros.js';
@@ -128,10 +129,8 @@ export function abrirCulto(cultoId, ctx) {
         const finais = [];
         // Reserva do push (RN-43): mensagem pronta desta escala para o grupo do WhatsApp
         if (publicada) {
-            finais.push(h('a', {
-                class: 'botao-secundario botao-largo', target: '_blank', rel: 'noopener noreferrer',
-                href: `https://wa.me/?text=${encodeURIComponent(mensagemDoCulto(culto, dados))}`,
-            }, icone('whatsapp'), 'Mandar esta escala no WhatsApp'));
+            finais.push(h('div', { class: 'acoes-compartilhar so-whats' },
+                botaoWhats({ rotulo: 'Mandar esta escala no WhatsApp', href: linkDoWhatsApp(mensagemDoCulto(culto, dados)), classe: 'botao-whats-grande' })));
         }
         if (!publicada && culto.itens.length > 0) {
             const publicar = h('button', { type: 'button', class: 'botao-principal botao-largo' }, 'Publicar só este culto');

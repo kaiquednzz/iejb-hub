@@ -103,11 +103,12 @@ function pronto() {
 }
 
 // Quem abre o link de um culto (#/culto/<id>, o da mensagem do repertório
-// no WhatsApp) fora do app. No iPhone, links SEMPRE abrem no Safari (o iOS
+// no WhatsApp) ou de um aviso do mural (#/mural/<id>) fora do app. No iPhone, links SEMPRE abrem no Safari (o iOS
 // não deixa um link abrir o app da tela de início), e o Safari não tem o
 // login do app. Então, em vez de "instale o app" (a pessoa provavelmente já
 // tem), explica o caminho pelo ícone. Quem ainda não tem segue para a trava.
 export function telaAbrirNoApp() {
+    const doMural = location.hash.startsWith('#/mural/');
     const naoTenho = h('button', { type: 'button', class: 'botao-texto botao-largo' }, 'Ainda não tenho o app');
     const tela = h('div', { class: 'tela tela-entrada tela-instalar' },
         h('main', { id: 'conteudo', class: 'entrada-palco' },
@@ -116,12 +117,14 @@ export function telaAbrirNoApp() {
             h('section', { class: 'entrada-cartao', 'aria-labelledby': 'titulo-tela' },
                 h('h1', { id: 'titulo-tela', tabindex: -1 }, 'Abra pelo app'),
                 h('p', { class: 'entrada-subtitulo' },
-                    'Links do WhatsApp abrem aqui no navegador, e não no app. Pra ver este culto:'),
+                    `Links do WhatsApp abrem aqui no navegador, e não no app. Pra ver ${doMural ? 'este aviso' : 'este culto'}:`),
                 h('ol', { class: 'abrir-no-app-passos' },
                     h('li', null, 'Feche esta página'),
                     h('li', null, 'Toque no ícone do ', h('strong', null, 'IEJB Hub'), ' na tela de início'),
-                    h('li', null, 'O repertório está no seu ', h('strong', null, 'próximo compromisso'), ' ou em ', h('strong', null, 'Ministérios › Louvor'))),
-                h('p', { class: 'entrada-subtitulo abrir-no-app-dica' }, 'As músicas, os tons e o link do YouTube já estão na mensagem.'),
+                    doMural
+                        ? h('li', null, 'O aviso está no ', h('strong', null, 'Mural'), ', na tela de início')
+                        : h('li', null, 'O repertório está no seu ', h('strong', null, 'próximo compromisso'), ' ou em ', h('strong', null, 'Ministérios › Louvor'))),
+                !doMural && h('p', { class: 'entrada-subtitulo abrir-no-app-dica' }, 'As músicas, os tons e o link do YouTube já estão na mensagem.'),
                 naoTenho),
         ),
     );

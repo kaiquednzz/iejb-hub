@@ -1,16 +1,19 @@
 // Tudo o que a tela Equipe precisa, numa leva só (4 consultas em paralelo).
 //
 // O que cada um recebe quem decide é o RLS:
-//   - pessoas e grupos: qualquer integrante ativo vê (contato é público, Q22);
+//   - pessoas e grupos: qualquer integrante ativo vê;
+//   - contatos: só quem serve (ministério ou cargo) e o admin, pela função
+//     contatos_da_equipe (D68: com a igreja toda no Hub, o telefone não fica
+//     aberto para qualquer membro);
 //   - a conta embutida em cada pessoa: só o admin recebe (os outros ganham null);
 //   - pedidos de acesso: só o admin recebe.
 // Por isso não há "if admin" nas consultas: a tela só olha o que chegou.
 import { supabase } from '../../supabase.js';
 
 export async function carregarEquipe(conta) {
-    const [pessoas, grupos, ministerio, pedidos] = await Promise.all([
+    const [pessoas, grupos, ministerio, pedidos, contatos] = await Promise.all([
         supabase.from('pessoa')
-            .select(`id, nome, apelido, contato, instrumentos, ativa, foto,
+            .select(`id, nome, apelido, instrumentos, ativa, foto,
                      membro_ministerio ( ministerio_id, e_lider, ativo ),
                      cargo_pessoa ( id, cargo ),
                      conta ( id, login, estado, e_administrador, senha_temporaria )`)
@@ -29,13 +32,16 @@ export async function carregarEquipe(conta) {
                 .in('estado', ['pendente', 'recusada'])
                 .order('criado_em', { ascending: false })
             : Promise.resolve({ data: [] }),
+        supabase.rpc('contatos_da_equipe'),
     ]);
 
-    const erro = pessoas.error || grupos.error || ministerio.error || pedidos.error;
+    const erro = pessoas.error || grupos.error || ministerio.error || pedidos.error || contatos.error;
     if (erro) return { erro };
 
+    const contatoDe = new Map((contatos.data ?? []).map((c) => [c.pessoa_id, c.contato]));
     const listaPessoas = pessoas.data.map((p) => ({
         ...p,
+        contato: contatoDe.get(p.id) ?? null,
         // Conta é 1 para 1 com pessoa; conforme a versão o PostgREST manda objeto ou lista
         conta: Array.isArray(p.conta) ? (p.conta[0] ?? null) : p.conta,
     }));

@@ -48,7 +48,9 @@ function telaApresentar(conta, depois) {
     const continuar = h('button', { type: 'submit', class: 'botao-principal botao-largo' }, 'Enviar e entrar na fila');
 
     // O que faz na igreja (opcional). É só um pedido: o admin aprova.
-    const funcoes = fichasMultiplas('Você serve em alguma dessas áreas?', FUNCOES);
+    // D68: o Hub é da igreja toda. Não servir em nenhuma área é resposta válida.
+    const funcoes = fichasMultiplas('Você serve em alguma dessas áreas?', FUNCOES,
+        'Não serve em nenhuma? Pode deixar em branco: você entra como membro e vê o mural e os eventos da igreja.');
     const instrumentos = fichasMultiplas('Toca ou canta o quê?', INSTRUMENTOS);
     instrumentos.elemento.hidden = true;
     funcoes.aoMudar(() => { instrumentos.elemento.hidden = !funcoes.valores().includes('louvor'); });
@@ -88,7 +90,7 @@ const FUNCOES = [['louvor', 'Louvor'], ['tesouraria', 'Tesouraria'], ['comunicac
 const INSTRUMENTOS = ['Voz', 'Violão', 'Guitarra', 'Baixo', 'Teclado', 'Bateria', 'Cajón', 'Mesa'].map((i) => [i, i]);
 
 // Fichas que ligam e desligam (várias ao mesmo tempo)
-function fichasMultiplas(rotulo, opcoes) {
+function fichasMultiplas(rotulo, opcoes, dica = null) {
     const marcadas = new Set();
     let aviso = null;
     const grupo = h('div', { class: 'fichas', role: 'group', 'aria-label': rotulo },
@@ -102,7 +104,7 @@ function fichasMultiplas(rotulo, opcoes) {
             return f;
         }));
     return {
-        elemento: h('fieldset', { class: 'campo' }, h('legend', null, rotulo), grupo),
+        elemento: h('fieldset', { class: 'campo' }, h('legend', null, rotulo), grupo, dica && h('p', { class: 'campo-dica' }, dica)),
         valores: () => [...marcadas],
         aoMudar: (fn) => { aviso = fn; },
     };

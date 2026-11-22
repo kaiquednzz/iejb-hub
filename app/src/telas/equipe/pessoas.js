@@ -1,8 +1,9 @@
 // Pessoas do Louvor. Admin e líder de louvor cadastram e editam (RN-14);
 // o admin também cuida do acesso ao Hub de cada um (RN-10, RN-65).
-// Os demais veem a lista com o contato (Q22).
+// Os demais veem a lista (o contato só aparece para quem serve, D68).
 import { instrumentosComIcone } from '../../util/instrumentos.js';
 import { h, icone, comCarregando, marcarCopiado } from '../../util/dom.js';
+import { botaoWhats, linkDoWhatsApp } from '../../util/compartilhar.js';
 import { supabase } from '../../supabase.js';
 import { abrirFolha, confirmar, avisar, anunciar } from '../../util/folha.js';
 import { mensagemDoBanco, mensagemDaFuncao } from '../../util/erros.js';
@@ -100,8 +101,8 @@ function folhaContato(pessoa) {
             contato
                 ? h('p', { class: 'folha-contato' }, contato)
                 : h('p', { class: 'folha-texto' }, 'Sem contato cadastrado.'),
-            whatsapp && h('a', { class: 'botao-principal botao-largo', href: whatsapp, target: '_blank', rel: 'noopener noreferrer' },
-                icone('whatsapp'), 'Chamar no WhatsApp'),
+            whatsapp && h('div', { class: 'acoes-compartilhar so-whats' },
+                botaoWhats({ rotulo: `Chamar ${pessoa.apelido || pessoa.nome} no WhatsApp`, href: whatsapp, classe: 'botao-whats-grande' })),
         ),
     });
 }
@@ -122,7 +123,7 @@ function folhaPessoa(pessoa, dados, ctx) {
         campo({ rotulo: 'Como é chamada no Louvor', nome: 'apelido', autocomplete: 'off', required: false,
             dica: 'Opcional. É o nome que aparece na escala.', value: pessoa?.apelido ?? '' }),
         campo({ rotulo: 'Contato', nome: 'contato', tipo: 'tel', autocomplete: 'off', required: false,
-            dica: 'Opcional. Todo o Louvor consegue ver.', value: pessoa?.contato ?? '' }),
+            dica: 'Opcional. Só quem serve na igreja consegue ver.', value: pessoa?.contato ?? '' }),
         instrumentos.elemento,
         aviso.elemento,
         botao,
@@ -173,7 +174,7 @@ function folhaMeuPerfil(pessoa, ctx) {
     const botao = h('button', { type: 'submit', class: 'botao-principal botao-largo' }, 'Salvar contato');
     const form = h('form', { class: 'form', novalidate: true },
         campo({ rotulo: 'Seu contato', nome: 'contato', tipo: 'tel', autocomplete: 'tel', required: false,
-            dica: 'Todo o Louvor consegue ver.', value: pessoa.contato ?? '' }),
+            dica: 'Só quem serve na igreja consegue ver.', value: pessoa.contato ?? '' }),
         aviso.elemento,
         botao,
     );
@@ -383,11 +384,9 @@ function resultadoDoAcesso(email, senha, titulo, folha) {
             h('dt', null, 'E-mail'), h('dd', null, email),
             h('dt', null, 'Senha temporária'), h('dd', { class: 'credenciais-senha' }, senha),
         ),
-        h('a', {
-            class: 'botao-principal botao-largo', target: '_blank', rel: 'noopener noreferrer',
-            href: `https://wa.me/?text=${encodeURIComponent(texto)}`,
-        }, icone('whatsapp'), 'Mandar no WhatsApp'),
-        copiar,
+        h('div', { class: 'acoes-compartilhar' },
+            botaoWhats({ rotulo: 'Mandar no WhatsApp', href: linkDoWhatsApp(texto), classe: 'botao-whats-grande' }),
+            copiar),
         pronto,
     );
 }
