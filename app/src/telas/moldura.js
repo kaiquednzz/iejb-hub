@@ -95,6 +95,8 @@ export function barraLateral(conta, atual) {
             item('#/inicio', 'Início', 'casa'),
             item('#/agenda', 'Agenda', 'calendario'),
             item('#/ministerios', 'Ministérios', 'igreja'),
+            // No computador o cabeçalho some: a oração mora aqui (D69)
+            item('#/oracao', 'Oração', 'maos'),
             h('p', { class: 'lateral-grupo', 'aria-hidden': 'true' }, 'Louvor'),
             h('ul', { 'aria-label': 'Louvor' },
                 [item('#/escala', 'Escala', 'calendario'),

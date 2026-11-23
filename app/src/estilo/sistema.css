@@ -1579,3 +1579,5 @@ blockquote.mural-palavra { position: relative; margin: 0; padding: 30px 0 0 var(
 .filtro-fichas::-webkit-scrollbar { display: none; }
 .filtro-fichas .ficha { flex: none; }
 .opcoes-ministerios { display: grid; gap: 2px; }
+/* A faixa de aniversário não cola na saudação */
+.inicio-ola-area + .aniversarios, .inicio-avisos + .aniversarios { margin-top: var(--esp-2); }
