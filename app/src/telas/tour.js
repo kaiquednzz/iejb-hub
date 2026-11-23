@@ -12,7 +12,9 @@
 // para o leitor de tela e fecha no Esc, sem a gente reinventar nada disso.
 import { h } from '../util/dom.js';
 
-const chaveVisto = (conta) => `iejb-tour-visto-${conta.id}`;
+// v2: tour corrigido (o balão saía da tela no passo do Mural); quem já viu
+// a versão 1 vê de novo uma vez
+const chaveVisto = (conta) => `iejb-tour-v2-visto-${conta.id}`;
 const reduzir = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 // Roda `fim` quando a animação de saída acaba (ou em `ms`, se ela não
@@ -63,7 +65,8 @@ function passos(conta) {
     const aba = (rota) => [`.barra-abas a[href="${rota}"]`, `.barra-lateral a[href="${rota}"]`];
     return [
         { alvo: aba('#/inicio'), titulo: 'Início', texto: serve ? 'O que importa hoje: sua próxima escala e os avisos da igreja.' : 'O que importa hoje: os avisos da igreja.' },
-        { alvo: ['.mural-secao:not([hidden])'], titulo: 'Mural', texto: 'Avisos e fotos da igreja. Gostou? Toque em Amém ou no coração.', rolar: true },
+        // O primeiro cartão (não o mural inteiro, que pode ser mais alto que a tela)
+        { alvo: ['.mural-lista > li:first-child .mural-cartao', '.mural-secao:not([hidden])'], titulo: 'Mural', texto: 'Avisos e fotos da igreja. Gostou? Toque em Amém ou no coração.', rolar: true },
         { alvo: aba('#/agenda'), titulo: 'Agenda', texto: serve ? 'Seus próximos cultos e os eventos da igreja.' : 'Os eventos da igreja.' },
         { alvo: aba('#/ministerios'), titulo: 'Ministérios', texto: serve ? 'A casa de cada ministério: escala, repertórios e equipe.' : 'Os ministérios da igreja.' },
         { alvo: aba('#/voce'), titulo: 'Você', texto: 'Seus dados e os pedidos de oração.' },
@@ -117,22 +120,33 @@ export function abrirTour(conta) {
         luz.style.setProperty('--y', `${r.top - folga}px`);
         luz.style.setProperty('--w', `${r.width + folga * 2}px`);
         luz.style.setProperty('--h', `${r.height + folga * 2}px`);
-        // O balão vai do lado que tem mais espaço (em cima das abas, embaixo
-        // de coisas do topo), sem sair da tela
-        const embaixo = r.top + r.height / 2 < innerHeight / 2;
+        // O balão vai do lado que tem mais espaço e NUNCA sai da tela: se o
+        // alvo ocupa quase tudo, o balão fica por cima dele, preso na borda
         const largura = Math.min(340, innerWidth - 32);
         const x = Math.max(16, Math.min(innerWidth - largura - 16, r.left + r.width / 2 - largura / 2));
         balao.style.width = `${largura}px`;
         balao.style.left = `${x}px`;
-        balao.style.top = embaixo ? `${Math.min(r.bottom + 16, innerHeight - 200)}px` : 'auto';
-        balao.style.bottom = embaixo ? 'auto' : `${Math.max(innerHeight - r.top + 16, 16)}px`;
+        const alto = balao.offsetHeight;
+        const margem = 16;
+        const espacoAcima = r.top - margem;
+        const espacoAbaixo = innerHeight - r.bottom - margem;
+        const embaixo = espacoAbaixo >= espacoAcima;
+        let y = embaixo ? r.bottom + margem : r.top - margem - alto;
+        y = Math.max(margem + seguro('top'), Math.min(innerHeight - alto - margem - seguro('bottom'), y));
+        balao.style.top = `${y}px`;
+        balao.style.bottom = 'auto';
         balao.dataset.lado = embaixo ? 'baixo' : 'cima';
     }
 
     function ir(n) {
         i = n;
         const passo = lista[i];
-        if (passo.rolar) passo.el.scrollIntoView({ block: 'center', behavior: reduzir() ? 'auto' : 'smooth' });
+        if (passo.rolar) {
+            // Rola com a página destravada por um instante, e trava de novo
+            document.documentElement.style.overflow = '';
+            passo.el.scrollIntoView({ block: 'center', behavior: reduzir() ? 'auto' : 'smooth' });
+            setTimeout(() => { document.documentElement.style.overflow = 'hidden'; }, reduzir() ? 0 : 500);
+        }
         titulo.textContent = passo.titulo;
         texto.textContent = passo.texto;
         contagem.textContent = `Passo ${i + 1} de ${lista.length}. `;
@@ -156,6 +170,26 @@ export function abrirTour(conta) {
     });
     addEventListener('resize', posicionar);
 
+    // A página não rola por baixo do tour (no iPhone o dedo arrastava o fundo
+    // e o alvo fugia da luz); se rolar mesmo assim, a luz acompanha
+    const travaAntes = document.documentElement.style.overflow;
+    document.documentElement.style.overflow = 'hidden';
+    addEventListener('scroll', posicionar, { passive: true, capture: true });
+    dialogo.addEventListener('close', () => {
+        document.documentElement.style.overflow = travaAntes;
+        removeEventListener('scroll', posicionar, { capture: true });
+    });
+
     dialogo.showModal();
     ir(0);
+}
+
+// Área segura do iPhone (entalhe e barra de gestos)
+function seguro(lado) {
+    const sonda = document.createElement('div');
+    sonda.style.cssText = `position:fixed;${lado}:0;height:env(safe-area-inset-${lado});visibility:hidden`;
+    document.body.append(sonda);
+    const px = sonda.offsetHeight;
+    sonda.remove();
+    return px;
 }

@@ -60,6 +60,21 @@ test('primeira vez: boas-vindas e tour, uma vez só', async ({ page, simular }) 
     await expect(page.getByRole('button', { name: 'Me mostra' })).toHaveCount(0);
 });
 
+test('o balão do tour nunca sai da tela, nem rolando', async ({ page, simular }) => {
+    const longo = { ...PUBLICACAO, texto: 'Texto comprido. '.repeat(60) };
+    await simular.abrir('#/inicio', umaConta(), { mural_publicacao: [longo, { ...PUBLICACAO, id: 'pub-2' }] }, { primeiraVez: true });
+    await page.getByRole('button', { name: 'Me mostra' }).click();
+    await page.locator('.tour-proximo').click();
+    await expect(page.locator('.tour-titulo')).toHaveText('Mural');
+    await page.waitForTimeout(700);
+    await page.mouse.wheel(0, 800);
+    await page.waitForTimeout(300);
+    const caixa = await page.locator('.tour-balao').boundingBox();
+    const tela = page.viewportSize();
+    expect(caixa.y).toBeGreaterThanOrEqual(0);
+    expect(caixa.y + caixa.height).toBeLessThanOrEqual(tela.height);
+});
+
 test('aniversário se põe em Você', async ({ page, simular }) => {
     await simular.abrir('#/voce', umaConta());
     await page.getByRole('button', { name: /Aniversário/ }).click();

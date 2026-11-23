@@ -93,7 +93,7 @@ export const test = base.extend({
                     localStorage.setItem(chave, valor);
                     localStorage.setItem('iejb-agenda-assinada', '1');
                     sessionStorage.setItem('iejb-abriu', '1');
-                    if (!tour) localStorage.setItem(`iejb-tour-visto-${contaId}`, 'x');
+                    if (!tour) localStorage.setItem(`iejb-tour-v2-visto-${contaId}`, 'x');
                 }, [`sb-${PROJETO}-auth-token`, JSON.stringify(sessao(conta.id)), conta.id, primeiraVez]);
                 await page.goto(`/${hash}`);
             },
