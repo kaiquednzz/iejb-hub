@@ -20,9 +20,7 @@
 
 /* Rótulo de seção ("VEM AÍ", "SUAS ÁREAS"): pequeno, maiúsculo, discreto.
    Pode ter uma ação à direita (.rotulo-secao-linha). */
-.rotulo-secao,
-.titulo-secao,
-.inicio-secao {
+.rotulo-secao, .titulo-secao {
     margin: var(--esp-8) 0 var(--esp-2);
     padding-inline: var(--esp-1);
     font: var(--texto-rotulo);
@@ -93,8 +91,7 @@
 .item-nome { display: flex; align-items: center; gap: var(--esp-2); font: 600 17px/1.3 var(--fonte-texto); color: var(--cor-texto); }
 .item-apoio { font: var(--texto-apoio); font-size: 14px; color: var(--cor-texto-2); }
 .item-seta { flex: none; color: var(--cor-texto-3); }
-.item-contador,
-.cabecalho-contador {
+.item-contador {
     min-width: 20px;
     height: 20px;
     padding: 0 6px;
@@ -127,7 +124,6 @@
     border-bottom: 1px solid var(--cor-borda);
 }
 .cabecalho::before { content: none; }
-html.leve .cabecalho { -webkit-backdrop-filter: none; backdrop-filter: none; background: var(--cor-fundo); }
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
     .cabecalho { background: var(--cor-fundo); }
 }
@@ -144,8 +140,6 @@ a.cabecalho-marca { text-decoration: none; min-height: 44px; border-radius: var(
     text-decoration: none;
 }
 .cabecalho-avatar { width: 34px; height: 34px; font-size: 13px; }
-.cabecalho-contador { position: absolute; top: 0; right: -4px; min-width: 18px; height: 18px; font-size: 11px; box-shadow: 0 0 0 2px var(--cor-fundo); }
-.cabecalho-titulo-modulo { font: 600 17px/1.2 var(--fonte-texto); color: var(--cor-texto); }
 
 /* --- Barra de abas -------------------------------------------------------
    Presa embaixo, da largura da tela (era uma cápsula flutuante). Ícone 24 +
@@ -166,7 +160,6 @@ a.cabecalho-marca { text-decoration: none; min-height: 44px; border-radius: var(
     box-shadow: none;
     animation: none;
 }
-html.leve .barra-abas { -webkit-backdrop-filter: none; backdrop-filter: none; background: none; }
 .barra-abas .aba,
 .barra-abas:has(.aba:nth-child(4)) .aba {
     min-width: 0;
@@ -212,21 +205,9 @@ html.leve .barra-abas { -webkit-backdrop-filter: none; backdrop-filter: none; ba
 }
 .segmentos button[aria-selected="true"],
 .segmentos a[aria-current="page"] { color: var(--cor-texto); }
-.segmentos-escala { margin: 0 0 var(--esp-5); }
 /* O seletor é o 1º elemento da tela: a pílula já nasce no lado certo */
-.segmentos-escala::before { transition: none; }
 
 /* --- Tela Você ----------------------------------------------------------- */
-.voce-perfil {
-    display: flex;
-    align-items: center;
-    gap: var(--esp-4);
-    padding: var(--esp-2) var(--esp-1) 0;
-    animation: subir 0.5s var(--ease-out) backwards;
-}
-.voce-avatar { width: 64px; height: 64px; flex: none; font-size: 22px; }
-.voce-nome { font: var(--texto-titulo-1); color: var(--cor-titulo); }
-.voce-papel { font: 600 15px/1.4 var(--fonte-texto); color: var(--cor-marca); }
 .voce-login { font: var(--texto-apoio); color: var(--cor-texto-2); }
 .voce-rodape { display: grid; justify-items: center; gap: var(--esp-2); margin-top: var(--esp-8); }
 .voce-sair { min-width: 200px; }
@@ -358,9 +339,6 @@ html.leve .barra-abas { -webkit-backdrop-filter: none; backdrop-filter: none; ba
 .evento-linha.agora .bloco-data { background: var(--cor-sucesso-sutil); }
 .eventos-lista { margin: 0; }
 .inicio-eventos { display: block; margin: 0; }
-
-.inicio-areas { margin: 0; }
-.inicio-em-breve { margin-top: var(--esp-3); padding-inline: var(--esp-1); font: var(--texto-corpo); font-size: 14px; color: var(--cor-texto-3); }
 .tela-inicio .app-conteudo { padding-bottom: var(--esp-4); }
 
 @media (min-width: 1024px) {
@@ -416,7 +394,6 @@ main .rotulo-secao::before { content: counter(secao, upper-roman) ".\00a0\00a0" 
 @keyframes chamaFora { 0%, 100% { transform: scale(1, 1) rotate(-2deg); } 50% { transform: scale(0.96, 1.06) rotate(2deg); } }
 @keyframes chamaDentro { 0%, 100% { transform: scale(1) translateY(0); } 50% { transform: scale(0.9, 1.1) translateY(-0.6px); } }
 @media (prefers-reduced-motion: reduce) { .chama-fora, .chama-dentro { animation: none; } }
-html.leve .chama-fora, html.leve .chama-dentro { animation: none; }
 
 /* No avatar: a pessoa toca nesta semana */
 .chama-avatar {
@@ -452,7 +429,6 @@ html.leve .chama-fora, html.leve .chama-dentro { animation: none; }
 }
 .cabecalho.titulo-fora .cabecalho-compacto,
 .cabecalho.com-area .cabecalho-compacto { opacity: 1; translate: 0 0; }
-.cabecalho.com-area .cabecalho-modulo .cabecalho-titulo-modulo { display: none; }
 
 /* --- Barra de abas: a "gota" que desliza entre as abas ----------------------
    Três camadas com view-transition-name próprio, para a troca de tela:
@@ -477,7 +453,6 @@ html.leve .chama-fora, html.leve .chama-dentro { animation: none; }
     pointer-events: none;
 }
 .barra-abas { border-top: none; }
-html.leve .barra-fundo { -webkit-backdrop-filter: none; backdrop-filter: none; background: var(--cor-fundo); }
 .barra-abas .aba { position: relative; }
 .aba-gota {
     position: absolute;
@@ -550,7 +525,6 @@ html.leve .barra-fundo { -webkit-backdrop-filter: none; backdrop-filter: none; b
     view-transition-name: subnav-traco;
 }
 ::view-transition-group(subnav-traco) { animation-duration: 0.45s; animation-timing-function: var(--ease-ios); }
-.casa-topo + .faixa-offline-area:empty + .avisos-area:empty { display: none; }
 
 /* --- Ministérios ------------------------------------------------------------ */
 .capa-ministerio {

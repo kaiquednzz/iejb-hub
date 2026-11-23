@@ -72,7 +72,6 @@ svg.desenha { animation: icPop 0.45s var(--mola); }
     cursor: pointer;
 }
 .festa.saindo { animation: festaSai 0.38s var(--ease-ios) forwards; }
-html.leve .festa { -webkit-backdrop-filter: none; backdrop-filter: none; background: rgba(253, 250, 245, 0.9); }
 .festa-palco { position: relative; width: 96px; height: 96px; margin-bottom: 14px; }
 .festa-circulo {
     position: absolute; inset: 0; border-radius: 50%;

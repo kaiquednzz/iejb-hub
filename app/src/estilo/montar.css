@@ -69,7 +69,6 @@
 .seta-esquerda { rotate: 180deg; }
 .mes-resumo { margin: 6px 0 16px; text-align: center; font-size: 14px; color: var(--texto-2); min-height: 1.5em; }
 .resumo-ok { color: var(--verde); font-weight: 600; }
-.resumo-rascunho { color: var(--ambar); font-weight: 600; }
 .resumo-falta { color: var(--principal-brighter); font-weight: 600; }
 
 .montar-area[data-direcao="frente"] .lista-semanas { animation: mesEntraDireita 0.45s var(--ease-out); }
@@ -219,8 +218,6 @@
 }
 .chip-mesa-largo { margin-left: 0; width: 100%; min-height: 48px; }
 
-.montar-dica { font-size: 13px; color: var(--texto-2); text-align: center; padding: 0 12px; }
-
 /* Barra de ações do mês, flutuando acima das abas */
 .montar-acoes {
     position: fixed;
@@ -323,12 +320,6 @@
 }
 .botao-youtube .icone { fill: currentColor; stroke: none; }
 .botao-youtube:active { transform: scale(0.96); transition-duration: 0.12s; }
-.botao-youtube-conta {
-    padding: 2px 8px;
-    border-radius: var(--raio-capsula);
-    background: rgba(255, 255, 255, 0.2);
-    font-size: 12px;
-}
 .repertorio-nota { font-size: 13px; color: var(--texto-2); text-align: center; }
 .repertorio-editar { display: grid; justify-items: center; padding: 6px 0 4px; }
 
@@ -479,7 +470,6 @@
 }
 /* O sino balança duas vezes e para (sem loop infinito) */
 .cartao-avisos-icone .icone { animation: balancar 1s 0.7s ease-in-out 2; transform-origin: 50% 10%; }
-@keyframes balancar { 20% { rotate: 14deg; } 40% { rotate: -12deg; } 60% { rotate: 7deg; } 80% { rotate: -4deg; } }
 .cartao-avisos-icone.ok { background: var(--verde); animation: surgir 0.5s var(--mola); }
 .cartao-avisos-textos { display: grid; font-size: 14px; color: var(--texto-2); }
 .cartao-avisos-textos strong { font-size: 16px; color: var(--texto-vinho); }
@@ -501,10 +491,6 @@
     font-weight: 600;
     cursor: pointer;
 }
-.meus-pedidos { list-style: none; display: grid; gap: 6px; }
-.meus-pedidos li { padding: 10px 12px; border-radius: 12px; background: var(--fundo-rosado); display: grid; gap: 4px; justify-items: start; }
-.pedido-texto { font-size: 15px; color: var(--texto); white-space: pre-wrap; }
-.pedido-motivo { font-size: 14px; color: var(--texto-2); }
 .estado-pedido-pendente { background: rgba(154, 91, 0, 0.12); color: var(--ambar); }
 .estado-pedido-aprovada { background: rgba(31, 122, 77, 0.1); color: var(--verde); }
 .estado-pedido-reprovada { background: rgba(84, 84, 88, 0.12); color: var(--texto-2); }
@@ -521,10 +507,6 @@
 }
 .campo-texto:focus { outline: none; border-color: var(--principal-brighter); box-shadow: 0 0 0 4px rgba(191, 38, 43, 0.16); }
 .contador { text-align: right; }
-.citado { padding: 10px 14px; border-left: 3px solid var(--principal); background: var(--fundo-rosado); border-radius: 0 12px 12px 0; }
-
-.area-pedidos:empty { display: none; }
-.pedidos-pendentes { display: grid; gap: 10px; margin-top: 18px; animation: surgir 0.6s 0.1s var(--mola) backwards; }
 .titulo-pedidos {
     display: flex;
     align-items: center;
@@ -535,18 +517,6 @@
     text-transform: uppercase;
     color: var(--ambar);
 }
-.cartao-pedido-alteracao {
-    display: grid;
-    gap: 10px;
-    padding: 14px;
-    border-radius: var(--raio-l);
-    background: #fff;
-    border: 1px solid rgba(154, 91, 0, 0.28);
-    box-shadow: var(--sombra-2), 0 0 0 3px rgba(154, 91, 0, 0.06);
-}
-.pedido-cabeca { display: flex; align-items: center; gap: 10px; }
-.pedido-botoes { display: grid; grid-template-columns: 1fr 1fr 1.2fr; gap: 6px; }
-.pedido-botoes > * { padding-inline: 8px; }
 .linha-nao-vai { color: var(--principal); font-weight: 600; }
 
 /* --- Revisão de interface (15/11/2026) ---------------------------------- */

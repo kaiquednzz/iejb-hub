@@ -21,15 +21,6 @@
 }
 .botao-voltar:active { transform: scale(0.94); transition-duration: 0.12s; }
 .seta-esquerda { rotate: 180deg; }
-.cabecalho-titulo-modulo {
-    font-family: var(--fonte-titulo);
-    font-size: 19px;
-    font-weight: 700;
-    color: var(--texto-vinho);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
 
 /* --- Início ------------------------------------------------------------------ */
 .tela-inicio .app-conteudo { position: relative; padding-bottom: calc(env(safe-area-inset-bottom) + 32px); }
@@ -61,25 +52,7 @@
 .inicio-compromisso.vazio { background: #fff; color: var(--texto-vinho); box-shadow: var(--sombra-2), var(--brilho); border: 1px solid var(--vidro-borda); }
 .inicio-compromisso.vazio .compromisso-rotulo, .inicio-compromisso.vazio .compromisso-acao { color: var(--principal); }
 .compromisso-rotulo { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; opacity: 0.92; }
-.compromisso-linha { display: flex; align-items: center; gap: 14px; }
-.compromisso-data {
-    display: grid;
-    justify-items: center;
-    flex: none;
-    width: 62px;
-    padding: 8px 0;
-    border-radius: 16px;
-    background: rgba(255, 255, 255, 0.16);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    line-height: 1.1;
-    font-size: 11px;
-    font-weight: 700;
-    text-transform: uppercase;
-}
-.compromisso-data strong { font-family: var(--fonte-titulo); font-size: 26px; text-transform: none; }
-.compromisso-textos { display: grid; gap: 4px; min-width: 0; }
 .compromisso-titulo { font-family: var(--fonte-titulo); font-size: 22px; font-weight: 700; line-height: 1.15; }
-.compromisso-culto { font-size: 15px; opacity: 0.92; }
 .compromisso-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 2px; }
 .compromisso-chip {
     padding: 3px 10px;
@@ -99,106 +72,11 @@
 
 /* Pedidos de acesso (admin) */
 .inicio-avisos:empty { display: none; }
-.inicio-pedidos {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    min-height: 56px;
-    padding: 10px 16px 10px 10px;
-    border-radius: var(--raio-m);
-    background: #fff;
-    border: 1px solid rgba(191, 38, 43, 0.18);
-    color: var(--texto-vinho);
-    font-weight: 600;
-    text-decoration: none;
-    box-shadow: var(--sombra-1);
-    animation: surgir 0.5s 0.18s var(--mola) backwards;
-}
-.inicio-pedidos > span:nth-child(2) { flex: 1; }
-.pedidos-numero {
-    display: grid;
-    place-items: center;
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    background: var(--principal-brighter);
-    color: #fff;
-    font-size: 16px;
-}
 
 /* Grade de módulos */
-.inicio-secao {
-    margin: 26px 2px 12px;
-    font-size: 13px;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--texto-2);
-}
-.grade-modulos { list-style: none; display: grid; grid-template-columns: 1fr; gap: 10px; }
-@media (min-width: 560px) { .grade-modulos { grid-template-columns: 1fr 1fr; } }
-.grade-modulos li { animation: modulo-entra 0.6s calc(0.12s + var(--i, 0) * 0.06s) var(--mola) backwards; }
 @keyframes modulo-entra { from { opacity: 0; translate: 0 18px; scale: 0.97; } }
 
-.modulo {
-    width: 100%;
-    display: grid;
-    grid-template-columns: auto 1fr auto;
-    align-items: center;
-    gap: 14px;
-    min-height: 76px;
-    padding: 12px 16px 12px 12px;
-    border: 1px solid var(--vidro-borda);
-    border-radius: var(--raio-l);
-    background: rgba(255, 255, 255, 0.92);
-    box-shadow: var(--sombra-1), var(--brilho);
-    color: var(--texto);
-    font: inherit;
-    text-align: left;
-    text-decoration: none;
-    cursor: pointer;
-    transition: transform 0.5s var(--mola), box-shadow 0.3s;
-}
-.modulo:active { transform: scale(0.97); transition-duration: 0.12s; }
-@media (hover: hover) { .modulo:not(.em-breve):hover { transform: translateY(-2px); box-shadow: var(--sombra-2), var(--brilho); } }
-.modulo-icone {
-    display: grid;
-    place-items: center;
-    width: 52px;
-    height: 52px;
-    border-radius: 16px;
-    color: #fff;
-    background: var(--principal);
-    box-shadow: 0 6px 16px rgba(143, 13, 11, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.25);
-}
-.modulo-icone .icone { width: 26px; height: 26px; }
-.modulo-eventos .modulo-icone { background: #a5480f; box-shadow: 0 6px 16px rgba(143, 58, 11, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.25); }
-.modulo-textos { display: grid; gap: 2px; min-width: 0; }
-.modulo-nome { font-size: 17px; font-weight: 700; color: var(--texto-vinho); }
-.modulo-texto { font-size: 14px; color: var(--texto-2); }
-.modulo-seta { color: var(--texto-2); }
-
 /* "Em breve": apagado, mas vivo (balança ao tocar) */
-.modulo.em-breve { background: rgba(255, 255, 255, 0.45); box-shadow: none; border-style: dashed; border-color: rgba(58, 10, 9, 0.14); }
-.modulo.em-breve .modulo-icone { background: rgba(58, 10, 9, 0.07); color: var(--texto-2); box-shadow: none; }
-.modulo.em-breve .modulo-nome { color: var(--texto-2); }
-.modulo-em-breve {
-    padding: 4px 10px;
-    border-radius: var(--raio-capsula);
-    background: rgba(58, 10, 9, 0.06);
-    font-size: 12px;
-    font-weight: 700;
-    color: var(--texto-2);
-}
-.modulo.balancar { animation: balancar 0.5s var(--ease-out); }
-@keyframes balancar {
-    20% { translate: -6px 0; }
-    40% { translate: 5px 0; }
-    60% { translate: -3px 0; }
-    80% { translate: 2px 0; }
-}
-
-.inicio-rodape { margin-top: 28px; text-align: center; font-size: 13px; color: var(--texto-2); }
 
 /* --- Repertórios (histórico) ---------------------------------------------- */
 .historico-busca {
@@ -301,24 +179,6 @@
 /* --- "Vem aí": eventos do site na Início (D50) ------------------------- */
 /* Faixa que desliza para o lado, com encaixe (scroll-snap): fechado, cada
    evento é só dia + nome + hora; tocar abre os detalhes. */
-.eventos-faixa {
-    display: grid;
-    grid-auto-flow: column;
-    grid-auto-columns: minmax(250px, 78%);
-    gap: 10px;
-    margin: 0 -20px;
-    padding: 2px 20px 8px;
-    list-style: none;
-    overflow-x: auto;
-    overscroll-behavior-x: contain;
-    scroll-snap-type: x mandatory;
-    scroll-padding-inline: 20px;
-    scrollbar-width: none;
-}
-.eventos-faixa::-webkit-scrollbar { display: none; }
-.eventos-faixa:has(> li:only-child) { grid-auto-columns: 100%; }
-.eventos-faixa li { scroll-snap-align: start; animation: modulo-entra 0.6s calc(0.12s + var(--i, 0) * 0.07s) var(--mola) backwards; }
-@media (min-width: 560px) { .eventos-faixa { grid-auto-columns: minmax(250px, 46%); } }
 
 .evento-bloco {
     width: 100%;
@@ -394,9 +254,3 @@
 .evento-detalhe .botao-secundario { display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
 @media (prefers-reduced-motion: reduce) { .evento-agora::before { animation: none; } }
 /* Pedidos de acesso esperando, no cartão Pessoas (D63) */
-.modulo-contador {
-    display: inline-grid; place-items: center; min-width: 22px; height: 22px; margin-left: 8px; padding: 0 6px;
-    border-radius: 99px; background: var(--principal-brighter); color: #fff;
-    font-size: 13px; font-weight: 700; vertical-align: 2px;
-    animation: surgir 0.45s 0.4s var(--mola) backwards;
-}

@@ -176,8 +176,6 @@
     .tela-inicio .inicio-destaque { display: grid; }
     .tela-inicio .inicio-destaque > * { height: 100%; }
     .tela-inicio .inicio-conferir > * { height: 100%; }
-    .tela-inicio .grade-modulos { grid-template-columns: repeat(3, 1fr); }
-    .tela-inicio .eventos-faixa { grid-auto-columns: minmax(260px, calc((100% - 24px) / 3)); }
 
     /* --- Financeiro: saldo à esquerda (parado), o mês à direita ----------- */
     .tela-financeiro .app-conteudo {
