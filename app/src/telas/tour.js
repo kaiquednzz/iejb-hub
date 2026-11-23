@@ -3,17 +3,14 @@
 // Na primeira vez que uma conta aprovada abre o Início: um cartão de
 // boas-vindas ("Mostrar" ou "Agora não") e, se a pessoa quiser, um tour de
 // poucos passos que acende uma parte da tela de cada vez (a luz desliza de
-// um ponto ao outro). No fim, se ainda não tem, pergunta o aniversário.
+// um ponto ao outro). O aniversário fica de fora (é detalhe, mora em Você).
 //
 // Sem forçar: dá para pular a qualquer momento (botão, Esc ou tocar fora),
 // e ele não volta sozinho. Quem quiser rever acha em Você > Como usar o app.
 //
 // Por que um <dialog>? Ele já prende o foco, deixa o resto da tela inerte
 // para o leitor de tela e fecha no Esc, sem a gente reinventar nada disso.
-import { h, icone, comCarregando } from '../util/dom.js';
-import { avisar } from '../util/folha.js';
-import { mensagemDoBanco } from '../util/erros.js';
-import { camposAniversario, salvarAniversario } from './aniversarios.js';
+import { h } from '../util/dom.js';
 
 const chaveVisto = (conta) => `iejb-tour-visto-${conta.id}`;
 const reduzir = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -53,7 +50,7 @@ function boasVindas(conta) {
         aoTerminarSaida(dialogo, () => { dialogo.close(); dialogo.remove(); depoisDeFechar?.(); });
     };
     mostrar.addEventListener('click', () => fechar(() => abrirTour(conta)));
-    depois.addEventListener('click', () => fechar(() => perguntarAniversario(conta)));
+    depois.addEventListener('click', () => fechar());
     dialogo.addEventListener('cancel', (e) => { e.preventDefault(); fechar(); });
     dialogo.showModal();
 }
@@ -65,11 +62,11 @@ function passos(conta) {
     const serve = !!conta.pessoa?.membro_ministerio?.some((m) => m.ativo);
     const aba = (rota) => [`.barra-abas a[href="${rota}"]`, `.barra-lateral a[href="${rota}"]`];
     return [
-        { alvo: aba('#/inicio'), titulo: 'Início', texto: serve ? 'O que importa hoje: sua próxima escala, os avisos e os aniversários.' : 'O que importa hoje: os avisos da igreja e os aniversários.' },
+        { alvo: aba('#/inicio'), titulo: 'Início', texto: serve ? 'O que importa hoje: sua próxima escala e os avisos da igreja.' : 'O que importa hoje: os avisos da igreja.' },
         { alvo: ['.mural-secao:not([hidden])'], titulo: 'Mural', texto: 'Avisos e fotos da igreja. Gostou? Toque em Amém ou no coração.', rolar: true },
         { alvo: aba('#/agenda'), titulo: 'Agenda', texto: serve ? 'Seus próximos cultos e os eventos da igreja.' : 'Os eventos da igreja.' },
         { alvo: aba('#/ministerios'), titulo: 'Ministérios', texto: serve ? 'A casa de cada ministério: escala, repertórios e equipe.' : 'Os ministérios da igreja.' },
-        { alvo: aba('#/voce'), titulo: 'Você', texto: 'Seus dados, seu aniversário e os pedidos de oração.' },
+        { alvo: aba('#/voce'), titulo: 'Você', texto: 'Seus dados e os pedidos de oração.' },
     ];
 }
 
@@ -104,15 +101,12 @@ export function abrirTour(conta) {
 
     let i = 0;
     let terminou = false;
-    const sair = (completo) => {
+    const sair = () => {
         if (terminou) return;
         terminou = true;
         removeEventListener('resize', posicionar);
         dialogo.classList.add('saindo');
-        aoTerminarSaida(dialogo, () => {
-            dialogo.close(); dialogo.remove();
-            if (completo) perguntarAniversario(conta);
-        });
+        aoTerminarSaida(dialogo, () => { dialogo.close(); dialogo.remove(); });
     };
 
     function posicionar() {
@@ -153,9 +147,9 @@ export function abrirTour(conta) {
         proximo.focus({ focusVisible: false });
     }
 
-    proximo.addEventListener('click', () => (i < lista.length - 1 ? ir(i + 1) : sair(true)));
-    pular.addEventListener('click', () => sair(false));
-    dialogo.addEventListener('cancel', (e) => { e.preventDefault(); sair(false); });
+    proximo.addEventListener('click', () => (i < lista.length - 1 ? ir(i + 1) : sair()));
+    pular.addEventListener('click', () => sair());
+    dialogo.addEventListener('cancel', (e) => { e.preventDefault(); sair(); });
     dialogo.addEventListener('keydown', (e) => {
         if (e.key === 'ArrowRight' && i < lista.length - 1) ir(i + 1);
         if (e.key === 'ArrowLeft' && i > 0) ir(i - 1);
@@ -164,38 +158,4 @@ export function abrirTour(conta) {
 
     dialogo.showModal();
     ir(0);
-}
-
-// --- Por último: o aniversário (se ainda não tem) -------------------------------
-function perguntarAniversario(conta) {
-    if (!conta.pessoa || conta.pessoa.aniversario_dia) return;
-    const campos = camposAniversario(conta.pessoa);
-    const salvar = h('button', { type: 'submit', class: 'botao-principal botao-largo' }, 'Salvar');
-    const pular = h('button', { type: 'button', class: 'botao-texto' }, 'Pular');
-    const erro = h('p', { class: 'campo-erro', role: 'alert', hidden: true });
-    const form = h('form', { class: 'boas-vindas-form', method: 'dialog', novalidate: true },
-        icone('presente', 'icone boas-vindas-presente'),
-        h('h2', { id: 'bv-aniv', class: 'boas-vindas-titulo' }, 'Quando é seu aniversário?'),
-        h('p', { class: 'boas-vindas-texto' }, 'A igreja fica sabendo um dia antes. Não precisa dizer o ano.'),
-        campos.elemento, erro,
-        h('div', { class: 'boas-vindas-acoes' }, salvar, pular));
-    const dialogo = h('dialog', { class: 'boas-vindas', 'aria-labelledby': 'bv-aniv' }, form);
-    document.body.append(dialogo);
-    const fechar = () => { dialogo.close(); dialogo.remove(); };
-    pular.addEventListener('click', fechar);
-    dialogo.addEventListener('cancel', (e) => { e.preventDefault(); fechar(); });
-    form.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const valor = campos.valor();
-        if (!valor) { erro.hidden = false; erro.textContent = 'Escolha o dia e o mês, ou toque em Pular.'; return; }
-        comCarregando(salvar, async () => {
-            const { error } = await salvarAniversario(valor);
-            if (error) { erro.hidden = false; erro.textContent = mensagemDoBanco(error); return; }
-            conta.pessoa.aniversario_dia = valor.dia;
-            conta.pessoa.aniversario_mes = valor.mes;
-            fechar();
-            avisar('Aniversário salvo. Tudo pronto!');
-        });
-    });
-    dialogo.showModal();
 }

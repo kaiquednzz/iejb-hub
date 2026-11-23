@@ -118,6 +118,14 @@ PWA: iPhone no Safari (passos), Android sem e com `beforeinstallprompt`
 login), e desktop logado que perde a internet: o app abre pelo service worker e
 mostra a escala guardada com a faixa de sem conexão.
 
+## Testes do front (D69)
+
+`npm test` builda o app, sobe a prévia na porta 4174 e roda os testes de `testes/` num Chrome com o tamanho de um iPhone. O Supabase é **simulado** (`testes/simulador.js`): cada teste diz quem está logado e o que o banco responde, e confere o que o app mandou (qual função, com quais argumentos). Qualquer erro de JavaScript na tela reprova o teste.
+
+Eles não substituem os testes do banco (`supabase/tests/local`): lá se prova que a permissão vale; aqui, que a tela chama a coisa certa e não quebra.
+
+Primeira vez: `npx playwright install chromium` (ou `CHROME=/caminho/do/chrome npm test` para usar um Chrome já instalado).
+
 ## Publicação (feita em 14/11/2026)
 
 1. **Cloudflare Workers** (conta IEJB), conectado ao repo: *Path* `app`, *Build

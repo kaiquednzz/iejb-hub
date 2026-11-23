@@ -2,3 +2,7 @@ node_modules/
 dist/
 .env.local
 .env.*.local
+
+# Testes do front (Playwright)
+test-results/
+playwright-report/
