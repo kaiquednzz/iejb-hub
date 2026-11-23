@@ -140,7 +140,13 @@ export function cabecalhoApp(conta, opcoes = {}) {
     const eu = h('a', { class: 'cabecalho-conta', href: '#/voce', 'aria-label': 'Você: sua conta' },
         avatar(pessoa, 'pessoa-avatar cabecalho-avatar'));
     acenderNoAvatar(eu); // a chama acende na semana em que a pessoa toca
-    return h('header', { class: `cabecalho${area ? ' com-area' : ''}` }, esquerda, compacto, eu);
+    // Pedir oração (D69): discreto, ao lado do avatar, em toda tela. O pastor
+    // com pedido esperando vê um pontinho.
+    const oracao = area !== 'Oração' && h('a', { class: 'cabecalho-oracao', href: '#/oracao', 'aria-label': 'Pedidos de oração', title: 'Pedidos de oração' },
+        icone('maos'));
+    if (oracao && temCargo(conta, 'pastor')) marcarPedidosDeOracao(oracao);
+    return h('header', { class: `cabecalho${area ? ' com-area' : ''}` }, esquerda, compacto,
+        h('div', { class: 'cabecalho-direita' }, oracao, eu));
 }
 
 // Barra de abas (redesign v2): as abas são da PESSOA, não de um ministério.
@@ -249,4 +255,14 @@ export function caixaDeAviso() {
         },
         limpar() { caixa.textContent = ''; },
     };
+}
+
+// Pontinho no botão de oração quando há pedido esperando o pastor. Uma
+// consulta por abertura de tela é barata (a função só olha os dele).
+async function marcarPedidosDeOracao(botao) {
+    const { data } = await supabase.rpc('pedidos_de_oracao_para_mim');
+    const n = (data ?? []).filter((p) => !p.orado_em).length;
+    if (!n || !botao.isConnected) return;
+    botao.classList.add('tem-pedido');
+    botao.setAttribute('aria-label', `Pedidos de oração: ${n} esperando`);
 }

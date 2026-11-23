@@ -213,11 +213,14 @@ export function blocoMural(conta, { aoCarregar } = {}) {
         const data = h('input', { type: 'date', id: 'mural-fixar-ate', min: hoje, value: p.fixado_ate && p.fixado_ate >= hoje ? p.fixado_ate : somarDias(hoje, 7) });
         const fixar = h('button', { type: 'button', class: 'botao-principal botao-largo' }, icone('pino', 'icone icone-p'), fixado ? 'Mudar a data' : 'Fixar no topo');
         const soltar = fixado && h('button', { type: 'button', class: 'botao-secundario botao-largo' }, 'Tirar do topo');
+        const editar = h('button', { type: 'button', class: 'botao-secundario botao-largo' }, 'Editar o texto');
         const apagar = h('button', { type: 'button', class: 'botao-perigo botao-largo' }, icone('lixeira', 'icone icone-p'), 'Apagar');
 
         const folha = abrirFolha({
             titulo: p.titulo || TIPOS[p.tipo],
             conteudo: h('div', { class: 'form' },
+                editar,
+                h('hr', { class: 'mural-separador' }),
                 h('div', { class: 'campo' },
                     h('label', { for: 'mural-fixar-ate' }, 'Fica no topo até'),
                     data),
@@ -233,6 +236,7 @@ export function blocoMural(conta, { aoCarregar } = {}) {
         soltar?.addEventListener('click', () => comCarregando(soltar, async () => {
             if (await mudar({ fixado_ate: null })) { folha.fechar(); avisar('Saiu do topo.'); }
         }));
+        editar.addEventListener('click', () => { folha.fechar(); folhaEditar(p); });
         apagar.addEventListener('click', async () => {
             folha.fechar();
             const ok = await confirmar({
@@ -249,11 +253,45 @@ export function blocoMural(conta, { aoCarregar } = {}) {
         });
 
         async function mudar(valores) {
-            const { error } = await supabase.from('mural_publicacao').update(valores).eq('id', p.id);
-            if (error) { aviso.mostrar(mensagemDoBanco(error)); return false; }
-            carregar();
-            return true;
+            return gravar(p, valores, aviso);
         }
+    }
+
+    // Editar: só o texto (título, texto, referência). Tipo e fotos ficam
+    // como foram publicados (D68).
+    function folhaEditar(p) {
+        const aviso = caixaDeAviso();
+        const titulo = h('input', { id: 'editar-titulo', maxlength: 80, value: p.titulo ?? '', autocomplete: 'off' });
+        const texto = h('textarea', { id: 'editar-texto', class: 'campo-texto', rows: 5, maxlength: 1000 }, p.texto ?? '');
+        const referencia = h('input', { id: 'editar-referencia', maxlength: 60, value: p.referencia ?? '', autocomplete: 'off' });
+        const salvar = h('button', { type: 'submit', class: 'botao-principal botao-largo' }, 'Salvar');
+        const form = h('form', { class: 'form', novalidate: true },
+            h('div', { class: 'campo' }, h('label', { for: 'editar-titulo' }, p.tipo === 'aviso' ? 'Título' : 'Título (opcional)'), titulo),
+            h('div', { class: 'campo' }, h('label', { for: 'editar-texto' }, p.tipo === 'palavra' ? 'A palavra' : 'Texto (opcional)'), texto),
+            p.tipo === 'palavra' && h('div', { class: 'campo' }, h('label', { for: 'editar-referencia' }, 'Referência (opcional)'), referencia),
+            aviso.elemento, salvar);
+        const folha = abrirFolha({ titulo: 'Editar publicação', conteudo: form });
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            aviso.limpar();
+            const valores = {
+                titulo: titulo.value.trim() || null,
+                texto: texto.value.trim() || null,
+                referencia: p.tipo === 'palavra' ? (referencia.value.trim() || null) : p.referencia,
+            };
+            if (p.tipo === 'aviso' && !valores.titulo) return aviso.mostrar('O aviso precisa de título.');
+            if (p.tipo === 'palavra' && !valores.texto) return aviso.mostrar('Escreva a palavra.');
+            comCarregando(salvar, async () => {
+                if (await gravar(p, valores, aviso)) { folha.fechar(); avisar('Publicação atualizada.'); }
+            });
+        });
+    }
+
+    async function gravar(p, valores, aviso) {
+        const { error } = await supabase.from('mural_publicacao').update(valores).eq('id', p.id);
+        if (error) { aviso.mostrar(mensagemDoBanco(error)); return false; }
+        carregar();
+        return true;
     }
 
     // --- Visor de fotos ------------------------------------------------------

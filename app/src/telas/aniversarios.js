@@ -91,11 +91,14 @@ export function blocoAniversarios() {
             .or(`and(aniversario_mes.eq.${a.mes},aniversario_dia.eq.${a.dia}),and(aniversario_mes.eq.${b.mes},aniversario_dia.eq.${b.dia})`);
         if (error || !data?.length) return;
         const deHoje = data.filter((p) => p.aniversario_mes === a.mes && p.aniversario_dia === a.dia);
-        const deAmanha = data.filter((p) => !deHoje.includes(p));
-        lugar.replaceChildren(
+        const deAmanha = data.filter((p) => p.aniversario_mes === b.mes && p.aniversario_dia === b.dia);
+        if (!deHoje.length && !deAmanha.length) return;
+        // h() ignora false; replaceChildren não (escreveria "false" na tela)
+        lugar.replaceChildren(...[
             h('h2', { class: 'sr-only', id: 'titulo-aniversarios' }, 'Aniversários'),
             deHoje.length > 0 && faixa('hoje', deHoje),
-            deAmanha.length > 0 && faixa('amanha', deAmanha));
+            deAmanha.length > 0 && faixa('amanha', deAmanha),
+        ].filter(Boolean));
         lugar.hidden = false;
     }
 

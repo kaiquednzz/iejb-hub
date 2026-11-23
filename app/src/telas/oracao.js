@@ -70,7 +70,7 @@ function pedir(conta, recarregar) {
         }
         // O próprio pastor não pede oração a si mesmo
         const lista = pastores.data.filter((p) => p.id !== conta.pessoa?.id);
-        lugar.replaceChildren(formulario(lista), meusPedidos(meus.data, lista));
+        lugar.replaceChildren(...[formulario(lista), meusPedidos(meus.data, lista)].filter(Boolean));
     }
 
     function formulario(pastores) {

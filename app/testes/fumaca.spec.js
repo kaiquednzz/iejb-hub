@@ -7,8 +7,11 @@ test.beforeEach(async ({ page }, info) => {
     info.erros = [];
     page.on('pageerror', (e) => info.erros.push(e.message));
 });
-test.afterEach(async ({}, info) => {
+test.afterEach(async ({ page }, info) => {
     expect(info.erros, 'erros de JavaScript na tela').toEqual([]);
+    // "null", "false" ou "undefined" escritos na tela = condição sem filtro
+    const texto = await page.locator('body').innerText();
+    expect(texto, 'valor vazio vazou para a tela').not.toMatch(/\b(null|false|undefined)\b/);
 });
 
 const PUBLICACAO = {
@@ -45,6 +48,31 @@ test('Comunicação publica um aviso no mural', async ({ page, simular }) => {
     await page.locator('.mural-form button[type=submit]').click();
     await expect.poll(() => simular.chamadas.find((c) => c.rpc === 'publicar_no_mural')?.args)
         .toMatchObject({ p_tipo: 'aviso', p_titulo: 'Mutirão de limpeza', p_avisar: false });
+});
+
+test('quem publica edita o texto do aviso', async ({ page, simular }) => {
+    await simular.abrir('#/inicio', umaConta({ cargos: ['comunicacao'] }), { mural_publicacao: [PUBLICACAO] });
+    await page.getByRole('button', { name: 'Opções da publicação' }).click();
+    await page.getByRole('button', { name: 'Editar o texto' }).click();
+    await page.getByLabel('Título').fill('Cantata de Natal: mudou o horário');
+    await page.getByRole('button', { name: 'Salvar' }).click();
+    await expect.poll(() => simular.chamadas.find((c) => c.tabela?.startsWith('mural_publicacao') && c.metodo === 'PATCH')?.corpo)
+        .toMatchObject({ titulo: 'Cantata de Natal: mudou o horário', texto: 'Dia 20, às 18h.' });
+});
+
+test('oração fica no cabeçalho, ao lado do avatar', async ({ page, simular }) => {
+    await simular.abrir('#/agenda', umaConta(), { rpc: { pastores_da_igreja: PASTORES } });
+    await page.getByRole('link', { name: 'Pedidos de oração' }).click();
+    await expect(page).toHaveURL(/#\/oracao$/);
+    await expect(page.locator('.cabecalho-oracao')).toHaveCount(0); // na própria tela, some
+});
+
+test('pastor com pedido esperando vê o pontinho', async ({ page, simular }) => {
+    const pedido = { id: 'o-1', texto: 'Oi.', anonimo: false, autor_nome: 'Ana', autor_apelido: null, autor_foto: null,
+        criado_em: '2026-11-23T12:00:00Z', orado_em: null, orado_por_nome: null };
+    await simular.abrir('#/agenda', umaConta({ cargos: ['pastor'] }), { rpc: { pedidos_de_oracao_para_mim: [pedido] } });
+    await expect(page.locator('.cabecalho-oracao')).toHaveClass(/tem-pedido/);
+    await expect(page.locator('.cabecalho-oracao')).toHaveAttribute('aria-label', 'Pedidos de oração: 1 esperando');
 });
 
 test('primeira vez: boas-vindas e tour, uma vez só', async ({ page, simular }) => {

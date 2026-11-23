@@ -67,9 +67,10 @@ function passos(conta) {
         { alvo: aba('#/inicio'), titulo: 'Início', texto: serve ? 'O que importa hoje: sua próxima escala e os avisos da igreja.' : 'O que importa hoje: os avisos da igreja.' },
         // O primeiro cartão (não o mural inteiro, que pode ser mais alto que a tela)
         { alvo: ['.mural-lista > li:first-child .mural-cartao', '.mural-secao:not([hidden])'], titulo: 'Mural', texto: 'Avisos e fotos da igreja. Gostou? Toque em Amém ou no coração.', rolar: true },
+        { alvo: ['.cabecalho-oracao'], titulo: 'Oração', texto: 'Peça oração a um pastor. Só ele lê, e dá para mandar sem o nome.' },
         { alvo: aba('#/agenda'), titulo: 'Agenda', texto: serve ? 'Seus próximos cultos e os eventos da igreja.' : 'Os eventos da igreja.' },
         { alvo: aba('#/ministerios'), titulo: 'Ministérios', texto: serve ? 'A casa de cada ministério: escala, repertórios e equipe.' : 'Os ministérios da igreja.' },
-        { alvo: aba('#/voce'), titulo: 'Você', texto: 'Seus dados e os pedidos de oração.' },
+        { alvo: aba('#/voce'), titulo: 'Você', texto: 'Seus dados e este tour de novo, se precisar.' },
     ];
 }
 

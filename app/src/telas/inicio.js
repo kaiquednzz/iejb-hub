@@ -64,7 +64,6 @@ export function telaInicio(conta) {
             blocoAniversarios(),
             destaque,
             blocoMural(conta),
-            linhaOracao(),
             blocoEventos(),
         ),
     );
@@ -255,17 +254,6 @@ function cartaoDepois(culto) {
         h('h2', { class: 'depois-titulo' }, 'Obrigado por tocar hoje.'),
         h('p', { class: 'depois-texto' }, `${culto.nome} · ${formatarHorario(culto.horario)}`),
         itens.length ? h('ol', { class: 'depois-musicas' }, itens.map((i) => h('li', null, i.musica.titulo, i.tom ? h('span', null, ` · ${i.tom}`) : null))) : null);
-}
-
-// Pedir oração: discreto, abaixo do mural (D69). Fica sempre no mesmo lugar
-// para a pessoa achar quando precisar, sem disputar atenção com o resto.
-function linhaOracao() {
-    return h('a', { class: 'inicio-oracao', href: '#/oracao' },
-        h('span', { class: 'item-icone', 'aria-hidden': 'true' }, icone('coracao')),
-        h('span', { class: 'item-textos' },
-            h('span', { class: 'item-nome' }, 'Pedir oração'),
-            h('span', { class: 'item-apoio' }, 'Só o pastor que você escolher lê')),
-        icone('seta', 'icone icone-p item-seta'));
 }
 
 // Pastor com pedido esperando: uma linha de atenção no topo, como os pedidos de acesso
