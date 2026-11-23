@@ -17,7 +17,7 @@ export function secaoPedidos(dados, ctx) {
 
     return h('div', { class: 'secao' },
         pendentes.length === 0
-            ? vazio('Nenhum pedido esperando.', 'Quando alguém tocar em "Pedir acesso" no app, o pedido aparece aqui.')
+            ? vazio('Nenhum pedido esperando.', 'Mostre o QR de convite: quem ler pede acesso e o pedido aparece aqui.')
             : h('ul', { class: 'lista-pedidos' }, pendentes.map((p, i) => cartaoPedido(p, i, dados, ctx))),
         recusados.length > 0 && h('details', { class: 'grupo-recolhido' },
             h('summary', null, `Recusados (${recusados.length})`),

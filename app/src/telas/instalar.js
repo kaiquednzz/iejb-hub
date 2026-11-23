@@ -6,6 +6,7 @@
 //     senão, o caminho pelo menu
 import { h, icone, comCarregando, marcarCopiado } from '../util/dom.js';
 import { aparelho, podeInstalarDireto, pedirInstalacao, aoMudarInstalacao } from '../pwa.js';
+import { veioPorConvite } from './convite.js';
 
 export function telaInstalar() {
     const corpo = h('div', { class: 'instalar-corpo' });
@@ -14,9 +15,10 @@ export function telaInstalar() {
             h('div', { class: 'instalar-icone-app', 'aria-hidden': 'true' },
                 h('img', { src: '/icone-192.png', alt: '', width: 96, height: 96 })),
             h('section', { class: 'entrada-cartao', 'aria-labelledby': 'titulo-tela' },
-                h('h1', { id: 'titulo-tela', tabindex: -1 }, 'Instale o IEJB Hub'),
-                h('p', { class: 'entrada-subtitulo' },
-                    'No celular o Hub funciona como app, direto da tela de início. É assim que os avisos de escala chegam até você.'),
+                h('h1', { id: 'titulo-tela', tabindex: -1 }, veioPorConvite() ? 'Que bom ter você aqui!' : 'Instale o IEJB Hub'),
+                h('p', { class: 'entrada-subtitulo' }, veioPorConvite()
+                    ? 'Instale o app da IEJB no celular. Depois é só abrir pela tela de início e entrar com o Google.'
+                    : 'No celular o Hub funciona como app, direto da tela de início. É assim que os avisos de escala chegam até você.'),
                 corpo,
             ),
             h('p', { class: 'entrada-rodape' }, 'Leva menos de um minuto e não ocupa espaço.'),

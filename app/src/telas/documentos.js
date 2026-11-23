@@ -27,6 +27,8 @@ function privacidade() {
                 [b('Cadastro: '), 'nome, apelido, telefone de contato (se você ou a liderança informar), instrumentos que toca e foto de perfil (se você enviar).'],
                 [b('Participação: '), 'grupos de que faz parte, escalas em que está, quando marca que não vai e funções na igreja (por exemplo Tesouraria ou Comunicação).'],
                 [b('Mural: '), 'os avisos, fotos e palavras publicados pelo pastor e pela Comunicação, com quem publicou, e quem deu Amém ou coração em cada um.'],
+                [b('Aniversário: '), 'se você informar, só o dia e o mês (sem o ano). A igreja vê e recebe um aviso na véspera. Você tira quando quiser, em Você.'],
+                [b('Pedidos de oração: '), 'o texto do pedido, para quais pastores foi e se foi marcado como orado. ', b('Só os pastores que você escolher leem'), ' (nem o administrador vê); no pedido sem nome, nem eles sabem quem mandou. O pedido é apagado sozinho em 30 dias, e você pode apagar antes.'],
                 [b('Avisos no celular: '), 'se você ativar, um identificador do aparelho para mandar as notificações. Ele some quando você sai da conta naquele aparelho.'],
                 [b('Agenda do celular: '), 'se você colocar seus cultos na agenda, um link secreto que dá acesso só aos cultos em que você está escalado. Você pode trocá-lo a qualquer momento, e o antigo para de funcionar.'],
                 [b('Testemunha da contagem: '), 'quem ajuda a conferir o dinheiro pelo QR, sem conta no app, deixa só o nome e o valor que contou. Essa pessoa não vê nada do caixa.'],

@@ -22,7 +22,7 @@ async function buscarConta(idUsuario) {
     const { data, error } = await supabase
         .from('conta')
         .select(`id, login, estado, e_administrador, senha_temporaria, nome_informado, apresentou_em, foto_informada, criado_em,
-                 pessoa:pessoa_id ( id, nome, apelido, foto, membro_ministerio ( e_lider, ativo ), cargo_pessoa ( cargo ) )`)
+                 pessoa:pessoa_id ( id, nome, apelido, foto, aniversario_dia, aniversario_mes, membro_ministerio ( e_lider, ativo ), cargo_pessoa ( cargo ) )`)
         .eq('id', idUsuario)
         .maybeSingle()
         // O supabase-js tenta de novo sozinho em erro de rede (espera 1s, 2s, 4s).

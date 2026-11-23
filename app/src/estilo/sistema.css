@@ -1350,3 +1350,172 @@ blockquote.mural-palavra { position: relative; margin: 0; padding: 30px 0 0 var(
 @media (prefers-reduced-motion: reduce) {
     .mural-lista > li, .mural-cartao.destacado, .reacao.reagiu .icone, .reacao.reagiu .reacao-n, .mural-escolhida { animation: none; }
 }
+
+/* --- Pedidos de oração (D69) ------------------------------------------------ */
+.oracao-topo { margin: var(--esp-1) 0 var(--esp-5); padding-inline: var(--esp-1); }
+.tela-oracao .segmentos { margin-bottom: var(--esp-5); }
+.oracao-esqueleto { height: 280px; border-radius: var(--raio-3); }
+.oracao-form { display: grid; gap: var(--esp-4); }
+.oracao-pastores { display: flex; flex-wrap: wrap; gap: var(--esp-2); }
+.oracao-pastor {
+    display: inline-flex; align-items: center; gap: var(--esp-2);
+    min-height: 48px; padding: 4px 14px 4px 4px;
+    border: 1px solid var(--cor-borda-forte); border-radius: var(--raio-pilula);
+    background: var(--cor-superficie); color: var(--cor-texto);
+    font: 600 15px/1 var(--fonte-texto); cursor: pointer;
+    transition: background var(--dur-media) ease, border-color var(--dur-media) ease, transform 0.35s var(--mola);
+}
+.oracao-pastor:active { transform: scale(0.95); transition-duration: 0.12s; }
+.oracao-pastor-foto { width: 38px; height: 38px; font-size: 14px; }
+.oracao-pastor-ok { width: 0; opacity: 0; color: var(--cor-marca); transition: width 0.3s var(--mola), opacity 0.2s ease; }
+.oracao-pastor[aria-pressed="true"] { border-color: var(--cor-marca); background: var(--cor-marca-sutil-2); }
+.oracao-pastor[aria-pressed="true"] .oracao-pastor-ok { width: 16px; opacity: 1; }
+.oracao-privacidade { display: flex; align-items: center; justify-content: center; gap: 6px; margin: 0; text-align: center; }
+.oracao-meus { margin-top: var(--esp-7); }
+.oracao-lista { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--esp-3); margin: 0; padding: 0; list-style: none; }
+.oracao-lista > li { animation: subir 0.45s calc(var(--i, 0) * 0.05s) var(--ease-out) backwards; }
+.oracao-cartao { display: grid; gap: var(--esp-3); padding: var(--esp-4); border: 1px solid var(--cor-borda); border-radius: var(--raio-3); background: var(--cor-superficie); }
+.oracao-cartao.orado { background: var(--cor-superficie-rebaixada); }
+.oracao-texto { margin: 0; font: var(--texto-corpo-g); color: var(--cor-texto); white-space: pre-line; overflow-wrap: anywhere; }
+.oracao-quem { display: flex; align-items: center; gap: var(--esp-2); }
+.oracao-quem-foto { width: 32px; height: 32px; font-size: 12px; }
+.oracao-quem-foto.anonimo { display: grid; place-items: center; background: var(--cor-superficie-rebaixada); color: var(--cor-texto-2); }
+.oracao-quem-nome { flex: 1; min-width: 0; font: 600 15px/1.2 var(--fonte-texto); color: var(--cor-texto); }
+.oracao-quando { font: var(--texto-apoio); color: var(--cor-texto-2); white-space: nowrap; }
+.oracao-rodape { display: flex; align-items: center; gap: var(--esp-2); }
+.oracao-status { flex: 1; min-width: 0; display: inline-flex; align-items: center; gap: 6px; margin: 0; font: var(--texto-apoio); color: var(--cor-texto-2); }
+.oracao-status.orado { color: var(--cor-marca); font-weight: 600; }
+.oracao-status.orado .icone { fill: currentColor; }
+.oracao-apagar { margin: -8px -8px -8px 0; background: none; color: var(--cor-texto-2); }
+.oracao-orei { justify-self: start; }
+.oracao-vazio { display: grid; justify-items: center; gap: var(--esp-2); padding: var(--esp-7) var(--esp-4); text-align: center; }
+.oracao-vazio p { margin: 0; }
+.oracao-vazio-icone { width: 40px; height: 40px; color: var(--cor-marca); opacity: 0.5; }
+
+/* Linha "Pedir oração" no Início */
+.inicio-oracao {
+    display: flex; align-items: center; gap: var(--esp-3);
+    min-height: 64px; padding: var(--esp-3) var(--esp-4);
+    border: 1px solid var(--cor-borda); border-radius: var(--raio-3);
+    background: var(--cor-superficie); color: inherit; text-decoration: none;
+    transition: transform 0.35s var(--mola);
+}
+.inicio-oracao:active { transform: scale(0.98); transition-duration: 0.12s; }
+
+/* --- Aniversários (D69) ----------------------------------------------------- */
+.aniversarios { display: grid; gap: var(--esp-2); }
+.aniversario-faixa {
+    position: relative;
+    display: flex; align-items: center; gap: var(--esp-3);
+    padding: var(--esp-3) var(--esp-4);
+    border: 1px solid var(--cor-borda); border-radius: var(--raio-3);
+    background: var(--cor-superficie);
+    overflow: hidden;
+    animation: subir 0.5s var(--ease-out) backwards;
+}
+.aniversario-faixa.hoje { border-color: #EAD3A8; background: var(--ambar-100); }
+.aniversario-rostos { display: flex; flex: none; }
+.aniversario-rosto { width: 40px; height: 40px; font-size: 14px; box-shadow: 0 0 0 2px var(--cor-superficie); }
+.aniversario-faixa.hoje .aniversario-rosto { box-shadow: 0 0 0 2px var(--ambar-100); }
+.aniversario-rosto + .aniversario-rosto { margin-left: -12px; }
+.aniversario-texto { flex: 1; min-width: 0; margin: 0; font: var(--texto-corpo); color: var(--cor-texto); }
+.aniversario-quando { font-weight: 700; }
+.aniversario-icone { flex: none; width: 26px; height: 26px; color: var(--cor-marca); transform-origin: 50% 80%; animation: presenteBalanca 2.4s 0.6s var(--ease-out) 2; }
+@keyframes presenteBalanca { 0%, 60%, 100% { transform: rotate(0); } 15% { transform: rotate(-12deg); } 30% { transform: rotate(10deg); } 45% { transform: rotate(-5deg); } }
+.aniversario-campos { display: grid; grid-template-columns: 1fr 1.6fr; gap: var(--esp-2); }
+.campo-select {
+    width: 100%; min-height: 52px; padding: 0 var(--esp-4);
+    border: 1px solid var(--cor-borda-campo); border-radius: var(--raio-2);
+    background: var(--cor-superficie); color: var(--cor-texto); font: var(--texto-corpo-g);
+}
+
+/* --- QR de convite (D69) ----------------------------------------------------- */
+.convite-abrir { margin-bottom: var(--esp-4); }
+.convite {
+    width: 100vw; max-width: none; height: 100dvh; max-height: none; margin: 0; padding: 0; border: 0;
+    background: var(--cor-fundo); color: var(--cor-texto);
+    animation: visorEntra 0.32s var(--ease-out);
+}
+.convite[open] { display: grid; grid-template-rows: 1fr auto; place-items: center; }
+.convite::backdrop { background: var(--cor-fundo); }
+.convite-fechar { position: absolute; top: calc(env(safe-area-inset-top) + var(--esp-3)); right: var(--esp-3); display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 0; border-radius: 50%; background: var(--cor-superficie-rebaixada); color: var(--cor-texto); cursor: pointer; }
+.convite-folha { display: grid; justify-items: center; gap: var(--esp-3); width: min(560px, 100%); padding: var(--esp-6) var(--esp-5) 0; text-align: center; }
+.convite-logo { width: 56px; height: 56px; border-radius: 14px; }
+.convite-chapeu { margin: 0; font: var(--texto-rotulo); letter-spacing: var(--rotulo-espaco); text-transform: uppercase; color: var(--cor-marca); }
+.convite-titulo { margin: 0; font: italic 700 clamp(32px, 7vw, 52px)/1.05 var(--fonte-titulo); color: var(--cor-titulo); }
+.convite-qr { width: min(78vw, 52dvh, 440px); padding: var(--esp-2); border: 1px solid var(--cor-borda); border-radius: var(--raio-3); background: #fff; animation: reacaoPula 0.6s 0.1s var(--mola) backwards; }
+.convite-qr .qr { display: block; width: 100%; height: auto; }
+.convite-passos { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; counter-reset: passo; font: var(--texto-corpo); text-align: left; }
+.convite-passos li { display: flex; align-items: flex-start; gap: var(--esp-2); counter-increment: passo; }
+.convite-passos li::before { content: counter(passo); display: inline-grid; place-items: center; flex: none; width: 22px; height: 22px; border-radius: 50%; background: var(--cor-marca); color: #fff; font: 700 12px/1 var(--fonte-texto); }
+.convite-link { margin: 0; font: var(--texto-apoio); color: var(--cor-texto-2); }
+.convite-acoes { padding: var(--esp-4) var(--esp-4) calc(env(safe-area-inset-bottom) + var(--esp-4)); }
+@media print {
+    html.imprimindo-convite body > :not(.convite) { display: none !important; }
+    html.imprimindo-convite .convite { position: static; height: auto; animation: none; background: #fff; }
+    html.imprimindo-convite .convite-fechar, html.imprimindo-convite .convite-acoes { display: none; }
+    html.imprimindo-convite .convite-qr { width: 12cm; animation: none; }
+    html.imprimindo-convite .convite-titulo { font-size: 44pt; }
+}
+
+/* --- Boas-vindas e tour (D69) ------------------------------------------------ */
+.boas-vindas {
+    margin: auto;
+    width: min(400px, calc(100vw - 32px)); padding: var(--esp-6) var(--esp-5) var(--esp-5);
+    border: 0; border-radius: 24px; background: var(--cor-superficie); color: var(--cor-texto);
+    text-align: center; box-shadow: var(--elev-2);
+    animation: boasVindasEntra 0.5s var(--mola);
+}
+.boas-vindas::backdrop { background: rgba(31, 21, 19, 0.45); animation: fundoEntra 0.3s ease; }
+.boas-vindas.saindo { animation: boasVindasSai 0.25s var(--ease-ios) forwards; }
+.boas-vindas.saindo::backdrop { opacity: 0; transition: opacity 0.25s; }
+@keyframes boasVindasEntra { from { opacity: 0; transform: translateY(24px) scale(0.94); } }
+@keyframes boasVindasSai { to { opacity: 0; transform: translateY(12px) scale(0.97); } }
+@keyframes fundoEntra { from { opacity: 0; } }
+.boas-vindas-logo { width: 72px; height: 72px; margin: 0 auto var(--esp-3); border-radius: 18px; animation: reacaoPula 0.6s 0.15s var(--mola) backwards; }
+.boas-vindas-titulo { margin: 0 0 var(--esp-2); font: italic 700 28px/1.15 var(--fonte-titulo); color: var(--cor-titulo); text-wrap: balance; }
+.boas-vindas-texto { margin: 0 0 var(--esp-5); font: var(--texto-corpo-g); color: var(--cor-texto-2); text-wrap: pretty; }
+.boas-vindas-acoes { display: grid; gap: var(--esp-2); }
+.boas-vindas-form { display: grid; gap: var(--esp-3); }
+.boas-vindas-form .boas-vindas-texto { margin-bottom: 0; }
+.boas-vindas-presente { justify-self: center; width: 40px; height: 40px; color: var(--cor-marca); animation: presenteBalanca 2.4s 0.3s var(--ease-out); }
+.campo-erro { margin: 0; font: var(--texto-apoio); color: var(--cor-perigo, var(--cor-marca)); }
+
+.tour { inset: 0; width: 100vw; max-width: none; height: 100dvh; max-height: none; margin: 0; padding: 0; border: 0; background: transparent; overflow: hidden; }
+.tour::backdrop { background: transparent; }
+.tour.saindo { animation: tourSai 0.3s ease forwards; }
+@keyframes tourSai { to { opacity: 0; } }
+/* A luz: um recorte com sombra enorme em volta (o resto da tela escurece) */
+.tour-luz {
+    position: fixed;
+    left: var(--x); top: var(--y); width: var(--w); height: var(--h);
+    border-radius: 18px;
+    box-shadow: 0 0 0 200vmax rgba(31, 21, 19, 0.62);
+    pointer-events: none;
+    transition: left 0.55s var(--mola), top 0.55s var(--mola), width 0.55s var(--mola), height 0.55s var(--mola);
+    animation: fundoEntra 0.35s ease;
+}
+.tour-balao {
+    position: fixed;
+    display: grid; gap: var(--esp-2);
+    padding: var(--esp-4) var(--esp-4) var(--esp-3);
+    border-radius: 20px; background: var(--cor-superficie); color: var(--cor-texto);
+    box-shadow: var(--elev-2);
+    transition: left 0.55s var(--mola), top 0.55s var(--mola), bottom 0.55s var(--mola);
+    animation: boasVindasEntra 0.45s var(--mola);
+}
+.tour-balao.troca .tour-titulo, .tour-balao.troca .tour-texto { animation: tourTexto 0.4s var(--ease-out); }
+@keyframes tourTexto { from { opacity: 0; transform: translateY(6px); } }
+.tour-titulo { margin: 0; font: italic 700 24px/1.1 var(--fonte-titulo); color: var(--cor-titulo); }
+.tour-texto { margin: 0; font: var(--texto-corpo-g); color: var(--cor-texto-2); }
+.tour-rodape { display: flex; align-items: center; gap: var(--esp-2); margin-top: var(--esp-2); }
+.tour-pontos { display: flex; gap: 6px; margin-right: auto; }
+.tour-pontos span { width: 7px; height: 7px; border-radius: 4px; background: var(--cor-borda-forte); transition: width 0.4s var(--mola), background 0.3s ease; }
+.tour-pontos span.atual { width: 20px; background: var(--cor-marca); }
+.tour-pular { min-height: 44px; }
+.tour-proximo { min-height: 44px; padding-inline: var(--esp-5); }
+
+@media (prefers-reduced-motion: reduce) {
+    .tour-luz, .tour-balao, .oracao-pastor-ok { transition: none; }
+    .boas-vindas, .boas-vindas-logo, .tour-balao, .tour-luz, .aniversario-icone, .aniversario-faixa, .oracao-lista > li, .convite, .convite-qr { animation: none; }
+}

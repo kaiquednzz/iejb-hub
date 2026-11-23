@@ -45,6 +45,7 @@ import { telaTestemunha } from './telas/testemunha.js';
 import { telaDocumento } from './telas/documentos.js';
 import { barraLateral, barraAbas } from './telas/moldura.js';
 import { telaVoce } from './telas/voce.js';
+import { telaOracao } from './telas/oracao.js';
 import { telaAgenda } from './telas/agenda.js';
 import { corDoTopo } from './util/tema.js';
 import { ligarTituloCompacto, ligarPuxarParaAtualizar } from './util/rolagem.js';
@@ -75,6 +76,7 @@ const ROTAS_DA_CONTA = {
     '#/financeiro': (conta) => (veFinanceiro(conta) ? telaFinanceiro(conta) : telaInicio(conta)),
     '#/pessoas': (conta) => (conta.e_administrador ? telaEquipe(conta, { area: 'pessoas' }) : telaInicio(conta)),
     '#/voce': telaVoce,
+    '#/oracao': telaOracao,
     '#/agenda': telaAgenda,
     '#/ministerios': telaMinisterios,
     '#/privacidade': (conta) => telaDocumento('privacidade', conta),

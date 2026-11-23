@@ -22,6 +22,9 @@ import { nomeCurto } from '../sessao.js';
 import { blocoConferir } from './financeiro/conferir.js';
 import { blocoEventos } from './inicio-eventos.js';
 import { blocoMural } from './mural.js';
+import { blocoAniversarios } from './aniversarios.js';
+import { pedidosSemResposta } from './oracao.js';
+import { mostrarBoasVindasSePrimeiraVez } from './tour.js';
 import { filaDoYoutube } from '../util/musica.js';
 import { chama, marcarEscalado } from '../util/chama.js';
 import { botaoWhatsRepertorio } from '../util/compartilhar.js';
@@ -58,14 +61,18 @@ export function telaInicio(conta) {
                 h('h1', { tabindex: -1, class: 'titulo-tela inicio-ola' }, `${saudacao()}${primeiroNome ? `, ${primeiroNome}` : ''}`)),
             conferir,
             avisosAdmin,
+            blocoAniversarios(),
             destaque,
             blocoMural(conta),
+            linhaOracao(),
             blocoEventos(),
         ),
     );
 
     if (destaque) carregarCompromisso(conta, destaque);
     if (conta.e_administrador) carregarPedidos(avisosAdmin);
+    carregarOracao(conta, avisosAdmin);
+    mostrarBoasVindasSePrimeiraVez(conta);
     return tela;
 }
 
@@ -250,10 +257,31 @@ function cartaoDepois(culto) {
         itens.length ? h('ol', { class: 'depois-musicas' }, itens.map((i) => h('li', null, i.musica.titulo, i.tom ? h('span', null, ` · ${i.tom}`) : null))) : null);
 }
 
+// Pedir oração: discreto, abaixo do mural (D69). Fica sempre no mesmo lugar
+// para a pessoa achar quando precisar, sem disputar atenção com o resto.
+function linhaOracao() {
+    return h('a', { class: 'inicio-oracao', href: '#/oracao' },
+        h('span', { class: 'item-icone', 'aria-hidden': 'true' }, icone('coracao')),
+        h('span', { class: 'item-textos' },
+            h('span', { class: 'item-nome' }, 'Pedir oração'),
+            h('span', { class: 'item-apoio' }, 'Só o pastor que você escolher lê')),
+        icone('seta', 'icone icone-p item-seta'));
+}
+
+// Pastor com pedido esperando: uma linha de atenção no topo, como os pedidos de acesso
+async function carregarOracao(conta, lugar) {
+    const n = await pedidosSemResposta(conta);
+    if (!n) return;
+    lugar.append(h('a', { class: 'atencao', href: '#/oracao' },
+        h('span', { class: 'atencao-ponto', 'aria-hidden': 'true' }),
+        h('span', { class: 'atencao-texto' }, n === 1 ? '1 pedido de oração para você' : `${n} pedidos de oração para você`),
+        icone('seta', 'icone icone-p item-seta')));
+}
+
 async function carregarPedidos(lugar) {
     const { count } = await supabase.from('conta').select('id', { count: 'exact', head: true }).eq('estado', 'pendente');
     if (!count) return;
-    lugar.replaceChildren(h('a', { class: 'atencao', href: '#/pessoas' },
+    lugar.prepend(h('a', { class: 'atencao', href: '#/pessoas' },
         h('span', { class: 'atencao-ponto', 'aria-hidden': 'true' }),
         h('span', { class: 'atencao-texto' }, count === 1 ? '1 pessoa pedindo acesso ao Hub' : `${count} pessoas pedindo acesso ao Hub`),
         icone('seta', 'icone icone-p item-seta')));

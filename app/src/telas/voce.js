@@ -4,6 +4,8 @@
 // mesmas regras de quem vê o quê (sessao.js); o banco continua conferindo.
 import { h, icone } from '../util/dom.js';
 import { cabecalhoApp, avatar, papelPrincipal, sair } from './moldura.js';
+import { textoAniversario, folhaAniversario } from './aniversarios.js';
+import { abrirTour } from './tour.js';
 
 // Linha de lista: ícone, nome, texto de apoio e seta. Toda a linha é o link.
 export function linhaLista({ href, nome, texto, nomeIcone }) {
@@ -13,6 +15,18 @@ export function linhaLista({ href, nome, texto, nomeIcone }) {
             h('span', { class: 'item-nome' }, nome),
             texto && h('span', { class: 'item-apoio' }, texto)),
         icone('seta', 'icone icone-p item-seta')));
+}
+
+// Linha que abre algo na própria tela (folha, tour), em vez de navegar
+function linhaBotao({ nome, texto, nomeIcone, aoTocar }) {
+    const b = h('button', { type: 'button', class: 'item-lista' },
+        nomeIcone && h('span', { class: 'item-icone', 'aria-hidden': 'true' }, icone(nomeIcone)),
+        h('span', { class: 'item-textos' },
+            h('span', { class: 'item-nome' }, nome),
+            texto != null && h('span', { class: 'item-apoio' }, texto)),
+        icone('seta', 'icone icone-p item-seta'));
+    b.addEventListener('click', () => aoTocar(b));
+    return h('li', null, b);
 }
 
 const MESES = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
@@ -81,6 +95,12 @@ export function telaVoce(conta) {
             h('h1', { class: 'sr-only', tabindex: -1 }, 'Você'),
             carteirinha(conta, pessoa, nome),
             conta.login && h('p', { class: 'voce-login' }, `Você entra com ${conta.login}`),
+            h('h2', { class: 'rotulo-secao' }, 'Você na igreja'),
+            h('ul', { class: 'grupo-lista' },
+                conta.pessoa && linhaBotao({ nome: 'Aniversário', texto: textoAniversario(conta.pessoa) ?? 'Adicionar', nomeIcone: 'presente',
+                    aoTocar: (b) => folhaAniversario(conta, () => { b.querySelector('.item-apoio').textContent = textoAniversario(conta.pessoa) ?? 'Adicionar'; }) }),
+                linhaLista({ href: '#/oracao', nome: 'Pedidos de oração', nomeIcone: 'coracao' }),
+                linhaBotao({ nome: 'Como usar o app', nomeIcone: 'info', aoTocar: () => abrirTour(conta) })),
             h('h2', { class: 'rotulo-secao' }, 'Sobre o app'),
             h('ul', { class: 'grupo-lista' },
                 linhaLista({ href: '#/privacidade', nome: 'Política de privacidade', nomeIcone: 'escudo' }),

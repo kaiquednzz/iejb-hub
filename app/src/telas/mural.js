@@ -365,7 +365,8 @@ export function abrirVisorDeFotos({ titulo, urls, inicio = 0, origem }) {
     });
 
     function sair() {
-        const terminar = () => { dialogo.close(); dialogo.remove(); origem?.focus({ preventScroll: true }); };
+        let feito = false;
+        const terminar = () => { if (feito) return; feito = true; dialogo.close(); dialogo.remove(); origem?.focus({ preventScroll: true }); };
         if (matchMedia('(prefers-reduced-motion: reduce)').matches) return terminar();
         dialogo.classList.add('saindo');
         dialogo.addEventListener('animationend', terminar, { once: true });

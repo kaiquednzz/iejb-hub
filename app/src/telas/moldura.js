@@ -124,7 +124,9 @@ export function cabecalhoApp(conta, opcoes = {}) {
     // Áreas que não são aba (Louvor, Financeiro, Eventos, Pessoas) moram em
     // Ministérios e voltam para lá; Privacidade e Termos voltam para o Você.
     const area = opcoes.modulo ?? null;
-    const [destino, rotulo] = AREAS_DA_VOCE.has(area) ? ['#/voce', 'Você'] : ['#/ministerios', 'Ministérios'];
+    // Oração é da igreja toda (não de um ministério): volta para o Início.
+    const [destino, rotulo] = AREAS_DA_VOCE.has(area) ? ['#/voce', 'Você']
+        : area === 'Oração' ? ['#/inicio', 'Início'] : ['#/ministerios', 'Ministérios'];
     const esquerda = area
         ? h('div', { class: 'cabecalho-marca cabecalho-modulo' },
             h('a', { class: 'botao-voltar', href: destino, 'aria-label': `Voltar para ${rotulo}` }, icone('seta', 'icone icone-p seta-esquerda'), h('span', null, rotulo)))
@@ -149,7 +151,7 @@ export function cabecalhoApp(conta, opcoes = {}) {
 const ABA_DA_ROTA = {
     '#/escala': '#/ministerios', '#/montar': '#/ministerios', '#/repertorios': '#/ministerios', '#/equipe': '#/ministerios',
     '#/eventos': '#/ministerios', '#/financeiro': '#/ministerios', '#/pessoas': '#/ministerios',
-    '#/privacidade': '#/voce', '#/termos': '#/voce',
+    '#/privacidade': '#/voce', '#/termos': '#/voce', '#/oracao': '#/inicio',
 };
 export function barraAbas(conta, rota) {
     const atual = ABA_DA_ROTA[rota] ?? rota;

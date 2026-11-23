@@ -11,6 +11,7 @@ import { secaoPessoas } from './pessoas.js';
 import { secaoGrupos } from './grupos.js';
 import { mensagemDoBanco } from '../../util/erros.js';
 import { vazio } from './pecas.js';
+import { botaoConvite } from '../convite.js';
 
 // A mesma tela serve dois lugares:
 //   - Louvor > Equipe: pessoas e grupos do Louvor;
@@ -28,6 +29,7 @@ export function telaEquipe(conta, { area = 'louvor' } = {}) {
         cabecalhoApp(conta, { modulo: ePessoas ? 'Pessoas' : 'Louvor' }),
         h('main', { id: 'conteudo', class: 'app-conteudo' },
             ePessoas ? h('h1', { tabindex: -1, class: 'titulo-tela' }, 'Pessoas') : navLouvor(conta, '#/equipe'),
+            ePessoas && botaoConvite(), // QR de convite (D69): sempre à mão, com ou sem pedido esperando
             abas,
             lugar,
         ),
