@@ -75,6 +75,22 @@ test('pastor com pedido esperando vê o pontinho', async ({ page, simular }) => 
     await expect(page.locator('.cabecalho-oracao')).toHaveAttribute('aria-label', 'Pedidos de oração: 1 esperando');
 });
 
+test('mostra quem reagiu', async ({ page, simular }) => {
+    const comReacoes = { ...PUBLICACAO, mural_reacao: [
+        { pessoa_id: 'a', tipo: 'amem', pessoa: { nome: 'Bia Lima', apelido: 'Bia', foto: null } },
+        { pessoa_id: 'b', tipo: 'coracao', pessoa: { nome: 'João Pedro', apelido: null, foto: null } },
+        { pessoa_id: 'a', tipo: 'coracao', pessoa: { nome: 'Bia Lima', apelido: 'Bia', foto: null } },
+        { pessoa_id: 'c', tipo: 'amem', pessoa: { nome: 'Carla Dias', apelido: null, foto: null } },
+    ] };
+    await simular.abrir('#/inicio', umaConta(), { mural_publicacao: [comReacoes] });
+    await expect(page.locator('.mural-quem-texto')).toHaveText('Bia, João e mais 1');
+    await page.locator('.mural-amem, .reacao-amem').first().click(); // eu dou Amém: viro o primeiro
+    await expect(page.locator('.mural-quem-texto')).toHaveText('Você, Bia e mais 2');
+    await page.locator('.mural-quem').click();
+    await expect(page.locator('.reagiram-grupo')).toHaveCount(2);
+    await expect(page.locator('.reagiram-grupo').first()).toContainText('Carla');
+});
+
 test('primeira vez: boas-vindas e tour, uma vez só', async ({ page, simular }) => {
     await simular.abrir('#/inicio', umaConta(), {}, { primeiraVez: true });
     await page.getByRole('button', { name: 'Me mostra' }).click();

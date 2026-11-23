@@ -50,7 +50,8 @@ export const test = base.extend({
             const url = new URL(req.url());
             const caminho = url.pathname;
             const metodo = req.method();
-            const corpo = req.postDataJSON?.() ?? null;
+            let corpo = null;
+            try { corpo = req.postDataJSON(); } catch { /* upload de arquivo (multipart) */ }
 
             if (caminho.startsWith('/auth/v1/')) {
                 if (caminho.endsWith('/user')) return responder(rota, sessao(dados.conta.id).user);

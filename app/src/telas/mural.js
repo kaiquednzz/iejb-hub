@@ -53,7 +53,7 @@ export function blocoMural(conta, { aoCarregar } = {}) {
     async function carregar() {
         const { data, error } = await supabase.from('mural_publicacao')
             .select(`id, tipo, titulo, texto, referencia, fotos, fixado_ate, criado_em, criado_por,
-                     autor:criado_por ( nome, apelido, foto ), mural_reacao ( pessoa_id, tipo )`)
+                     autor:criado_por ( nome, apelido, foto ), mural_reacao ( pessoa_id, tipo, pessoa:pessoa_id ( nome, apelido, foto ) )`)
             .order('criado_em', { ascending: false })
             .limit(LIMITE);
         if (error) {
@@ -137,7 +137,8 @@ export function blocoMural(conta, { aoCarregar } = {}) {
                 h('span', { class: 'mural-acoes' },
                     botaoReacao(p, 'amem'),
                     botaoReacao(p, 'coracao'),
-                    botaoWhats({ rotulo: 'Mandar no WhatsApp', texto: () => textoDaPublicacao(p), classe: 'mural-whats' }))));
+                    botaoWhats({ rotulo: 'Mandar no WhatsApp', texto: () => textoDaPublicacao(p), classe: 'mural-whats' }))),
+            quemReagiu(p));
         return artigo;
     }
 
@@ -176,9 +177,10 @@ export function blocoMural(conta, { aoCarregar } = {}) {
             b.dataset.ocupado = '1';
             const dar = !minha();
             // Otimista: muda na hora (o toque responde) e desfaz se o banco recusar
-            if (dar) p.mural_reacao.push({ pessoa_id: meuId, tipo });
+            if (dar) p.mural_reacao.push({ pessoa_id: meuId, tipo, pessoa: conta.pessoa });
             else p.mural_reacao = p.mural_reacao.filter((r) => !(r.pessoa_id === meuId && r.tipo === tipo));
             pintar();
+            p.aoMudarReacao?.();
             if (dar) {
                 b.classList.remove('reagiu');
                 void b.offsetWidth; // reinicia o "pulo"
@@ -191,12 +193,61 @@ export function blocoMural(conta, { aoCarregar } = {}) {
             delete b.dataset.ocupado;
             if (error) {
                 if (dar) p.mural_reacao = p.mural_reacao.filter((r) => !(r.pessoa_id === meuId && r.tipo === tipo));
-                else p.mural_reacao.push({ pessoa_id: meuId, tipo });
+                else p.mural_reacao.push({ pessoa_id: meuId, tipo, pessoa: conta.pessoa });
                 pintar();
+                p.aoMudarReacao?.();
                 avisar('Não deu certo. Confira a internet.');
             }
         });
         return b;
+    }
+
+    // --- Quem reagiu -----------------------------------------------------------
+    // "Bia, João e mais 3": os rostos e os nomes de quem deu Amém ou coração.
+    // Tocando, abre a lista completa, separada por reação. Eu primeiro ("Você").
+    function quemReagiu(p) {
+        const linha = h('button', { type: 'button', class: 'mural-quem', hidden: true });
+        p.aoMudarReacao = () => {
+            const pessoas = pessoasQueReagiram(p);
+            linha.hidden = pessoas.length === 0;
+            if (!pessoas.length) return;
+            const nomes = pessoas.map((x) => (x.id === meuId ? 'Você' : nomeCurto(x)));
+            const texto = nomes.length <= 2 ? juntarNomes(nomes) : `${nomes.slice(0, 2).join(', ')} e mais ${nomes.length - 2}`;
+            linha.replaceChildren(
+                h('span', { class: 'mural-quem-rostos', 'aria-hidden': 'true' }, pessoas.slice(0, 3).map((x) => avatar(x, 'pessoa-avatar mural-quem-rosto'))),
+                h('span', { class: 'mural-quem-texto' }, texto));
+            linha.setAttribute('aria-label', `Quem reagiu: ${texto}. Ver todos`);
+        };
+        p.aoMudarReacao();
+        linha.addEventListener('click', () => folhaQuemReagiu(p));
+        return linha;
+    }
+
+    // Cada pessoa uma vez (quem deu Amém e coração conta uma vez), eu primeiro
+    function pessoasQueReagiram(p, tipo = null) {
+        const vistos = new Map();
+        for (const r of p.mural_reacao) {
+            if (tipo && r.tipo !== tipo) continue;
+            if (!vistos.has(r.pessoa_id)) vistos.set(r.pessoa_id, { id: r.pessoa_id, ...(r.pessoa ?? { nome: 'Alguém' }) });
+        }
+        return [...vistos.values()].sort((a, b) => (b.id === meuId) - (a.id === meuId));
+    }
+
+    function folhaQuemReagiu(p) {
+        const grupo = (tipo, titulo) => {
+            const pessoas = pessoasQueReagiram(p, tipo);
+            if (!pessoas.length) return null;
+            return h('section', { class: 'reagiram-grupo' },
+                h('h3', { class: 'reagiram-titulo' },
+                    tipo === 'amem' ? h('span', { class: 'reagiram-amem' }, 'Amém') : icone('coracao', 'icone reagiram-coracao'),
+                    h('span', { class: 'reagiram-n' }, String(pessoas.length)), h('span', { class: 'sr-only' }, titulo)),
+                h('ul', { class: 'reagiram-lista' }, pessoas.map((x) => h('li', null,
+                    avatar(x, 'pessoa-avatar'), h('span', null, x.id === meuId ? 'Você' : nomeCurto(x))))));
+        };
+        abrirFolha({
+            titulo: 'Quem reagiu',
+            conteudo: h('div', { class: 'reagiram' }, [grupo('amem', 'deram Amém'), grupo('coracao', 'deram coração')].filter(Boolean)),
+        });
     }
 
     // --- Opções de quem publica ---------------------------------------------
@@ -212,7 +263,8 @@ export function blocoMural(conta, { aoCarregar } = {}) {
         const aviso = caixaDeAviso();
         const data = h('input', { type: 'date', id: 'mural-fixar-ate', min: hoje, value: p.fixado_ate && p.fixado_ate >= hoje ? p.fixado_ate : somarDias(hoje, 7) });
         const fixar = h('button', { type: 'button', class: 'botao-principal botao-largo' }, icone('pino', 'icone icone-p'), fixado ? 'Mudar a data' : 'Fixar no topo');
-        const soltar = fixado && h('button', { type: 'button', class: 'botao-secundario botao-largo' }, 'Tirar do topo');
+        // null (e não false) quando não tem: false?.addEventListener quebra
+        const soltar = fixado ? h('button', { type: 'button', class: 'botao-secundario botao-largo' }, 'Tirar do topo') : null;
         const editar = h('button', { type: 'button', class: 'botao-secundario botao-largo' }, 'Editar o texto');
         const apagar = h('button', { type: 'button', class: 'botao-perigo botao-largo' }, icone('lixeira', 'icone icone-p'), 'Apagar');
 
@@ -558,3 +610,5 @@ function folhaPublicar(conta, aoPublicar) {
         }
     }
 }
+
+const juntarNomes = (nomes) => (nomes.length < 2 ? nomes[0] : `${nomes.slice(0, -1).join(', ')} e ${nomes.at(-1)}`);

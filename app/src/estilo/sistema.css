@@ -1503,3 +1503,53 @@ blockquote.mural-palavra { position: relative; margin: 0; padding: 30px 0 0 var(
     .tour-luz, .tour-balao, .oracao-pastor-ok { transition: none; }
     .boas-vindas, .boas-vindas-logo, .tour-balao, .tour-luz, .aniversario-icone, .aniversario-faixa, .oracao-lista > li, .convite, .convite-qr { animation: none; }
 }
+
+/* --- Quem reagiu (mural) ------------------------------------------------- */
+.mural-quem {
+    display: flex; align-items: center; gap: var(--esp-2);
+    min-height: 36px; margin: calc(-1 * var(--esp-1)) 0 0; padding: 0;
+    border: 0; background: none; color: var(--cor-texto-2);
+    font: var(--texto-apoio); text-align: left; cursor: pointer;
+    animation: reacaoConta 0.35s var(--ease-out);
+}
+.mural-quem[hidden] { display: none; }
+.mural-quem-rostos { display: flex; flex: none; }
+.mural-quem-rosto { width: 22px; height: 22px; font-size: 9px; box-shadow: 0 0 0 2px var(--cor-superficie); }
+.mural-quem-rosto + .mural-quem-rosto { margin-left: -7px; }
+.mural-quem-texto { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+@media (hover: hover) { .mural-quem:hover .mural-quem-texto { text-decoration: underline; } }
+.reagiram { display: grid; gap: var(--esp-5); }
+.reagiram-titulo { display: flex; align-items: center; gap: var(--esp-2); margin: 0 0 var(--esp-2); font: 600 15px/1 var(--fonte-texto); color: var(--cor-marca); }
+.reagiram-amem { font-weight: 700; }
+.reagiram-coracao { width: 18px; height: 18px; fill: currentColor; }
+.reagiram-n { color: var(--cor-texto-2); font-weight: 600; }
+.reagiram-lista { display: grid; gap: var(--esp-2); margin: 0; padding: 0; list-style: none; }
+.reagiram-lista li { display: flex; align-items: center; gap: var(--esp-3); min-height: 44px; font: var(--texto-corpo); color: var(--cor-texto); }
+.reagiram-lista .pessoa-avatar { width: 36px; height: 36px; font-size: 13px; }
+
+/* --- Foto de membro (D70) --------------------------------------------------- */
+.mural-convite-foto {
+    display: flex; align-items: center; gap: var(--esp-3); width: 100%;
+    min-height: 64px; margin-bottom: var(--esp-3); padding: var(--esp-3) var(--esp-4);
+    border: 1px dashed var(--cor-borda-forte); border-radius: var(--raio-3);
+    background: var(--cor-superficie); color: inherit; text-align: left; cursor: pointer;
+    transition: transform 0.35s var(--mola), border-color var(--dur-media) ease;
+    animation: subir 0.45s var(--ease-out) backwards;
+}
+.mural-convite-foto:active { transform: scale(0.98); transition-duration: 0.12s; }
+@media (hover: hover) { .mural-convite-foto:hover { border-color: var(--cor-marca); } }
+.foto-membro-quadro {
+    position: relative;
+    display: grid; place-items: center; align-content: center; gap: var(--esp-2);
+    aspect-ratio: 4 / 3; overflow: hidden;
+    border: 1px dashed var(--cor-borda-forte); border-radius: var(--raio-3);
+    background: var(--cor-superficie-rebaixada); color: var(--cor-texto-2);
+    font: 600 15px/1 var(--fonte-texto); cursor: pointer;
+}
+.foto-membro-quadro:has(+ input:focus-visible) { outline: 3px solid var(--cor-foco); outline-offset: 2px; }
+.foto-membro-icone { width: 32px; height: 32px; }
+.foto-membro-quadro.com-foto { border-style: solid; }
+.foto-membro-quadro img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; animation: fundoEntra 0.3s ease; }
+.foto-membro-trocar { position: absolute; right: var(--esp-2); bottom: var(--esp-2); padding: 6px 12px; border-radius: var(--raio-pilula); background: rgba(31, 21, 19, 0.6); color: #fff; font-size: 14px; }
+.foto-membro-contador { justify-self: end; font-variant-numeric: tabular-nums; }
+.foto-membro-regras { margin: 0; text-align: center; }
