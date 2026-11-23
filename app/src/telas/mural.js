@@ -40,22 +40,31 @@ const miniatura = (nome) => nome.replace(/\.(webp|jpg)$/, '-mini.$1');
 // --- O bloco do Início -------------------------------------------------------
 export function blocoMural(conta, { aoCarregar } = {}) {
     const meuId = conta.pessoa?.id;
+    // Foto de membro que é minha (D70): editar a legenda e apagar.
+    // Declarada aqui em cima: depois do return, uma const não chega a existir.
+    const eMinha = (p) => p.de_membro && p.criado_por === meuId;
     const publica = publicaNoMural(conta);
     const lugar = h('section', { class: 'mural-secao', 'aria-labelledby': 'titulo-mural', hidden: !publica });
     const lista = h('ul', { class: 'mural-lista', id: 'lista-mural' });
     let publicacoes = [];
     let links = new Map(); // nome do arquivo → link assinado
     let aberto = false;
+    let cultoAberto = null; // culto que aceita foto de membro agora (D70)
 
     carregar();
     return lugar;
 
     async function carregar() {
-        const { data, error } = await supabase.from('mural_publicacao')
-            .select(`id, tipo, titulo, texto, referencia, fotos, fixado_ate, criado_em, criado_por,
-                     autor:criado_por ( nome, apelido, foto ), mural_reacao ( pessoa_id, tipo, pessoa:pessoa_id ( nome, apelido, foto ) )`)
-            .order('criado_em', { ascending: false })
-            .limit(LIMITE);
+        const [{ data, error }, aberto_] = await Promise.all([
+            supabase.from('mural_publicacao')
+                .select(`id, tipo, titulo, texto, referencia, fotos, fixado_ate, criado_em, criado_por, de_membro, guardar,
+                         culto:culto_id ( nome ),
+                         autor:criado_por ( nome, apelido, foto ), mural_reacao ( pessoa_id, tipo, pessoa:pessoa_id ( nome, apelido, foto ) )`)
+                .order('criado_em', { ascending: false })
+                .limit(LIMITE),
+            supabase.rpc('culto_para_foto'),
+        ]);
+        cultoAberto = aberto_.data?.[0] ?? null;
         if (error) {
             console.error(error);
             return; // sem rede: o mural só não aparece (a escala continua)
@@ -78,7 +87,8 @@ export function blocoMural(conta, { aoCarregar } = {}) {
     }
 
     function desenhar() {
-        if (!publicacoes.length && !publica) { lugar.hidden = true; return; }
+        const convite = cultoAberto && !cultoAberto.ja_postei && meuId ? conviteFoto(cultoAberto) : null;
+        if (!publicacoes.length && !publica && !convite) { lugar.hidden = true; return; }
         const cabeca = h('div', { class: 'rotulo-secao-linha' },
             h('h2', { id: 'titulo-mural', class: 'rotulo-secao' }, 'Mural'));
         if (publica) {
@@ -91,9 +101,10 @@ export function blocoMural(conta, { aoCarregar } = {}) {
         lista.replaceChildren(...itens);
 
         const partes = [cabeca];
-        if (!publicacoes.length) {
+        if (convite) partes.push(convite);
+        if (!publicacoes.length && !convite) {
             partes.push(h('p', { class: 'mural-vazio' }, 'Nada publicado ainda. O primeiro aviso aparece aqui para a igreja toda.'));
-        } else {
+        } else if (publicacoes.length) {
             partes.push(lista);
             if (publicacoes.length > VISIVEIS) {
                 const mais = h('button', { type: 'button', class: 'botao-texto mural-mais', 'aria-expanded': String(aberto), 'aria-controls': 'lista-mural' },
@@ -104,6 +115,80 @@ export function blocoMural(conta, { aoCarregar } = {}) {
         }
         lugar.replaceChildren(...partes);
         lugar.hidden = false;
+    }
+
+    // --- Foto de membro (D70) ---------------------------------------------------
+    // Nas 48h depois de um culto, um convite discreto no topo do mural. Some
+    // quando a pessoa posta (uma por culto).
+    function conviteFoto(culto) {
+        const b = h('button', { type: 'button', class: 'mural-convite-foto' },
+            h('span', { class: 'item-icone', 'aria-hidden': 'true' }, icone('imagem')),
+            h('span', { class: 'item-textos' },
+                h('span', { class: 'item-nome' }, `Foi no ${culto.nome}?`),
+                h('span', { class: 'item-apoio' }, 'Poste uma foto para a igreja')),
+            icone('mais', 'icone icone-p item-seta'));
+        b.addEventListener('click', () => folhaFotoDoCulto(culto));
+        return b;
+    }
+
+    function folhaFotoDoCulto(culto) {
+        let arquivo = null;
+        let previa = null;
+        const aviso = caixaDeAviso();
+        const escolher = h('input', { type: 'file', accept: 'image/*', class: 'sr-only', id: 'foto-membro' });
+        const quadro = h('label', { for: 'foto-membro', class: 'foto-membro-quadro' },
+            icone('imagem', 'icone foto-membro-icone'), h('span', null, 'Escolher a foto'));
+        const legenda = h('textarea', { id: 'foto-legenda', class: 'campo-texto', rows: 2, maxlength: 140, placeholder: 'Escreva algo (opcional)' });
+        const contador = h('span', { class: 'campo-dica foto-membro-contador', 'aria-live': 'polite' }, '0/140');
+        legenda.addEventListener('input', () => { contador.textContent = `${legenda.value.length}/140`; });
+        const postar = h('button', { type: 'submit', class: 'botao-principal botao-largo' }, 'Postar');
+        const form = h('form', { class: 'form', novalidate: true },
+            quadro, escolher,
+            h('div', { class: 'campo' }, h('label', { for: 'foto-legenda' }, 'Legenda'), legenda, contador),
+            aviso.elemento, postar,
+            h('p', { class: 'campo-dica foto-membro-regras' }, 'Uma foto por culto. Ela aparece para a igreja toda e some em 90 dias.'));
+        const folha = abrirFolha({ titulo: `Foto do ${culto.nome}`, conteudo: form, aoFechar: () => previa && URL.revokeObjectURL(previa) });
+
+        escolher.addEventListener('change', () => {
+            const a = escolher.files?.[0];
+            if (!a || !a.type.startsWith('image/')) return;
+            arquivo = a;
+            if (previa) URL.revokeObjectURL(previa);
+            previa = URL.createObjectURL(a);
+            quadro.classList.add('com-foto');
+            quadro.replaceChildren(h('img', { src: previa, alt: 'A foto escolhida' }), h('span', { class: 'foto-membro-trocar' }, 'Trocar'));
+            aviso.limpar();
+        });
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            aviso.limpar();
+            if (!arquivo) return aviso.mostrar('Escolha a foto.');
+            comCarregando(postar, async () => {
+                const subidas = [];
+                try {
+                    postar.textContent = 'Enviando…';
+                    // 1280 px: menor que as fotos da Comunicação (1600), para pesar pouco
+                    const [grande, mini] = await Promise.all([reduzirImagem(arquivo, 1280), reduzirImagem(arquivo, 480)]);
+                    const nome = `membros/${meuId}/${crypto.randomUUID()}.${grande.type === 'image/webp' ? 'webp' : 'jpg'}`;
+                    for (const [caminho, blob] of [[nome, grande], [miniatura(nome), mini]]) {
+                        const { error } = await supabase.storage.from('mural').upload(caminho, blob, { contentType: blob.type, upsert: false });
+                        if (error) throw error;
+                        subidas.push(caminho);
+                    }
+                    const { error } = await supabase.rpc('postar_foto_do_culto', { p_culto: culto.id, p_foto: nome, p_legenda: legenda.value.trim() || null });
+                    if (error) throw error;
+                    folha.fechar();
+                    avisar('Foto postada!');
+                    carregar();
+                } catch (erro) {
+                    console.error(erro);
+                    if (subidas.length) supabase.storage.from('mural').remove(subidas);
+                    postar.textContent = 'Postar';
+                    aviso.mostrar(mensagemDoBanco(erro, 'Não deu para postar. Tente de novo.'));
+                }
+            });
+        });
     }
 
     // --- Um cartão -----------------------------------------------------------
@@ -124,9 +209,9 @@ export function blocoMural(conta, { aoCarregar } = {}) {
 
         const artigo = h('article', { class: `mural-cartao tipo-${p.tipo}${fixado ? ' fixado' : ''}`, id: `mural-${p.id}`, tabindex: -1 },
             h('header', { class: 'mural-topo' },
-                h('span', { class: 'mural-chapeu' }, TIPOS[p.tipo]),
+                h('span', { class: 'mural-chapeu' }, p.de_membro ? `Foto · ${p.culto?.nome ?? 'Culto'}` : TIPOS[p.tipo]),
                 fixado && h('span', { class: 'mural-fixado' }, icone('pino', 'icone icone-p'), 'Fixado'),
-                publica && botaoOpcoes(p)),
+                (publica || eMinha(p)) && botaoOpcoes(p)),
             corpo,
             h('footer', { class: 'mural-rodape' },
                 h('span', { class: 'mural-autor' },
@@ -265,21 +350,30 @@ export function blocoMural(conta, { aoCarregar } = {}) {
         const fixar = h('button', { type: 'button', class: 'botao-principal botao-largo' }, icone('pino', 'icone icone-p'), fixado ? 'Mudar a data' : 'Fixar no topo');
         // null (e não false) quando não tem: false?.addEventListener quebra
         const soltar = fixado ? h('button', { type: 'button', class: 'botao-secundario botao-largo' }, 'Tirar do topo') : null;
-        const editar = h('button', { type: 'button', class: 'botao-secundario botao-largo' }, 'Editar o texto');
+        const editar = h('button', { type: 'button', class: 'botao-secundario botao-largo' }, p.de_membro ? 'Editar a legenda' : 'Editar o texto');
         const apagar = h('button', { type: 'button', class: 'botao-perigo botao-largo' }, icone('lixeira', 'icone icone-p'), 'Apagar');
+        const guardar = publica && p.de_membro ? h('button', { type: 'button', class: 'botao-secundario botao-largo' },
+            p.guardar ? 'Deixar sumir em 90 dias' : 'Guardar esta foto') : null;
 
         const folha = abrirFolha({
-            titulo: p.titulo || TIPOS[p.tipo],
+            titulo: p.de_membro ? 'Foto do culto' : (p.titulo || TIPOS[p.tipo]),
             conteudo: h('div', { class: 'form' },
                 editar,
-                h('hr', { class: 'mural-separador' }),
-                h('div', { class: 'campo' },
-                    h('label', { for: 'mural-fixar-ate' }, 'Fica no topo até'),
-                    data),
-                fixar, soltar, aviso.elemento,
+                publica && [
+                    h('hr', { class: 'mural-separador' }),
+                    h('div', { class: 'campo' },
+                        h('label', { for: 'mural-fixar-ate' }, 'Fica no topo até'),
+                        data),
+                    fixar, soltar],
+                guardar && [guardar, h('p', { class: 'campo-dica' },
+                    p.guardar ? 'Esta foto fica para sempre no mural.' : 'Fotos de membros somem sozinhas em 90 dias. Guardadas ficam.')],
+                aviso.elemento,
                 h('hr', { class: 'mural-separador' }),
                 apagar),
         });
+        guardar?.addEventListener('click', () => comCarregando(guardar, async () => {
+            if (await mudar({ guardar: !p.guardar })) { folha.fechar(); avisar(p.guardar ? 'Vai sumir em 90 dias.' : 'Foto guardada.'); }
+        }));
 
         fixar.addEventListener('click', () => comCarregando(fixar, async () => {
             if (!data.value || data.value < hoje) return aviso.mostrar('Escolha um dia de hoje em diante.');
@@ -317,16 +411,17 @@ export function blocoMural(conta, { aoCarregar } = {}) {
         const texto = h('textarea', { id: 'editar-texto', class: 'campo-texto', rows: 5, maxlength: 1000 }, p.texto ?? '');
         const referencia = h('input', { id: 'editar-referencia', maxlength: 60, value: p.referencia ?? '', autocomplete: 'off' });
         const salvar = h('button', { type: 'submit', class: 'botao-principal botao-largo' }, 'Salvar');
+        if (p.de_membro) texto.maxLength = 140;
         const form = h('form', { class: 'form', novalidate: true },
-            h('div', { class: 'campo' }, h('label', { for: 'editar-titulo' }, p.tipo === 'aviso' ? 'Título' : 'Título (opcional)'), titulo),
-            h('div', { class: 'campo' }, h('label', { for: 'editar-texto' }, p.tipo === 'palavra' ? 'A palavra' : 'Texto (opcional)'), texto),
+            !p.de_membro && h('div', { class: 'campo' }, h('label', { for: 'editar-titulo' }, p.tipo === 'aviso' ? 'Título' : 'Título (opcional)'), titulo),
+            h('div', { class: 'campo' }, h('label', { for: 'editar-texto' }, p.de_membro ? 'Legenda (opcional)' : p.tipo === 'palavra' ? 'A palavra' : 'Texto (opcional)'), texto),
             p.tipo === 'palavra' && h('div', { class: 'campo' }, h('label', { for: 'editar-referencia' }, 'Referência (opcional)'), referencia),
             aviso.elemento, salvar);
         const folha = abrirFolha({ titulo: 'Editar publicação', conteudo: form });
         form.addEventListener('submit', (e) => {
             e.preventDefault();
             aviso.limpar();
-            const valores = {
+            const valores = p.de_membro ? { texto: texto.value.trim() || null } : {
                 titulo: titulo.value.trim() || null,
                 texto: texto.value.trim() || null,
                 referencia: p.tipo === 'palavra' ? (referencia.value.trim() || null) : p.referencia,

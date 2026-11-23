@@ -75,6 +75,41 @@ test('pastor com pedido esperando vê o pontinho', async ({ page, simular }) => 
     await expect(page.locator('.cabecalho-oracao')).toHaveAttribute('aria-label', 'Pedidos de oração: 1 esperando');
 });
 
+test('membro posta uma foto do último culto', async ({ page, simular }) => {
+    const culto = { id: 'cu-1', nome: 'Culto da Família', data: '2026-11-22', horario: '18:00:00', ja_postei: false };
+    await simular.abrir('#/inicio', umaConta(), { rpc: { culto_para_foto: [culto], postar_foto_do_culto: 'novo' } });
+    await page.getByRole('button', { name: /Foi no Culto da Família\?/ }).click();
+    await page.locator('#foto-membro').setInputFiles('public/icone-192.png');
+    await page.getByLabel('Legenda').fill('Que culto!');
+    await page.getByRole('button', { name: 'Postar' }).click();
+    await expect.poll(() => simular.chamadas.find((c) => c.rpc === 'postar_foto_do_culto')?.args)
+        .toMatchObject({ p_culto: 'cu-1', p_legenda: 'Que culto!', p_foto: expect.stringMatching(/^membros\/p-eu\/[0-9a-f-]{36}\.(webp|jpg)$/) });
+    // Subiu a foto e a miniatura, na pasta da própria pessoa
+    expect(simular.chamadas.filter((c) => c.storage?.includes('/object/mural/membros/p-eu/')).length).toBe(2);
+});
+
+test('quem já postou não vê o convite de novo', async ({ page, simular }) => {
+    const culto = { id: 'cu-1', nome: 'Culto da Família', data: '2026-11-22', horario: '18:00:00', ja_postei: true };
+    await simular.abrir('#/inicio', umaConta(), { mural_publicacao: [PUBLICACAO], rpc: { culto_para_foto: [culto] } });
+    await expect(page.locator('.mural-cartao')).toHaveCount(1);
+    await expect(page.getByRole('button', { name: /Foi no/ })).toHaveCount(0);
+});
+
+test('o autor da foto só edita a legenda e apaga', async ({ page, simular }) => {
+    const minha = { ...PUBLICACAO, id: 'pub-m', tipo: 'fotos', titulo: null, texto: 'Que culto!', fixado_ate: null,
+        fotos: ['membros/p-eu/44444444-4444-4444-4444-444444444444.webp'], de_membro: true, guardar: false,
+        criado_por: 'p-eu', culto: { nome: 'Culto da Família' }, autor: { nome: 'Ana Souza', apelido: null, foto: null } };
+    await simular.abrir('#/inicio', umaConta(), { mural_publicacao: [minha, PUBLICACAO] });
+    await expect(page.locator('#mural-pub-m .mural-chapeu')).toHaveText('Foto · Culto da Família');
+    await expect(page.getByRole('button', { name: 'Opções da publicação' })).toHaveCount(1); // só na dela
+    await page.getByRole('button', { name: 'Opções da publicação' }).click();
+    await expect(page.getByRole('button', { name: 'Fixar no topo' })).toHaveCount(0);
+    await page.getByRole('button', { name: 'Editar a legenda' }).click();
+    await page.getByLabel('Legenda (opcional)').fill('Que culto abençoado!');
+    await page.getByRole('button', { name: 'Salvar' }).click();
+    await expect.poll(() => simular.chamadas.find((c) => c.metodo === 'PATCH')?.corpo).toEqual({ texto: 'Que culto abençoado!' });
+});
+
 test('mostra quem reagiu', async ({ page, simular }) => {
     const comReacoes = { ...PUBLICACAO, mural_reacao: [
         { pessoa_id: 'a', tipo: 'amem', pessoa: { nome: 'Bia Lima', apelido: 'Bia', foto: null } },
