@@ -35,6 +35,11 @@ const TITULOS: Record<string, string> = {
     contagem_para_conferir: 'Conferir contagem',
     contagem_decidida: 'Contagem do culto',
     mural_publicacao: 'Mural da IEJB',
+    oracao_pedido: 'Pedido de oração',
+    oracao_orada: 'Pedido de oração',
+    aniversario: 'Aniversário',
+    lembrete_ensaio: 'Hora de ensaiar',
+    acesso_pedido: 'Pedido de acesso',
 };
 
 // Para onde o toque na notificação leva
@@ -43,6 +48,10 @@ const DESTINO: Record<string, string> = {
     contagem_para_conferir: '/#/inicio',
     contagem_decidida: '/#/financeiro',
     mural_publicacao: '/#/inicio',
+    oracao_pedido: '/#/oracao',
+    oracao_orada: '/#/oracao',
+    aniversario: '/#/inicio',
+    acesso_pedido: '/#/pessoas',
 };
 
 // Lê o par de chaves; se ainda não existe, cria e guarda (uma vez na vida)

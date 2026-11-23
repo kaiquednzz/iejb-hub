@@ -52,3 +52,4 @@ cenario 14_testemunha_da_contagem.sql
 cenario 15_primeiro_acesso.sql
 cenario 16_mural.sql
 cenario 17_contato_so_de_quem_serve.sql
+cenario 18_oracao_aniversario_lembrete.sql
