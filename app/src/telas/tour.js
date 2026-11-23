@@ -11,6 +11,7 @@
 // Por que um <dialog>? Ele já prende o foco, deixa o resto da tela inerte
 // para o leitor de tela e fecha no Esc, sem a gente reinventar nada disso.
 import { h } from '../util/dom.js';
+import { serveNoLouvor } from '../sessao.js';
 
 // v2: tour corrigido (o balão saía da tela no passo do Mural); quem já viu
 // a versão 1 vê de novo uma vez
@@ -61,7 +62,7 @@ function boasVindas(conta) {
 // Cada passo procura o alvo visível (barra de abas no celular, barra lateral
 // no computador). Passo sem alvo na tela é pulado.
 function passos(conta) {
-    const serve = !!conta.pessoa?.membro_ministerio?.some((m) => m.ativo);
+    const serve = serveNoLouvor(conta); // tem escala
     const aba = (rota) => [`.barra-abas a[href="${rota}"]`, `.barra-lateral a[href="${rota}"]`];
     return [
         { alvo: aba('#/inicio'), titulo: 'Início', texto: serve ? 'O que importa hoje: sua próxima escala e os avisos da igreja.' : 'O que importa hoje: os avisos da igreja.' },

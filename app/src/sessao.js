@@ -22,7 +22,8 @@ async function buscarConta(idUsuario) {
     const { data, error } = await supabase
         .from('conta')
         .select(`id, login, estado, e_administrador, senha_temporaria, nome_informado, apresentou_em, foto_informada, criado_em,
-                 pessoa:pessoa_id ( id, nome, apelido, foto, aniversario_dia, aniversario_mes, membro_ministerio ( e_lider, ativo ), cargo_pessoa ( cargo ) )`)
+                 pessoa:pessoa_id ( id, nome, apelido, foto, titulo, aniversario_dia, aniversario_mes,
+                   membro_ministerio ( e_lider, ativo, ministerio_id, ministerio ( nome ) ), cargo_pessoa ( cargo ) )`)
         .eq('id', idUsuario)
         .maybeSingle()
         // O supabase-js tenta de novo sozinho em erro de rede (espera 1s, 2s, 4s).
@@ -36,18 +37,23 @@ async function buscarConta(idUsuario) {
     return { conta: data };
 }
 
-// Líder de louvor: quem monta a escala. No piloto só existe o Louvor, então
-// "líder em algum vínculo ativo" basta (o banco confere por ministério).
+// Líder de louvor: quem monta a escala. Desde o D71 há outros ministérios
+// (a líder do Kids não monta escala do Louvor). Cópia offline antiga, sem o
+// nome do ministério, conta como Louvor (era o único).
 export function eLiderDeLouvor(conta) {
-    return !!conta?.pessoa?.membro_ministerio?.some((m) => m.e_lider && m.ativo);
+    return !!conta?.pessoa?.membro_ministerio?.some((m) => m.e_lider && m.ativo && (m.ministerio?.nome ?? 'Louvor') === 'Louvor');
 }
+export const serveNoLouvor = (conta) =>
+    !!conta?.pessoa?.membro_ministerio?.some((m) => m.ativo && (m.ministerio?.nome ?? 'Louvor') === 'Louvor');
+// Pastor é título (D71), não permissão: recebe oração e publica no mural
+export const ePastor = (conta) => conta?.pessoa?.titulo === 'pastor' || conta?.pessoa?.titulo === 'pastora';
 
-// Cargos fora dos ministérios (D45): tesouraria, pastor, comunicacao.
+// Permissões no app (D45, D71): tesouraria, ve_financeiro, comunicacao.
 // A tela só esconde o que não é da pessoa; quem barra de verdade é o banco.
 export function temCargo(conta, cargo) {
     return !!conta?.pessoa?.cargo_pessoa?.some((c) => c.cargo === cargo);
 }
-export const veFinanceiro = (conta) => temCargo(conta, 'tesouraria') || temCargo(conta, 'pastor');
+export const veFinanceiro = (conta) => temCargo(conta, 'tesouraria') || temCargo(conta, 've_financeiro');
 export const cuidaDosEventos = (conta) => !!conta?.e_administrador || temCargo(conta, 'comunicacao');
 
 // Como a pessoa quer ser chamada: apelido, senão o primeiro nome

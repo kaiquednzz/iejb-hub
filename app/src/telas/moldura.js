@@ -2,7 +2,8 @@
 import { acenderNoAvatar } from '../util/chama.js';
 import { h, icone } from '../util/dom.js';
 import { supabase } from '../supabase.js';
-import { eLiderDeLouvor, veFinanceiro, cuidaDosEventos, temCargo } from '../sessao.js';
+import { eLiderDeLouvor, veFinanceiro, cuidaDosEventos, temCargo, ePastor } from '../sessao.js';
+import { nomeDoTitulo } from '../util/titulos.js';
 import { avatar } from '../util/foto.js';
 import { removerAparelho } from '../util/push.js';
 import { googleAtivo, entrarComGoogle } from '../util/google.js';
@@ -32,8 +33,9 @@ export function molduraEntrada({ titulo, subtitulo, conteudo, rodape }) {
 // Primeiro desliga o push deste aparelho (ainda logado, o banco deixa apagar)
 // O papel mais importante, para mostrar embaixo do nome
 export function papelPrincipal(conta) {
+    const titulo = conta.pessoa?.titulo;
+    if (titulo && titulo !== 'membro') return nomeDoTitulo(titulo);
     if (conta.e_administrador) return 'Administrador';
-    if (temCargo(conta, 'pastor')) return 'Pastor';
     if (eLiderDeLouvor(conta)) return 'Líder de louvor';
     if (temCargo(conta, 'tesouraria')) return 'Tesouraria';
     if (temCargo(conta, 'comunicacao')) return 'Comunicação';
@@ -144,7 +146,7 @@ export function cabecalhoApp(conta, opcoes = {}) {
     // com pedido esperando vê um pontinho.
     const oracao = area !== 'Oração' && h('a', { class: 'cabecalho-oracao', href: '#/oracao', 'aria-label': 'Pedidos de oração', title: 'Pedidos de oração' },
         icone('maos'));
-    if (oracao && temCargo(conta, 'pastor')) marcarPedidosDeOracao(oracao);
+    if (oracao && ePastor(conta)) marcarPedidosDeOracao(oracao);
     return h('header', { class: `cabecalho${area ? ' com-area' : ''}` }, esquerda, compacto,
         h('div', { class: 'cabecalho-direita' }, oracao, eu));
 }
@@ -160,7 +162,7 @@ const ABA_DA_ROTA = {
     '#/privacidade': '#/voce', '#/termos': '#/voce', '#/oracao': '#/inicio',
 };
 export function barraAbas(conta, rota) {
-    const atual = ABA_DA_ROTA[rota] ?? rota;
+    const atual = ABA_DA_ROTA[rota] ?? (rota.startsWith('#/ministerio/') ? '#/ministerios' : rota);
     const aba = (destino, nome, nomeIcone) => {
         const ativa = atual === destino;
         return h('a', { class: 'aba', href: destino, 'aria-current': ativa ? 'page' : null },

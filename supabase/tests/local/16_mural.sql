@@ -9,7 +9,10 @@ select pessoa_id as p_g2   from public.conta where login = 'g2@teste' \gset
 select pessoa_id as p_kai  from public.conta where login = 'kaique@teste' \gset
 -- membro = pastor, avulso = Comunicação, g2 = só tesouraria (não publica)
 delete from public.cargo_pessoa where pessoa_id in (:'p_mem', :'p_avu', :'p_g2');
-insert into public.cargo_pessoa (pessoa_id, cargo) values (:'p_mem', 'pastor'), (:'p_avu', 'comunicacao'), (:'p_g2', 'tesouraria');
+insert into public.cargo_pessoa (pessoa_id, cargo) values (:'p_avu', 'comunicacao'), (:'p_g2', 'tesouraria');
+-- Pastor é título desde o D71 (não mais cargo)
+select set_config('request.jwt.claims', '', false); -- como o banco, sem ninguém logado
+update public.pessoa set titulo = 'pastor' where id = :'p_mem';
 \set foto1 '11111111-1111-1111-1111-111111111111.webp'
 
 set role authenticated;

@@ -1553,3 +1553,29 @@ blockquote.mural-palavra { position: relative; margin: 0; padding: 30px 0 0 var(
 .foto-membro-trocar { position: absolute; right: var(--esp-2); bottom: var(--esp-2); padding: 6px 12px; border-radius: var(--raio-pilula); background: rgba(31, 21, 19, 0.6); color: #fff; font-size: 14px; }
 .foto-membro-contador { justify-self: end; font-variant-numeric: tabular-nums; }
 .foto-membro-regras { margin: 0; text-align: center; }
+
+/* --- Cadastro da igreja toda (D71) ------------------------------------------ */
+.capas-ministerios { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: var(--esp-3); margin: var(--esp-3) 0 0; padding: 0; list-style: none; }
+.capas-ministerios > li { animation: subir 0.45s calc(var(--i, 0) * 0.05s + 0.1s) var(--ease-out) backwards; }
+.capa-outro {
+    position: relative;
+    display: grid; align-content: end; gap: 2px;
+    width: 100%; min-height: 104px; padding: var(--esp-4);
+    border: 1px solid var(--cor-borda); border-radius: var(--raio-3);
+    background: var(--cor-superficie); color: inherit; text-align: left; text-decoration: none;
+    cursor: pointer; transition: transform 0.35s var(--mola), border-color var(--dur-media) ease;
+}
+.capa-outro:active { transform: scale(0.97); transition-duration: 0.12s; }
+@media (hover: hover) { .capa-outro:hover { border-color: var(--cor-borda-forte); } }
+.capa-outro-nome { font: italic 700 22px/1.1 var(--fonte-titulo); color: var(--cor-titulo); }
+.capa-outro-texto { font: var(--texto-apoio); color: var(--cor-texto-2); }
+.capa-outro-seta { position: absolute; top: var(--esp-4); right: var(--esp-4); color: var(--cor-texto-2); }
+.capa-novo { align-content: center; justify-items: center; gap: var(--esp-2); border-style: dashed; color: var(--cor-marca); font: 600 15px/1 var(--fonte-texto); }
+.ministerio-esqueleto { height: 240px; border-radius: var(--raio-3); }
+.ministerio-vazio { margin: 0 0 var(--esp-5); padding: var(--esp-4); border: 1px dashed var(--cor-borda-forte); border-radius: var(--raio-3); font: var(--texto-corpo); color: var(--cor-texto-2); text-align: center; }
+.ministerio-pagina .mural { margin-bottom: var(--esp-5); }
+.ministerio-dica { text-align: center; }
+.filtro-fichas { display: flex; gap: var(--esp-2); margin: 0 calc(-1 * var(--esp-4)) var(--esp-4); padding: 2px var(--esp-4); overflow-x: auto; scrollbar-width: none; }
+.filtro-fichas::-webkit-scrollbar { display: none; }
+.filtro-fichas .ficha { flex: none; }
+.opcoes-ministerios { display: grid; gap: 2px; }

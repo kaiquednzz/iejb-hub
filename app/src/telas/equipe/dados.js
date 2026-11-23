@@ -11,9 +11,9 @@
 import { supabase } from '../../supabase.js';
 
 export async function carregarEquipe(conta) {
-    const [pessoas, grupos, ministerio, pedidos, contatos] = await Promise.all([
+    const [pessoas, grupos, ministerio, pedidos, contatos, ministerios, convites] = await Promise.all([
         supabase.from('pessoa')
-            .select(`id, nome, apelido, instrumentos, ativa, foto,
+            .select(`id, nome, apelido, instrumentos, ativa, foto, titulo,
                      membro_ministerio ( ministerio_id, e_lider, ativo ),
                      cargo_pessoa ( id, cargo ),
                      conta ( id, login, estado, e_administrador, senha_temporaria )`)
@@ -28,14 +28,18 @@ export async function carregarEquipe(conta) {
         supabase.from('ministerio').select('id').eq('nome', 'Louvor').maybeSingle(),
         conta.e_administrador
             ? supabase.from('conta')
-                .select('id, login, nome_informado, foto_informada, apresentou_em, louvor_pedido, instrumentos_pedidos, cargos_pedidos, estado, criado_em')
+                .select('id, login, nome_informado, foto_informada, apresentou_em, louvor_pedido, instrumentos_pedidos, cargos_pedidos, titulo_pedido, ministerios_pedidos, estado, criado_em')
                 .in('estado', ['pendente', 'recusada'])
                 .order('criado_em', { ascending: false })
             : Promise.resolve({ data: [] }),
         supabase.rpc('contatos_da_equipe'),
+        // Todos os ministérios (D71): Louvor primeiro, depois por nome
+        supabase.from('ministerio').select('id, nome, ativo').order('nome'),
+        // Gmail de convite de quem ainda não entrou (só o admin recebe)
+        conta.e_administrador ? supabase.rpc('convites_por_email') : Promise.resolve({ data: [] }),
     ]);
 
-    const erro = pessoas.error || grupos.error || ministerio.error || pedidos.error || contatos.error;
+    const erro = pessoas.error || grupos.error || ministerio.error || pedidos.error || contatos.error || ministerios.error;
     if (erro) return { erro };
     const contatoDe = new Map((contatos.data ?? []).map((c) => [c.pessoa_id, c.contato]));
     const listaPessoas = pessoas.data.map((p) => ({
@@ -64,6 +68,8 @@ export async function carregarEquipe(conta) {
             porId,
             grupos: grupos.data,
             ministerioId,
+            ministerios: ministerios.data.sort((a, b) => (b.nome === 'Louvor') - (a.nome === 'Louvor')),
+            convites: new Map((convites.data ?? []).map((c) => [c.pessoa_id, c.email])),
             pedidos: pedidos.data,
             minhaPessoa,
             papeis,

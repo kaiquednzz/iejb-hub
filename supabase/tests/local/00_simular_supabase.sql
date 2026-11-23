@@ -19,7 +19,8 @@ create table auth.users (
   email              text,
   phone              text,
   encrypted_password text,
-  raw_user_meta_data jsonb not null default '{}'
+  raw_user_meta_data jsonb not null default '{}',
+  raw_app_meta_data  jsonb not null default '{}' -- provider: email, google...
 );
 
 -- No Supabase, quem está logado chega com um JWT e auth.uid() lê o "sub".

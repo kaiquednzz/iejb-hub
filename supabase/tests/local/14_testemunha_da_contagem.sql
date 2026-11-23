@@ -1,7 +1,7 @@
 -- =============================================================================
 -- Migração 28: testemunha da contagem (D61)
 -- =============================================================================
--- Depois do 13: g2 é tesouraria, membro é pastor.
+-- Depois do 13: g2 é tesouraria, membro vê o caixa (era o cargo pastor, D71).
 \set ON_ERROR_STOP 1
 reset role;
 select id as caixa from public.conta_financeira where ativa order by tipo = 'dinheiro' desc limit 1 \gset

@@ -13,9 +13,8 @@ import { confirmar, avisar, anunciar } from '../util/folha.js';
 import { mensagemDoBanco } from '../util/erros.js';
 import { comemorar } from '../util/comemorar.js';
 import { interruptor } from './equipe/pecas.js';
-import { nomeCurto, temCargo } from '../sessao.js';
+import { nomeCurto, ePastor } from '../sessao.js';
 
-const ePastor = (conta) => temCargo(conta, 'pastor');
 
 export function telaOracao(conta) {
     const lugar = h('div', { class: 'oracao-area' });

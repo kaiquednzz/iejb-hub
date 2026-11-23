@@ -49,7 +49,7 @@ import { telaOracao } from './telas/oracao.js';
 import { telaAgenda } from './telas/agenda.js';
 import { corDoTopo } from './util/tema.js';
 import { ligarTituloCompacto, ligarPuxarParaAtualizar } from './util/rolagem.js';
-import { telaMinisterios } from './telas/ministerios.js';
+import { telaMinisterios, telaMinisterio } from './telas/ministerios.js';
 import { telaInstalar, telaAbrirNoApp } from './telas/instalar.js';
 import { precisaInstalar, registrarServiceWorker } from './pwa.js';
 import { apagarCopiasLocais } from './offline.js';
@@ -90,10 +90,13 @@ const ROTAS_DA_CONTA = {
 const LINK_DE_CULTO = /^#\/culto\/[\w-]+$/;
 const LINK_DO_MURAL = /^#\/mural\/[\w-]+$/;
 const linkCompartilhado = (hash) => LINK_DE_CULTO.test(hash) || LINK_DO_MURAL.test(hash);
+// Página de um ministério (D71): #/ministerio/<id>
+const PAGINA_DE_MINISTERIO = /^#\/ministerio\/([\w-]+)$/;
 function rotaAberta(conta) {
     const h = location.hash;
     if (LINK_DE_CULTO.test(h)) return '#/escala';
     if (LINK_DO_MURAL.test(h)) return '#/inicio';
+    if (PAGINA_DE_MINISTERIO.test(h)) return h;
     if (h === '#/montar' && !eLiderDeLouvor(conta)) return '#/escala';
     if ((h === '#/eventos' && !cuidaDosEventos(conta)) || (h === '#/financeiro' && !veFinanceiro(conta))
         || (h === '#/pessoas' && !conta.e_administrador)) return '#/inicio';
@@ -102,8 +105,9 @@ function rotaAberta(conta) {
 // Toda tela de quem já entrou leva a barra lateral (o CSS só a mostra no
 // computador) e a barra de abas (só no celular e no tablet)
 function telaDaConta(conta) {
-    const tela = (ROTAS_DA_CONTA[rotaAberta(conta)] ?? telaInicio)(conta);
     const rota = rotaAberta(conta);
+    const pagina = PAGINA_DE_MINISTERIO.exec(rota);
+    const tela = pagina ? telaMinisterio(conta, pagina[1]) : (ROTAS_DA_CONTA[rota] ?? telaInicio)(conta);
     tela.prepend(barraLateral(conta, rota));
     tela.append(barraAbas(conta, rota));
     return tela;
@@ -150,7 +154,7 @@ async function decidirTela() {
     } else {
         // Logado: o #/pedir-acesso não faz mais sentido (e voltaria ao sair)
         // (o link de um culto ou do mural fica: a Escala e o Início usam)
-        if (location.hash && !ROTAS_DA_CONTA[location.hash] && !linkCompartilhado(location.hash)) history.replaceState(null, '', location.pathname);
+        if (location.hash && !ROTAS_DA_CONTA[location.hash] && !linkCompartilhado(location.hash) && !PAGINA_DE_MINISTERIO.test(location.hash)) history.replaceState(null, '', location.pathname);
         const { conta, erro } = await carregarConta(session.user.id);
         if (erro) tela = telaErro(erro, decidirTela);
         // pendente, recusada ou desativada: a tela explica cada caso

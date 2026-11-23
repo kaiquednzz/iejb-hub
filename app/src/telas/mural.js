@@ -19,7 +19,7 @@ import { reduzirImagem } from '../util/foto.js';
 import { avatar, caixaDeAviso } from './moldura.js';
 import { interruptor } from './equipe/pecas.js';
 import { botaoWhats } from '../util/compartilhar.js';
-import { nomeCurto, temCargo } from '../sessao.js';
+import { nomeCurto, temCargo, ePastor } from '../sessao.js';
 
 const LIMITE = 30;      // publicações carregadas
 const VISIVEIS = 3;     // o resto em "Ver mais", sem sair da tela
@@ -33,7 +33,7 @@ const TIPOS = {
 };
 
 export const publicaNoMural = (conta) =>
-    !!conta?.e_administrador || temCargo(conta, 'comunicacao') || temCargo(conta, 'pastor');
+    !!conta?.e_administrador || temCargo(conta, 'comunicacao') || ePastor(conta);
 
 const miniatura = (nome) => nome.replace(/\.(webp|jpg)$/, '-mini.$1');
 

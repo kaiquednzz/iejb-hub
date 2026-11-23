@@ -17,15 +17,21 @@ function sessao(id) {
 }
 
 // Uma conta pronta: membro (sem área), com ministério, cargos, admin...
-export function umaConta({ nome = 'Ana Souza', apelido = null, admin = false, louvor = false, lider = false, cargos = [], aniversario = null } = {}) {
+export const LOUVOR = 'min-louvor';
+export const KIDS = 'min-kids';
+export const MINISTERIOS = [{ id: LOUVOR, nome: 'Louvor', ativo: true }, { id: KIDS, nome: 'Kids', ativo: true }];
+
+export function umaConta({ nome = 'Ana Souza', apelido = null, admin = false, louvor = false, lider = false, cargos = [], aniversario = null,
+    titulo = 'membro', estado = 'ativa', apresentou = true } = {}) {
     const pessoa = {
-        id: 'p-eu', nome, apelido, foto: null,
+        id: 'p-eu', nome, apelido, foto: null, titulo,
         aniversario_dia: aniversario?.[0] ?? null, aniversario_mes: aniversario?.[1] ?? null,
-        membro_ministerio: louvor ? [{ e_lider: lider, ativo: true }] : [],
+        membro_ministerio: louvor ? [{ e_lider: lider, ativo: true, ministerio_id: LOUVOR, ministerio: { nome: 'Louvor' } }] : [],
         cargo_pessoa: cargos.map((cargo) => ({ cargo })),
     };
-    return { id: 'c-eu', login: 'ana@teste', estado: 'ativa', e_administrador: admin, senha_temporaria: false,
-        nome_informado: nome, apresentou_em: '2026-11-01T10:00:00Z', foto_informada: null, criado_em: '2026-11-01T10:00:00Z', pessoa };
+    return { id: 'c-eu', login: 'ana@teste', estado, e_administrador: admin, senha_temporaria: false,
+        nome_informado: nome, apresentou_em: apresentou ? '2026-11-01T10:00:00Z' : null, foto_informada: null, criado_em: '2026-11-01T10:00:00Z',
+        pessoa: estado === 'ativa' ? pessoa : null };
 }
 
 export const test = base.extend({
@@ -79,7 +85,14 @@ export const test = base.extend({
                 const unica = url.searchParams.get('id') || url.searchParams.get('select')?.includes('pessoa:pessoa_id');
                 return responder(rota, unica ? [dados.conta] : (dados.pedidos ?? []));
             }
-            const lista = dados[rest] ?? [];
+            // Filtros simples do PostgREST (coluna=eq.valor / neq.valor) nos campos de texto/número
+            let lista = dados[rest] ?? [];
+            for (const [col, v] of url.searchParams) {
+                const m = /^(eq|neq)\.(.*)$/.exec(v);
+                if (!m || ['select', 'order', 'limit', 'or'].includes(col) || col.includes('.')) continue;
+                const igual = (x) => String(x?.[col]) === m[2];
+                lista = lista.filter((x) => !(col in x) || (m[1] === 'eq' ? igual(x) : !igual(x)));
+            }
             const umSo = (req.headers().accept ?? '').includes('vnd.pgrst.object');
             if (metodo === 'HEAD') return rota.fulfill({ status: 200, headers: { 'content-range': `0-0/${lista.length}` }, body: '' });
             return responder(rota, umSo ? (lista[0] ?? null) : lista);

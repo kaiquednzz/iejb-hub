@@ -1,6 +1,6 @@
 // Testes de fumaça: cada um abre uma tela como uma pessoa de verdade usaria
 // e confere o essencial. Supabase simulado (simulador.js).
-import { test, expect, umaConta } from './simulador.js';
+import { test, expect, umaConta, MINISTERIOS, LOUVOR, KIDS } from './simulador.js';
 
 // Nenhuma tela pode estourar erro no console
 test.beforeEach(async ({ page }, info) => {
@@ -70,7 +70,7 @@ test('oração fica no cabeçalho, ao lado do avatar', async ({ page, simular })
 test('pastor com pedido esperando vê o pontinho', async ({ page, simular }) => {
     const pedido = { id: 'o-1', texto: 'Oi.', anonimo: false, autor_nome: 'Ana', autor_apelido: null, autor_foto: null,
         criado_em: '2026-11-23T12:00:00Z', orado_em: null, orado_por_nome: null };
-    await simular.abrir('#/agenda', umaConta({ cargos: ['pastor'] }), { rpc: { pedidos_de_oracao_para_mim: [pedido] } });
+    await simular.abrir('#/agenda', umaConta({ titulo: 'pastor' }), { rpc: { pedidos_de_oracao_para_mim: [pedido] } });
     await expect(page.locator('.cabecalho-oracao')).toHaveClass(/tem-pedido/);
     await expect(page.locator('.cabecalho-oracao')).toHaveAttribute('aria-label', 'Pedidos de oração: 1 esperando');
 });
@@ -182,7 +182,7 @@ test('com um pastor só, ele já vem escolhido', async ({ page, simular }) => {
 test('pastor vê o pedido sem nome e marca que orou', async ({ page, simular }) => {
     const pedido = { id: 'o-1', texto: 'Pelo emprego.', anonimo: true, autor_nome: null, autor_apelido: null, autor_foto: null,
         criado_em: '2026-11-23T12:00:00Z', orado_em: null, orado_por_nome: null };
-    await simular.abrir('#/oracao', umaConta({ cargos: ['pastor'] }), { rpc: { pedidos_de_oracao_para_mim: [pedido], pastores_da_igreja: [] } });
+    await simular.abrir('#/oracao', umaConta({ titulo: 'pastor' }), { rpc: { pedidos_de_oracao_para_mim: [pedido], pastores_da_igreja: [] } });
     await expect(page.locator('.oracao-quem-nome')).toHaveText('Sem nome');
     await page.getByRole('button', { name: 'Orei por você' }).click();
     await expect.poll(() => simular.chamadas.find((c) => c.rpc === 'marcar_orei')?.args).toEqual({ p_pedido: 'o-1' });
@@ -220,3 +220,84 @@ test('botões de WhatsApp são só o logo, com nome para leitor de tela', async 
     await expect(whats).toHaveAttribute('aria-label', 'Mandar no WhatsApp');
     await expect(whats).toHaveText('');
 });
+
+// --- Cadastro da igreja toda (D71) ------------------------------------------
+const PESSOAS = [
+    { id: 'p-1', nome: 'Gabi Rocha', apelido: 'Gabi', instrumentos: ['Voz'], ativa: true, foto: null, titulo: 'membro',
+        membro_ministerio: [{ ministerio_id: LOUVOR, e_lider: false, ativo: true }], cargo_pessoa: [], conta: null },
+    { id: 'p-2', nome: 'Bia Lima', apelido: 'Tia Bia', instrumentos: [], ativa: true, foto: null, titulo: 'diaconisa',
+        membro_ministerio: [{ ministerio_id: KIDS, e_lider: true, ativo: true }], cargo_pessoa: [], conta: null },
+    { id: 'p-3', nome: 'Seu Antônio', apelido: null, instrumentos: [], ativa: true, foto: null, titulo: 'presbitero',
+        membro_ministerio: [], cargo_pessoa: [], conta: null },
+];
+
+test('Louvor mostra só quem é do Louvor; Pessoas mostra a igreja toda', async ({ page, simular }) => {
+    await simular.abrir('#/equipe', umaConta({ admin: true, louvor: true, lider: true }), { pessoa: PESSOAS, ministerio: MINISTERIOS });
+    await page.getByRole('tab', { name: 'Pessoas' }).click();
+    await expect(page.locator('.linha-pessoa, .mural-pessoa, .lista-linhas li')).toHaveCount(1);
+    await page.goto('/#/pessoas');
+    await page.getByRole('tab', { name: 'Cadastro' }).click();
+    await expect(page.locator('.lista-linhas li')).toHaveCount(3);
+    await expect(page.locator('.lista-linhas')).toContainText('Diaconisa · Kids');
+    await page.getByRole('button', { name: 'Kids', exact: true }).click();
+    await expect(page.locator('.lista-linhas li')).toHaveCount(1);
+    await page.getByRole('button', { name: 'Sem área' }).click();
+    await expect(page.locator('.lista-linhas')).toContainText('Seu Antônio');
+});
+
+test('admin cadastra presbítero no Kids, com Gmail de convite', async ({ page, simular }) => {
+    await simular.abrir('#/pessoas', umaConta({ admin: true }), {
+        pessoa: PESSOAS, ministerio: MINISTERIOS, rpc: { cadastrar_pessoa: 'p-novo', definir_email_de_convite: 'esperando' },
+    });
+    await page.getByRole('tab', { name: 'Cadastro' }).click();
+    await page.getByRole('button', { name: 'Cadastrar pessoa' }).click();
+    await page.getByLabel('Nome completo').fill('João Batista');
+    await page.getByLabel('Título na igreja').selectOption('presbitero');
+    await page.getByRole('checkbox', { name: 'Kids' }).check();
+    await expect(page.getByText('O que toca ou canta no Louvor')).toBeHidden(); // instrumento é coisa do Louvor
+    await page.getByLabel('Gmail para entrar').fill('Joao.Batista@gmail.com');
+    await page.getByRole('button', { name: 'Cadastrar', exact: true }).click();
+    await expect.poll(() => simular.chamadas.find((c) => c.rpc === 'cadastrar_pessoa')?.args)
+        .toMatchObject({ p_nome: 'João Batista', p_titulo: 'presbitero', p_ministerios: [KIDS] });
+    await expect.poll(() => simular.chamadas.find((c) => c.rpc === 'definir_email_de_convite')?.args)
+        .toEqual({ p_pessoa: 'p-novo', p_email: 'joao.batista@gmail.com' });
+});
+
+test('primeiro acesso oferece os ministérios que existem e o título', async ({ page, simular }) => {
+    await simular.abrir('#/inicio', umaConta({ estado: 'pendente', apresentou: false }), {
+        rpc: { ministerios_para_escolher: MINISTERIOS.map(({ id, nome }) => ({ id, nome })), apresentar_me: null },
+    });
+    await page.getByLabel('Como quer ser chamado?').fill('Maria');
+    await page.getByLabel('Tem algum cargo na igreja?').selectOption('diaconisa');
+    await page.getByRole('button', { name: 'Kids', exact: true }).click();
+    await expect(page.getByRole('group', { name: 'Toca ou canta o quê?' })).toBeHidden();
+    await page.getByRole('button', { name: 'Enviar e entrar na fila' }).click();
+    await expect.poll(() => simular.chamadas.find((c) => c.rpc === 'apresentar_me')?.args)
+        .toMatchObject({ p_nome: 'Maria', p_titulo: 'diaconisa', p_ministerios: [KIDS], p_cargos: [], p_instrumentos: [] });
+});
+
+test('Ministérios mostra o Kids e a página dele lista quem serve', async ({ page, simular }) => {
+    const kids = { id: KIDS, nome: 'Kids', ativo: true, membro_ministerio: [
+        { e_lider: true, ativo: true, pessoa: { id: 'p-2', nome: 'Bia Lima', apelido: 'Tia Bia', foto: null, titulo: 'diaconisa', ativa: true } },
+        { e_lider: false, ativo: true, pessoa: { id: 'p-4', nome: 'Carla Dias', apelido: null, foto: null, titulo: 'membro', ativa: true } },
+    ] };
+    await simular.abrir('#/ministerios', umaConta(), { ministerio: [kids] });
+    await page.getByRole('link', { name: /Kids/ }).click();
+    await expect(page).toHaveURL(new RegExp(`#/ministerio/${KIDS}$`));
+    await expect(page.locator('h1')).toHaveText('Kids');
+    await expect(page.locator('.mural').first()).toContainText('Tia Bia');
+    await expect(page.locator('.mural').nth(1)).toContainText('Carla');
+    await expect(page.locator('.barra-abas [aria-current="page"]')).toContainText('Ministérios');
+});
+
+test('pastor sem "vê o caixa" não vê o Financeiro', async ({ page, simular }) => {
+    await simular.abrir('#/ministerios', umaConta({ titulo: 'pastor' }), {});
+    await expect(page.getByRole('link', { name: /Financeiro/ })).toHaveCount(0);
+    await expect(page.locator('.carteirinha, body')).toBeTruthy();
+});
+
+test('quem tem "vê o caixa" vê o Financeiro', async ({ page, simular }) => {
+    await simular.abrir('#/ministerios', umaConta({ cargos: ['ve_financeiro'] }), {});
+    await expect(page.getByRole('link', { name: /Financeiro/ })).toHaveCount(1);
+});
+

@@ -54,3 +54,4 @@ cenario 16_mural.sql
 cenario 17_contato_so_de_quem_serve.sql
 cenario 18_oracao_aniversario_lembrete.sql
 cenario 19_foto_de_membro.sql
+cenario 20_cadastro_da_igreja.sql

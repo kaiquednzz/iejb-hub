@@ -35,7 +35,7 @@ export function telaEquipe(conta, { area = 'louvor' } = {}) {
         ),
     );
 
-    const ctx = { conta, recarregar: carregar, dados: () => dados };
+    const ctx = { conta, recarregar: carregar, dados: () => dados, area };
     carregar();
     return tela;
 

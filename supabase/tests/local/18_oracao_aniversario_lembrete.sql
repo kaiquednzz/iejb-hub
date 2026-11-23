@@ -9,8 +9,8 @@ select pessoa_id as p_g3   from public.conta where login = 'g3@teste' \gset
 select pessoa_id as p_cida from public.conta where login = 'so-membro@teste' \gset
 select pessoa_id as p_lid  from public.conta where login = 'lider@teste' \gset
 -- Dois pastores: membro (já era) e g2
-insert into public.cargo_pessoa (pessoa_id, cargo) select :'p_g2', 'pastor'
-where not exists (select 1 from public.cargo_pessoa where pessoa_id = :'p_g2' and cargo = 'pastor');
+select set_config('request.jwt.claims', '', false); -- como o banco, sem ninguém logado
+update public.pessoa set titulo = 'pastor' where id in (:'p_mem', :'p_g2'); -- título (D71)
 delete from public.aviso_destinatario; delete from public.aviso;
 
 set role authenticated;

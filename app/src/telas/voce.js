@@ -6,6 +6,7 @@ import { h, icone } from '../util/dom.js';
 import { cabecalhoApp, avatar, papelPrincipal, sair } from './moldura.js';
 import { textoAniversario, folhaAniversario } from './aniversarios.js';
 import { abrirTour } from './tour.js';
+import { nomeDoTitulo } from '../util/titulos.js';
 
 // Linha de lista: ícone, nome, texto de apoio e seta. Toda a linha é o link.
 export function linhaLista({ href, nome, texto, nomeIcone }) {
@@ -36,12 +37,16 @@ const MESES = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julh
 // degradê) que anda quando a pessoa arrasta o dedo sobre o cartão ou, se
 // ela permitir, quando inclina o celular.
 function carteirinha(conta, pessoa, nome) {
-    const ministerios = (pessoa.membro_ministerio ?? []).some((m) => m.ativo) ? 'Ministério de Louvor' : null;
+    // Onde serve (D71): "Louvor · Kids"; quem lidera aparece primeiro
+    const vinculos = (pessoa.membro_ministerio ?? []).filter((m) => m.ativo)
+        .sort((a, b) => b.e_lider - a.e_lider)
+        .map((m) => `${m.ministerio?.nome ?? 'Louvor'}${m.e_lider ? ' (líder)' : ''}`);
+    const ministerios = vinculos.length ? vinculos.join(' · ') : null;
     const desde = conta.criado_em ? `${MESES[Number(conta.criado_em.slice(5, 7)) - 1]} de ${conta.criado_em.slice(0, 4)}` : null;
     const cartao = h('section', { class: 'carteirinha', 'aria-label': `Carteirinha de ${nome}` },
         h('div', { class: 'carteirinha-topo' },
             h('img', { src: '/logo-iejb-pequeno.png', alt: '', width: 13, height: 30 }),
-            h('span', null, 'IEJB · Membro')),
+            h('span', null, `IEJB · ${nomeDoTitulo(pessoa.titulo)}`)),
         h('div', { class: 'carteirinha-meio' },
             avatar(pessoa, 'pessoa-avatar carteirinha-foto'),
             h('div', null,

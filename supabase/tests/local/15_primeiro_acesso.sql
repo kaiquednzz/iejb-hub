@@ -10,7 +10,7 @@ select teste.ok((select estado = 'pendente' and apresentou_em is null from publi
 
 set role authenticated;
 select teste.entrar('primeiro@teste');
-select public.apresentar_me('  Fulano de Tal ', format('contas/%s/%s.webp', :'conta_nova', gen_random_uuid()), array['tesouraria']);
+select public.apresentar_me(p_nome => '  Fulano de Tal ', p_foto => format('contas/%s/%s.webp', :'conta_nova', gen_random_uuid()), p_cargos => array['tesouraria']);
 reset role;
 select teste.ok((select nome_informado = 'Fulano de Tal' and foto_informada like 'contas/%' and apresentou_em is not null
                  from public.conta where id = :'conta_nova'), 'D62: nome e foto ficam no pedido');
@@ -28,7 +28,7 @@ select teste.ok(not privado.pode_mudar_foto_no_caminho(format('contas/%s/%s.webp
 select teste.deve_falhar(format('select public.apresentar_me(''Fulano'', %L)', format('contas/%s/%s.webp', :'conta_outra', gen_random_uuid())),
   'D62: não aponta para a foto de outra conta');
 select teste.deve_falhar('select public.apresentar_me('' '')', 'D62: nome vazio não passa');
-select teste.deve_falhar('select public.apresentar_me(''Fulano'', null, array[''admin''])', 'D62: não dá para pedir cargo que não existe');
+select teste.deve_falhar('select public.apresentar_me(''Fulano'', null, p_cargos => array[''admin''])', 'D62: não dá para pedir cargo que não existe');
 
 -- Já aprovada: não mexe mais por aqui
 select teste.entrar('membro@teste');
@@ -48,8 +48,8 @@ select teste.ok((select foto = (select foto_informada from public.conta where id
 select id as louvor from public.ministerio where nome = 'Louvor' \gset
 set role authenticated;
 select teste.entrar('segundo@teste');
-select public.apresentar_me('Segundo', null, array['tesouraria'], true, array['Bateria', ' Voz ', 'Bateria']);
-select teste.deve_falhar('select public.apresentar_me(''Segundo'', null, array[''dono''])', 'D62: só pede cargos que existem');
+select public.apresentar_me('Segundo', null, p_cargos => array['tesouraria'], p_ministerios => array[:'louvor']::uuid[], p_instrumentos => array['Bateria', ' Voz ', 'Bateria']);
+select teste.deve_falhar('select public.apresentar_me(''Segundo'', null, p_cargos => array[''dono''])', 'D62: só pede cargos que existem');
 reset role;
 select teste.ok((select louvor_pedido and cargos_pedidos = array['tesouraria'] and instrumentos_pedidos @> array['Bateria', 'Voz']
                         and cardinality(instrumentos_pedidos) = 2 from public.conta where id = :'conta_outra'),
@@ -58,7 +58,7 @@ select teste.ok((select louvor_pedido and cargos_pedidos = array['tesouraria'] a
 -- Louvor + instrumentos + cargo
 set role authenticated;
 select teste.entrar_so_com_senha('lider@teste');
-select public.aprovar_pedido(:'conta_outra', null, 'Segundo da Silva', :'louvor', true, array['Bateria', 'Voz'], array['tesouraria']) as p_seg \gset
+select public.aprovar_pedido(:'conta_outra', null, 'Segundo da Silva', 'membro', array[:'louvor']::uuid[], array['Bateria', 'Voz'], array['tesouraria']) as p_seg \gset
 reset role;
 select teste.ok(exists (select 1 from public.membro_ministerio where pessoa_id = :'p_seg' and ministerio_id = :'louvor' and ativo), 'D62: aprovado no Louvor');
 select teste.ok((select instrumentos @> array['Bateria', 'Voz'] from public.pessoa where id = :'p_seg'), 'D62: instrumentos vão para o cadastro');
@@ -69,7 +69,7 @@ insert into auth.users (email, raw_user_meta_data) values ('terceiro@teste', '{}
 select id as conta_3 from public.conta where login = 'terceiro@teste' \gset
 set role authenticated;
 select teste.entrar('lider@teste');
-select public.aprovar_pedido(:'conta_3', null, 'Terceiro', :'louvor', false) as p_3 \gset
+select public.aprovar_pedido(:'conta_3', null, 'Terceiro') as p_3 \gset
 reset role;
 select teste.ok(not exists (select 1 from public.membro_ministerio where pessoa_id = :'p_3'), 'D62: sem Louvor marcado, não entra no Louvor');
 

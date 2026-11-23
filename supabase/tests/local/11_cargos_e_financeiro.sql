@@ -19,7 +19,7 @@ select teste.entrar('g2@teste');
 select teste.deve_falhar(format('insert into public.cargo_pessoa (pessoa_id, cargo) values (%L, ''tesouraria'')', :'p_gabi'),
   'D45: quem não é admin não se dá cargo');
 select teste.entrar('lider@teste');
-insert into public.cargo_pessoa (pessoa_id, cargo) values (:'p_gabi', 'tesouraria'), (:'p_mem', 'pastor'), (:'p_avu', 'comunicacao');
+insert into public.cargo_pessoa (pessoa_id, cargo) values (:'p_gabi', 'tesouraria'), (:'p_mem', 've_financeiro'), (:'p_avu', 'comunicacao');
 select teste.deve_falhar(format('insert into public.cargo_pessoa (pessoa_id, cargo) values (%L, ''tesoureiro_chefe'')', :'p_g3'),
   'D45: só os cargos da lista');
 reset role;

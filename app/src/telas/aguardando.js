@@ -5,6 +5,7 @@ import { molduraEntrada, campo, caixaDeAviso } from './moldura.js';
 import { blocoFoto } from './equipe/pecas.js';
 import { avisar } from '../util/folha.js';
 import { chama } from '../util/chama.js';
+import { seletorDeTitulo } from '../util/titulos.js';
 
 const TEXTOS = {
     pendente: {
@@ -49,28 +50,44 @@ function telaApresentar(conta, depois) {
 
     // O que faz na igreja (opcional). É só um pedido: o admin aprova.
     // D68: o Hub é da igreja toda. Não servir em nenhuma área é resposta válida.
-    const funcoes = fichasMultiplas('Você serve em alguma dessas áreas?', FUNCOES,
-        'Não serve em nenhuma? Pode deixar em branco: você entra como membro e vê o mural e os eventos da igreja.');
+    // D71: os ministérios são os que existem de verdade (vêm do banco), e o
+    // título na igreja é uma pergunta à parte.
+    const titulo = seletorDeTitulo({ id: 'apresentar-titulo' });
+    titulo.options[0].textContent = 'Membro (sem cargo)';
+    const lugarFuncoes = h('div', { class: 'apresentar-funcoes' });
+    let funcoes = null;
+    let louvorId = null;
     const instrumentos = fichasMultiplas('Toca ou canta o quê?', INSTRUMENTOS);
     instrumentos.elemento.hidden = true;
-    funcoes.aoMudar(() => { instrumentos.elemento.hidden = !funcoes.valores().includes('louvor'); });
+    supabase.rpc('ministerios_para_escolher').then(({ data }) => {
+        louvorId = (data ?? []).find((m) => m.nome === 'Louvor')?.id ?? null;
+        funcoes = fichasMultiplas('Você serve em alguma área?',
+            [...(data ?? []).map((m) => [`m:${m.id}`, m.nome]), ...FUNCOES],
+            'Não serve em nenhuma? Pode deixar em branco: você entra como membro e vê o mural e os eventos da igreja.');
+        funcoes.aoMudar(() => { instrumentos.elemento.hidden = !funcoes.valores().includes(`m:${louvorId}`); });
+        lugarFuncoes.replaceChildren(funcoes.elemento);
+    });
 
     const form = h('form', { class: 'form', novalidate: true },
         blocoFoto({ id: conta.id, nome: conta.nome_informado || conta.login, foto }, null, destino),
         h('p', { class: 'campo-dica apresentar-dica' }, 'A foto é opcional.'),
-        nome, funcoes.elemento, instrumentos.elemento, aviso.elemento, continuar);
+        nome,
+        h('div', { class: 'campo' }, h('label', { for: 'apresentar-titulo' }, 'Tem algum cargo na igreja?'), titulo),
+        lugarFuncoes, instrumentos.elemento, aviso.elemento, continuar);
     form.addEventListener('submit', (evento) => {
         evento.preventDefault();
         aviso.limpar();
         const n = form.querySelector('[name=nome]').value.trim();
         if (n.length < 2) return aviso.mostrar('Escreva seu nome.');
         comCarregando(continuar, async () => {
-            const escolhidas = funcoes.valores();
+            const escolhidas = funcoes?.valores() ?? [];
+            const ministerios = escolhidas.filter((f) => f.startsWith('m:')).map((f) => f.slice(2));
             const { error } = await supabase.rpc('apresentar_me', {
                 p_nome: n, p_foto: foto,
-                p_cargos: escolhidas.filter((f) => f !== 'louvor'),
-                p_louvor: escolhidas.includes('louvor'),
-                p_instrumentos: escolhidas.includes('louvor') ? instrumentos.valores() : [],
+                p_titulo: titulo.value,
+                p_ministerios: ministerios,
+                p_cargos: escolhidas.filter((f) => !f.startsWith('m:')),
+                p_instrumentos: ministerios.includes(louvorId) ? instrumentos.valores() : [],
             });
             if (error) return avisar('Não deu para salvar. Tente de novo.');
             await depois();
@@ -86,7 +103,8 @@ function telaApresentar(conta, depois) {
     });
 }
 
-const FUNCOES = [['louvor', 'Louvor'], ['tesouraria', 'Tesouraria'], ['comunicacao', 'Comunicação'], ['pastor', 'Pastor']];
+// Além dos ministérios: as duas áreas que dão permissão no app (D71)
+const FUNCOES = [['tesouraria', 'Tesouraria'], ['comunicacao', 'Comunicação']];
 const INSTRUMENTOS = ['Voz', 'Violão', 'Guitarra', 'Baixo', 'Teclado', 'Bateria', 'Cajón', 'Mesa'].map((i) => [i, i]);
 
 // Fichas que ligam e desligam (várias ao mesmo tempo)

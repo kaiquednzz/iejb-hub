@@ -29,6 +29,7 @@ import { filaDoYoutube } from '../util/musica.js';
 import { chama, marcarEscalado } from '../util/chama.js';
 import { botaoWhatsRepertorio } from '../util/compartilhar.js';
 import { corDoTopo } from '../util/tema.js';
+import { serveNoLouvor } from '../sessao.js';
 
 const DURACAO_DO_CULTO_MIN = 150; // depois disso o culto conta como encerrado
 
@@ -46,7 +47,7 @@ export function telaInicio(conta) {
     const primeiroNome = conta.pessoa?.apelido?.trim() || (conta.pessoa?.nome || conta.nome_informado || '').split(' ')[0];
     // Quem não serve em nenhum ministério (D68: o Hub é da igreja toda) não
     // tem escala: o Início dele começa direto no mural
-    const serve = !!conta.pessoa?.membro_ministerio?.some((m) => m.ativo);
+    const serve = serveNoLouvor(conta); // só o Louvor tem escala (D71)
     const destaque = serve
         ? h('div', { class: 'inicio-destaque', 'aria-live': 'polite' }, h('div', { class: 'inicio-compromisso esqueleto' }))
         : null;

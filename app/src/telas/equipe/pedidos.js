@@ -8,8 +8,8 @@ import { campo, caixaDeAviso } from '../moldura.js';
 import { vazio } from './pecas.js';
 import { chave } from './dados.js';
 import { avatar } from '../../util/foto.js';
+import { nomeDoTitulo, nomeDaPermissao, PERMISSOES, seletorDeTitulo } from '../../util/titulos.js';
 
-const NOME_CARGO = { tesouraria: 'Tesouraria', pastor: 'Pastor', comunicacao: 'Comunicação' };
 
 export function secaoPedidos(dados, ctx) {
     const pendentes = dados.pedidos.filter((p) => p.estado === 'pendente');
@@ -53,7 +53,7 @@ function cartaoPedido(pedido, indice, dados, ctx) {
             h('div', null,
                 h('p', { class: 'pedido-nome' }, pedido.nome_informado || 'Sem nome'),
                 h('p', { class: 'pedido-login' }, pedido.login),
-                pediu(pedido) && h('p', { class: 'pedido-funcoes' }, pediu(pedido)),
+                pediu(pedido, dados) && h('p', { class: 'pedido-funcoes' }, pediu(pedido, dados)),
                 h('p', { class: 'pedido-quando' }, `Pediu ${haQuanto(pedido.criado_em)}`),
             ),
         ),
@@ -88,19 +88,30 @@ function folhaAprovar(pedido, dados, ctx) {
     [opcaoNova, opcaoExistente].forEach((o) => o.addEventListener('change', atualizar));
     atualizar();
 
-    // O que a pessoa pediu no primeiro acesso (D62), já marcado. Desmarque o
-    // que não concordar. Quem não preencheu (pedido antigo): Louvor marcado,
-    // que era o comportamento de antes.
+    // O que a pessoa pediu no primeiro acesso (D62, D71), já marcado. Desmarque
+    // o que não concordar. Pedido antigo, sem nada: Louvor marcado (era assim).
     const marcar = (rotulo, ligado, detalhe) => {
         const caixa = h('input', { type: 'checkbox', checked: ligado });
         return { caixa, elemento: h('label', { class: 'opcao' }, caixa, h('span', null, rotulo, detalhe && h('small', { class: 'opcao-detalhe-texto' }, ` · ${detalhe}`))) };
     };
-    const louvor = marcar('Louvor', pedido.louvor_pedido || !pedido.apresentou_em, (pedido.instrumentos_pedidos ?? []).join(', '));
-    const cargos = (pedido.cargos_pedidos ?? []).map((c) => ({ id: c, ...marcar(NOME_CARGO[c], true) }));
-    const blocoPediu = h('fieldset', { class: 'opcoes' },
-        h('legend', { class: 'bloco-subtitulo' }, 'Aprovar também'),
-        louvor.elemento, cargos.map((c) => c.elemento),
-        h('p', { class: 'campo-dica' }, 'Sem nada marcado, a pessoa entra como membro: vê o mural e os eventos.'));
+    const pediuMinisterios = new Set(pedido.ministerios_pedidos ?? []);
+    if (pedido.louvor_pedido || !pedido.apresentou_em) pediuMinisterios.add(dados.ministerioId);
+    const ministerios = dados.ministerios.filter((m) => m.ativo).map((m) => ({
+        id: m.id,
+        ...marcar(m.nome, pediuMinisterios.has(m.id),
+            m.id === dados.ministerioId ? (pedido.instrumentos_pedidos ?? []).join(', ') : null),
+    }));
+    const titulo = seletorDeTitulo({ id: 'aprovar-titulo', valor: pedido.titulo_pedido ?? 'membro' });
+    const permissoes = PERMISSOES.map(([id, nome]) => ({ id, ...marcar(nome, (pedido.cargos_pedidos ?? []).includes(id)) }));
+    const blocoPediu = h('div', { class: 'form' },
+        h('div', { class: 'campo' }, h('label', { for: 'aprovar-titulo' }, 'Título na igreja'), titulo),
+        h('fieldset', { class: 'opcoes' },
+            h('legend', { class: 'bloco-subtitulo' }, 'Onde serve'),
+            ministerios.map((m) => m.elemento),
+            h('p', { class: 'campo-dica' }, 'Nenhum marcado: entra como membro, vê o mural e os eventos.')),
+        h('fieldset', { class: 'opcoes' },
+            h('legend', { class: 'bloco-subtitulo' }, 'Pode no app'),
+            permissoes.map((c) => c.elemento)));
 
     const form = h('form', { class: 'form', novalidate: true },
         h('p', { class: 'folha-texto' },
@@ -124,15 +135,17 @@ function folhaAprovar(pedido, dados, ctx) {
         const nome = form.elements.nome.value.trim();
         if (nova && !nome) return aviso.mostrar('Escreva o nome da pessoa.');
 
-        const cargosAprovados = cargos.filter((c) => c.caixa.checked).map((c) => c.id);
+        const cargosAprovados = permissoes.filter((c) => c.caixa.checked).map((c) => c.id);
+        const ministeriosAprovados = ministerios.filter((m) => m.caixa.checked).map((m) => m.id);
+        const comLouvor = ministeriosAprovados.includes(dados.ministerioId);
         await comCarregando(botao, async () => {
             const { error } = await supabase.rpc('aprovar_pedido', {
                 p_conta: pedido.id,
                 p_pessoa: nova ? null : lista.value,
                 p_nome: nova ? nome : null,
-                p_ministerio: dados.ministerioId,
-                p_louvor: louvor.caixa.checked,
-                p_instrumentos: louvor.caixa.checked ? (pedido.instrumentos_pedidos ?? []) : [],
+                p_titulo: titulo.value,
+                p_ministerios: ministeriosAprovados,
+                p_instrumentos: comLouvor ? (pedido.instrumentos_pedidos ?? []) : [],
                 p_cargos: cargosAprovados,
             });
             if (error) return aviso.mostrar(mensagemDoBanco(error));
@@ -145,11 +158,16 @@ function folhaAprovar(pedido, dados, ctx) {
     const folha = abrirFolha({ titulo: 'Aprovar acesso', conteudo: form });
 }
 
-// "Louvor (Bateria, Voz) · Tesouraria", ou nada se não pediu
-function pediu(pedido) {
+// "Presbítero · Louvor (Bateria, Voz), Kids · Tesouraria", ou nada se não pediu
+function pediu(pedido, dados) {
     const partes = [];
-    if (pedido.louvor_pedido) partes.push(`Louvor${pedido.instrumentos_pedidos?.length ? ` (${pedido.instrumentos_pedidos.join(', ')})` : ''}`);
-    for (const c of pedido.cargos_pedidos ?? []) partes.push(NOME_CARGO[c]);
+    if (pedido.titulo_pedido && pedido.titulo_pedido !== 'membro') partes.push(nomeDoTitulo(pedido.titulo_pedido));
+    const onde = new Set(pedido.ministerios_pedidos ?? []);
+    if (pedido.louvor_pedido) onde.add(dados.ministerioId);
+    const nomes = dados.ministerios.filter((m) => onde.has(m.id)).map((m) => (m.id === dados.ministerioId && pedido.instrumentos_pedidos?.length
+        ? `${m.nome} (${pedido.instrumentos_pedidos.join(', ')})` : m.nome));
+    if (nomes.length) partes.push(nomes.join(', '));
+    for (const c of pedido.cargos_pedidos ?? []) partes.push(nomeDaPermissao(c));
     return partes.join(' · ');
 }
 
