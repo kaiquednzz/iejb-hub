@@ -17,7 +17,7 @@ Está no ar em [`app.iejb.com.br`](https://app.iejb.com.br) (acesso só para int
 | Área | O que tem |
 |---|---|
 | **Início** | O próximo compromisso da pessoa (com contagem regressiva e o repertório no dia em que ela toca), aviso de aniversário de amanhã, contagem do caixa esperando a conferência dela, pedidos de acesso (admin) e o mural. |
-| **Mural** | Avisos, fotos do culto e palavra, publicados por quem cuida da comunicação, com fixar, guardar, editar e compartilhar no WhatsApp. Reações (Amém e coração) mostram quem reagiu. Cada membro pode postar **uma** foto do último culto; essas fotos somem sozinhas em 90 dias. |
+| **Mural** | Avisos, fotos do culto e palavra, publicados pelo pastor e pela Comunicação, com fixar, guardar, editar e compartilhar no WhatsApp. Reações (Amém e coração) mostram quem reagiu. Cada membro compartilha **uma vez por semana** uma foto ou uma palavra (versículo ou mensagem curta); esses posts somem sozinhos em 90 dias. |
 | **Oração** | O membro escolhe para qual pastor ou pastora manda o pedido, pode esconder o nome e recebe "Orei por você" quando o pastor marcar. O pastor recebe o pedido como notificação. O pedido some em 30 dias. |
 | **Agenda** | As escalas da pessoa e os eventos da igreja, mês a mês. |
 | **Ministérios** | Louvor e os outros ministérios (Kids, Recepção, Intercessão...) com a lista de quem serve e lidera. O admin cria ministérios novos. |

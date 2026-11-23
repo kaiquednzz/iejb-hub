@@ -23,8 +23,11 @@ Deno.serve(async () => {
         let apagadas = 0;
         for (const p of vencidas ?? []) {
             const arquivos = (p.fotos as string[]).flatMap((f) => [f, miniatura(f)]);
-            const { error: erroArquivo } = await sistema.storage.from('mural').remove(arquivos);
-            if (erroArquivo) { console.error(p.id, erroArquivo); continue; }
+            // A palavra (D72) não tem arquivo: só apaga o post
+            if (arquivos.length) {
+                const { error: erroArquivo } = await sistema.storage.from('mural').remove(arquivos);
+                if (erroArquivo) { console.error(p.id, erroArquivo); continue; }
+            }
             const { error: erroPost } = await sistema.from('mural_publicacao').delete().eq('id', p.id);
             if (erroPost) { console.error(p.id, erroPost); continue; }
             apagadas++;

@@ -26,7 +26,7 @@ function privacidade() {
                 [b('Conta: '), 'e-mail de login, o nome que você informou ao pedir acesso, a situação da conta e quem a aprovou. A senha fica com o serviço de login e nunca é vista por ninguém da igreja.'],
                 [b('Cadastro: '), 'nome, apelido, telefone de contato (se você ou a liderança informar), instrumentos que toca e foto de perfil (se você enviar).'],
                 [b('Participação: '), 'grupos de que faz parte, escalas em que está, quando marca que não vai e funções na igreja (por exemplo Tesouraria ou Comunicação).'],
-                [b('Mural: '), 'os avisos, fotos e palavras publicados pelo pastor e pela Comunicação, com quem publicou, e quem deu Amém ou coração em cada um.'],
+                [b('Mural: '), 'os avisos, fotos e palavras publicados pelo pastor e pela Comunicação, as fotos e palavras que cada membro compartilha (uma por semana; somem em 90 dias se não forem guardadas), com quem publicou, e quem deu Amém ou coração em cada um.'],
                 [b('Aniversário: '), 'se você informar, só o dia e o mês (sem o ano). A igreja vê e recebe um aviso na véspera. Você tira quando quiser, em Você.'],
                 [b('Pedidos de oração: '), 'o texto do pedido, para quais pastores foi e se foi marcado como orado. ', b('Só os pastores que você escolher leem'), ' (nem o administrador vê); no pedido sem nome, nem eles sabem quem mandou. O pedido é apagado sozinho em 30 dias, e você pode apagar antes.'],
                 [b('Avisos no celular: '), 'se você ativar, um identificador do aparelho para mandar as notificações. Ele some quando você sai da conta naquele aparelho.'],
@@ -67,6 +67,7 @@ function termos() {
             lista(
                 'Use o Hub para as atividades da igreja: escalas, repertórios, eventos, mural e caixa.',
                 'Fotos do mural são da igreja e de quem aparece nelas. Não publique fora do Hub sem combinar com a Comunicação.',
+                'No mural, compartilhe o que edifica a igreja: nada de venda, política ou corrente. O pastor e a Comunicação podem apagar o que fugir disso.',
                 'Os contatos e fotos dos irmãos são para combinar o serviço na igreja. Não repasse para fora nem use para venda ou propaganda.',
                 'Seja verdadeiro no que registra, principalmente no financeiro. Lançamentos não são apagados: um erro é cancelado com o motivo, e tudo fica no histórico.',
                 'Não tente acessar o que a sua função não permite nem atrapalhar o funcionamento do app.',

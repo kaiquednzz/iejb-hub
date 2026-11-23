@@ -75,24 +75,40 @@ test('pastor com pedido esperando vê o pontinho', async ({ page, simular }) => 
     await expect(page.locator('.cabecalho-oracao')).toHaveAttribute('aria-label', 'Pedidos de oração: 1 esperando');
 });
 
-test('membro posta uma foto do último culto', async ({ page, simular }) => {
-    const culto = { id: 'cu-1', nome: 'Culto da Família', data: '2026-11-22', horario: '18:00:00', ja_postei: false };
-    await simular.abrir('#/inicio', umaConta(), { rpc: { culto_para_foto: [culto], postar_foto_do_culto: 'novo' } });
+test('membro compartilha uma foto depois do culto', async ({ page, simular }) => {
+    const espaco = { pode: true, volta_em: '2026-11-29', culto_recente: 'Culto da Família' };
+    await simular.abrir('#/inicio', umaConta(), { rpc: { posso_compartilhar: [espaco], compartilhar_no_mural: 'novo' } });
     await page.getByRole('button', { name: /Foi no Culto da Família\?/ }).click();
     await page.locator('#foto-membro').setInputFiles('public/icone-192.png');
-    await page.getByLabel('Legenda').fill('Que culto!');
-    await page.getByRole('button', { name: 'Postar' }).click();
-    await expect.poll(() => simular.chamadas.find((c) => c.rpc === 'postar_foto_do_culto')?.args)
-        .toMatchObject({ p_culto: 'cu-1', p_legenda: 'Que culto!', p_foto: expect.stringMatching(/^membros\/p-eu\/[0-9a-f-]{36}\.(webp|jpg)$/) });
+    await page.getByLabel('Legenda (opcional)').fill('Que culto!');
+    await page.locator('form').getByRole('button', { name: 'Compartilhar' }).click();
+    await expect.poll(() => simular.chamadas.find((c) => c.rpc === 'compartilhar_no_mural')?.args)
+        .toMatchObject({ p_tipo: 'fotos', p_texto: 'Que culto!', p_referencia: null, p_foto: expect.stringMatching(/^membros\/p-eu\/[0-9a-f-]{36}\.(webp|jpg)$/) });
     // Subiu a foto e a miniatura, na pasta da própria pessoa
     expect(simular.chamadas.filter((c) => c.storage?.includes('/object/mural/membros/p-eu/')).length).toBe(2);
 });
 
-test('quem já postou não vê o convite de novo', async ({ page, simular }) => {
-    const culto = { id: 'cu-1', nome: 'Culto da Família', data: '2026-11-22', horario: '18:00:00', ja_postei: true };
-    await simular.abrir('#/inicio', umaConta(), { mural_publicacao: [PUBLICACAO], rpc: { culto_para_foto: [culto] } });
+test('membro compartilha uma palavra, sem culto recente', async ({ page, simular }) => {
+    const espaco = { pode: true, volta_em: '2026-11-29', culto_recente: null };
+    await simular.abrir('#/inicio', umaConta(), { rpc: { posso_compartilhar: [espaco], compartilhar_no_mural: 'novo' } });
+    await expect(page.getByRole('button', { name: /Foi no/ })).toHaveCount(0);
+    await page.locator('.mural-publicar').click();
+    await page.getByRole('tab', { name: 'Palavra' }).click();
+    await expect(page.locator('#compartilhar-texto')).toHaveAttribute('maxlength', '280');
+    await page.getByLabel('Versículo ou mensagem').fill('O Senhor é o meu pastor; nada me faltará.');
+    await page.getByLabel('Referência (opcional)').fill('Salmo 23:1');
+    await page.locator('form').getByRole('button', { name: 'Compartilhar' }).click();
+    await expect.poll(() => simular.chamadas.find((c) => c.rpc === 'compartilhar_no_mural')?.args)
+        .toMatchObject({ p_tipo: 'palavra', p_texto: 'O Senhor é o meu pastor; nada me faltará.', p_referencia: 'Salmo 23:1', p_foto: null });
+    expect(simular.chamadas.filter((c) => c.storage).length).toBe(0);
+});
+
+test('quem já compartilhou na semana não vê convite nem botão', async ({ page, simular }) => {
+    const espaco = { pode: false, volta_em: '2026-11-29', culto_recente: 'Culto da Família' };
+    await simular.abrir('#/inicio', umaConta(), { mural_publicacao: [PUBLICACAO], rpc: { posso_compartilhar: [espaco] } });
     await expect(page.locator('.mural-cartao')).toHaveCount(1);
     await expect(page.getByRole('button', { name: /Foi no/ })).toHaveCount(0);
+    await expect(page.locator('.mural-publicar')).toHaveCount(0);
 });
 
 test('o autor da foto só edita a legenda e apaga', async ({ page, simular }) => {
