@@ -105,7 +105,11 @@ Três camadas:
 | `--cor-sucesso`, `--cor-atencao`, `--cor-perigo`, `--cor-info` (+ `-sutil`) | status |
 | `--cor-foco` | anel de foco |
 
-Sem modo escuro (decisão anterior mantida).
+### 3.1.1 Tema escuro (D74, 25/11/2026)
+
+O seletor de aparência fica em **Você**: Seguir sistema, Claro ou Escuro. A escolha manual é local ao aparelho; nenhuma preferência estética é gravada no Supabase. O tema escuro usa grafite neutro nas superfícies, texto claro com hierarquia preservada e o vinho da IEJB como acento. Controles nativos recebem `color-scheme: dark`, e o foco visível continua destacado. A tela de entrada e a abertura HTML também leem a preferência antes da primeira pintura. A tela nativa inicial do PWA ainda usa a cor estática `#FDFAF5` definida no manifesto; ela não acompanha a escolha local nesta versão.
+
+Os tokens semânticos são a fonte da paleta (`tokens.css`). Componentes antigos com cores fixas são revisados por área para evitar cartões claros soltos, status apagados ou texto de baixo contraste. QR codes e conteúdos cuja leitura exige branco/preto mantêm fundo branco.
 
 ### 3.2 Tipografia (atalhos `font:`)
 | Token | Valor | Uso |
@@ -274,6 +278,9 @@ Semana normal → cartão vermelho. **Véspera** e **dia de culto** → capa com
 O destaque do Início passa a mostrar o próximo culto ativo para todas as contas aprovadas, e não somente o próximo culto em que a pessoa serve. Quem está numa escala publicada no próximo culto continua vendo seus instrumentos; na véspera e no dia, mantém a capa personalizada com repertório e equipe. Sem participação na escala daquele culto, o cartão mostra data e horário e abre a Agenda. A Agenda lista os cultos ativos da igreja e marca a participação pessoal quando houver. Se não houver culto futuro cadastrado, o destaque não aparece. O restante da ordem permanece: pendências que pedem atenção, próximo culto, Mural e eventos do site. Os cultos futuros continuam dependendo da geração autorizada pelo fluxo Escala/Montar.
 
 O mural busca as 30 publicações recentes e, em uma consulta complementar, todos os posts com `fixado_ate` válido. Une por ID e ordena os fixados primeiro; assim, um aviso antigo não sai da lista por ficar fora do limite de recentes.
+
+### 13.9 Aparência escura (D74, 25/11/2026)
+Preferência local em **Você**, com três opções: Seguir sistema, Claro e Escuro. O tema escuro usa grafite em vez de preto puro e mantém vinho em pequenos pontos de identidade. A tela de entrada e a abertura recebem a escolha antes da primeira pintura. Não altera dados, permissões nem configuração do Supabase.
 
 ### 13.4 Acabamento
 Transição do cartão do compromisso para a Escala (View Transitions, `view-transition-name: compromisso`); "gota" que desliza entre as abas; traço que desliza na casa do Louvor; título compacto no cabeçalho ao rolar (`util/rolagem.js`); puxar para atualizar com a chama (só no app instalado).

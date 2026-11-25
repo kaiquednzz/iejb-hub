@@ -7,6 +7,7 @@ import { cabecalhoApp, avatar, papelPrincipal, sair } from './moldura.js';
 import { textoAniversario, folhaAniversario } from './aniversarios.js';
 import { abrirTour } from './tour.js';
 import { nomeDoTitulo } from '../util/titulos.js';
+import { definirPreferenciaTema, preferenciaTema } from '../util/tema.js';
 
 // Linha de lista: ícone, nome, texto de apoio e seta. Toda a linha é o link.
 export function linhaLista({ href, nome, texto, nomeIcone }) {
@@ -31,6 +32,39 @@ function linhaBotao({ nome, texto, nomeIcone, aoTocar }) {
 }
 
 const MESES = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
+
+function secaoAparencia() {
+    const opcoes = [
+        ['sistema', 'Seguir sistema'],
+        ['claro', 'Claro'],
+        ['escuro', 'Escuro'],
+    ];
+    const atual = preferenciaTema();
+    const descricao = h('p', { class: 'aparencia-descricao', 'aria-live': 'polite' },
+        atual === 'sistema' ? 'Acompanhando a aparência do aparelho.' : `Tema ${atual} ativado.`);
+    const botoes = opcoes.map(([modo, nome]) => {
+        const botao = h('button', {
+            type: 'button', class: 'aparencia-opcao', 'aria-pressed': String(atual === modo),
+        }, nome);
+        botao.addEventListener('click', () => {
+            definirPreferenciaTema(modo);
+            botoes.forEach(([opcao], i) => {
+                const escolhido = opcao === modo;
+                const el = grupo.querySelectorAll('button')[i];
+                el.setAttribute('aria-pressed', String(escolhido));
+            });
+            descricao.textContent = modo === 'sistema'
+                ? 'Acompanhando a aparência do aparelho.' : `Tema ${modo} ativado.`;
+        });
+        return [modo, nome, botao];
+    });
+    const grupo = h('div', { class: 'aparencia-opcoes', role: 'group', 'aria-label': 'Escolha a aparência' },
+        ...botoes.map(([, , botao]) => botao));
+    return h('section', { class: 'secao-aparencia', 'aria-labelledby': 'titulo-aparencia' },
+        h('h2', { id: 'titulo-aparencia', class: 'rotulo-secao' }, 'Aparência'),
+        h('div', { class: 'grupo-lista aparencia-cartao' },
+            h('div', { class: 'aparencia-controles' }, grupo, descricao)));
+}
 
 // Carteirinha digital (redesign v2, fase 3): o cartão da pessoa no Hub, com
 // foto, nome, papel e ministério. O reflexo é uma faixa de luz lisa (sem
@@ -106,6 +140,7 @@ export function telaVoce(conta) {
                     aoTocar: (b) => folhaAniversario(conta, () => { b.querySelector('.item-apoio').textContent = textoAniversario(conta.pessoa) ?? 'Adicionar'; }) }),
                 linhaLista({ href: '#/oracao', nome: 'Pedidos de oração', nomeIcone: 'coracao' }),
                 linhaBotao({ nome: 'Como usar o app', nomeIcone: 'info', aoTocar: () => abrirTour(conta) })),
+            secaoAparencia(),
             h('h2', { class: 'rotulo-secao' }, 'Sobre o app'),
             h('ul', { class: 'grupo-lista' },
                 linhaLista({ href: '#/privacidade', nome: 'Política de privacidade', nomeIcone: 'escudo' }),

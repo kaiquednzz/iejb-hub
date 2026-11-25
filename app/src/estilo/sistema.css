@@ -1582,3 +1582,103 @@ blockquote.mural-palavra { position: relative; margin: 0; padding: 30px 0 0 var(
 .opcoes-ministerios { display: grid; gap: 2px; }
 /* A faixa de aniversário não cola na saudação */
 .inicio-ola-area + .aniversarios, .inicio-avisos + .aniversarios { margin-top: var(--esp-2); }
+
+/* --- Aparência escura ------------------------------------------------------ */
+html[data-tema="escuro"] body,
+html[data-tema="escuro"] .tela-app,
+html[data-tema="escuro"] .carregando-inicial { background-color: var(--cor-fundo); }
+html[data-tema="escuro"] .entrada-cartao { background: var(--cor-superficie); color: var(--cor-texto); }
+html[data-tema="escuro"] .entrada-cartao h1 { color: var(--cor-titulo); }
+html[data-tema="escuro"] .entrada-cartao :is(input, textarea, select) { background: var(--cor-superficie-rebaixada); color: var(--cor-texto); }
+
+/* Superfícies que ainda tinham branco fixo antes da introdução dos tokens. */
+html[data-tema="escuro"] :is(
+    .cartao-culto, .semana-escala, .lista-linhas, .cartao-pedido, .cartao-grupo,
+    .fichas-outro-campo:focus, .opcao, .credenciais, .evento-linha, .evento-imagem, .previa-cartao,
+    .fin-contagem, .fin-resumo, .fin-linhas, .fin-opcao, .fin-valor, .fin-entrada,
+    .fin-detalhe, .cartao-conferir, .fin-an-topo, .fin-an-bloco, .historico-culto,
+    .historico-musica, .evento-bloco, .cartao-semana, .chip-grupo, .fichas-chip,
+    .previa-whatsapp, .opcao-mesa, .cartao-mesa, .lista-cultos .estado
+) { background-color: var(--cor-superficie); color: var(--cor-texto); }
+html[data-tema="escuro"] :is(.historico-busca, .busca-musica, .inicio-compromisso.vazio) {
+    background-color: var(--cor-superficie);
+    color: var(--cor-texto);
+}
+html[data-tema="escuro"] .inicio-compromisso.vazio { border-color: var(--cor-borda); }
+html[data-tema="escuro"] .segmentos::before { background: var(--cor-superficie); }
+html[data-tema="escuro"] :is(.botao-streaming, .linha-editor, .opcao-culto, .resultado-musica, .resultado-novo, .ficha, .seletor, .escolha-pessoa) {
+    background-color: var(--cor-superficie);
+    color: var(--cor-texto);
+    border-color: var(--cor-borda);
+}
+html[data-tema="escuro"] :is(.ficha[aria-pressed="true"], .ficha[aria-checked="true"], .chip-grupo[aria-pressed="true"]) {
+    background: var(--cor-marca);
+    border-color: var(--cor-marca);
+    color: var(--cor-sobre-marca);
+}
+html[data-tema="escuro"] .escolha-pessoa[aria-checked="true"] {
+    background: var(--cor-marca);
+    border-color: var(--cor-marca);
+    color: var(--cor-sobre-marca);
+}
+html[data-tema="escuro"] .opcao:has(input:checked) { background: var(--cor-marca-sutil); border-color: var(--cor-marca); }
+html[data-tema="escuro"] .resultado-icone { color: var(--cor-sobre-marca); }
+
+html[data-tema="escuro"] :is(
+    .grupo-lista, .cartao-culto, .semana-escala, .lista-linhas, .cartao-pedido,
+    .cartao-grupo, .fin-contagem, .fin-resumo, .fin-linhas, .fin-opcao,
+    .fin-detalhe, .cartao-conferir, .fin-an-topo, .fin-an-bloco, .historico-culto,
+    .evento-linha, .evento-imagem, .previa-cartao, .evento-bloco, .cartao-semana,
+    .previa-whatsapp, .opcao, .opcao-mesa, .chip-grupo,
+    .campo-texto, .fin-entrada, .fin-valor, .historico-busca, .busca-musica
+) { border-color: var(--cor-borda); }
+
+html[data-tema="escuro"] .entrada-cartao,
+html[data-tema="escuro"] .cartao-culto,
+html[data-tema="escuro"] .grupo-lista,
+html[data-tema="escuro"] .lista-linhas { box-shadow: var(--elev-1); }
+html[data-tema="escuro"] :is(.cabecalho, .montar-acoes, .barra-abas::before) { background: var(--cor-superficie-vidro); }
+html[data-tema="escuro"] .capa-ministerio { background: #292E35; color: var(--cor-texto); border: 1px solid var(--cor-borda); }
+html[data-tema="escuro"] .carteirinha { background: #24282E; border: 1px solid #4C545E; border-top: 3px solid var(--cor-marca); }
+html[data-tema="escuro"] .carteirinha-topo { color: var(--cor-marca); }
+html[data-tema="escuro"] .destaque:not(.inicio-compromisso) { background: #6E0908; }
+html[data-tema="escuro"] .fin-saldo { background: #292E35; border: 1px solid var(--cor-borda); }
+html[data-tema="escuro"] .cartao-culto.cancelado { opacity: 1; background: var(--cor-superficie-rebaixada); }
+html[data-tema="escuro"] :is(.selo-voce, .aba-contador, .segmento-contador) { color: var(--cor-sobre-marca); }
+html[data-tema="escuro"] .selo-admin { background: var(--cor-superficie-rebaixada); color: var(--cor-texto-2); }
+html[data-tema="escuro"] :is(.botao-perigo, .item-contador, .rotulo-culto, .convite-passos li::before) { color: var(--cor-sobre-marca); }
+html[data-tema="escuro"] .inicio-compromisso:not(.vazio):not(.esqueleto) { background: #6E0908; }
+html[data-tema="escuro"] .evento-bloco.agora .evento-bloco-data,
+html[data-tema="escuro"] .bloco-dia.sel,
+html[data-tema="escuro"] .agenda-culto:not(.nao-vai) .bloco-data,
+html[data-tema="escuro"] .inicio-dia { background: #6E0908; }
+html[data-tema="escuro"] .dia-botao-claro { color: #6E0908; }
+html[data-tema="escuro"] .sou-eu .pessoa-avatar { color: var(--cor-sobre-marca); }
+html[data-tema="escuro"] .aviso-form[data-tipo="info"] { background: var(--cor-atencao-sutil); color: var(--cor-atencao); }
+html[data-tema="escuro"] .fin-conta { background: rgba(255, 255, 255, 0.06); }
+html[data-tema="escuro"] .fin-qr { background: #fff; }
+
+.secao-aparencia { margin-top: var(--esp-8); }
+.secao-aparencia .rotulo-secao { margin-top: 0; }
+.aparencia-cartao { padding: var(--esp-3); }
+.aparencia-controles { display: grid; gap: var(--esp-3); }
+.aparencia-opcoes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--esp-2); }
+.aparencia-opcao {
+    min-height: 44px;
+    padding: 8px 6px;
+    border: 1px solid var(--cor-borda-forte);
+    border-radius: var(--raio-2);
+    background: var(--cor-superficie);
+    color: var(--cor-texto-2);
+    font: 600 13px/1.2 var(--fonte-texto);
+    cursor: pointer;
+}
+.aparencia-opcao[aria-pressed="true"] {
+    border-color: var(--cor-marca);
+    background: var(--cor-marca-sutil);
+    color: var(--cor-texto);
+}
+.aparencia-descricao { padding-inline: var(--esp-1); font: var(--texto-apoio); color: var(--cor-texto-2); }
+@media (forced-colors: active) {
+    .aparencia-opcao[aria-pressed="true"] { outline: 2px solid Highlight; outline-offset: 2px; }
+}

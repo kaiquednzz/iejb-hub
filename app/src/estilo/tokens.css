@@ -8,6 +8,7 @@
    ========================================================================== */
 
 :root {
+    color-scheme: light;
     /* --- 1. Primitivas ---------------------------------------------------- */
     --vermelho-900: #500403;
     --vermelho-800: #6E0908;
@@ -113,6 +114,10 @@
     --cor-foco: var(--vermelho-500);
     --foco: var(--cor-foco);
 
+    /* Superfícies translúcidas usadas por barras e camadas sobre cartões. */
+    --cor-superficie-vidro: rgba(253, 250, 245, 0.9);
+    --cor-borda-vidro: var(--cor-borda);
+
     /* O logo PNG é branco; este filtro pinta de vermelho da marca */
     --logo-vermelho: brightness(0) invert(38%) sepia(91%) saturate(2925%) hue-rotate(-23deg) brightness(55%) contrast(126%);
 
@@ -143,6 +148,63 @@
     --raio-m: 16px;
     --raio-l: var(--raio-3);
     --raio-capsula: var(--raio-pilula);
+}
+
+/* Aparência escura: grafite neutro; o vinho permanece como acento da marca. */
+html[data-tema="escuro"] {
+    color-scheme: dark;
+    --cor-fundo: #17191D;
+    --cor-superficie: #202329;
+    --cor-superficie-rebaixada: #292E35;
+    --cor-borda: #3B424C;
+    --cor-borda-forte: #535D69;
+    --cor-borda-campo: #687482;
+    --cor-texto: #F2F3F5;
+    --cor-texto-2: #C4CAD2;
+    --cor-texto-3: #A3ABB5;
+    --cor-titulo: #F1E9E7;
+    --cor-marca: #F09A94;
+    --cor-marca-hover: #FFB0AA;
+    --cor-marca-viva: #FFAAA4;
+    --cor-marca-sutil: #422B2E;
+    --cor-marca-sutil-2: #302629;
+    --cor-sobre-marca: #241719;
+    --cor-sucesso: #85D8A5;
+    --cor-sucesso-sutil: #20392D;
+    --cor-atencao: #F0C27A;
+    --cor-atencao-sutil: #403421;
+    --cor-perigo: #FF8C87;
+    --cor-perigo-sutil: #402527;
+    --cor-info: #8DC7F2;
+    --cor-info-sutil: #223749;
+    --cor-foco: #FFC0B9;
+    --foco: var(--cor-foco);
+    --tinta-900: #F2F3F5;
+    --tinta-700: #F1E9E7;
+    --tinta-600: #C4CAD2;
+    --tinta-400: #A3ABB5;
+    --creme-500: #687482;
+    --verde-700: #85D8A5;
+    --verde-100: #20392D;
+    --ambar-700: #F0C27A;
+    --ambar-100: #403421;
+    --azul-700: #8DC7F2;
+    --azul-100: #223749;
+    --principal: var(--cor-marca);
+    --principal-brighter: var(--cor-marca-viva);
+    --principal-escuro: #17191D;
+    --secondary: #333840;
+    --background: var(--cor-fundo);
+    --fundo-rosado: #302629;
+    --texto: var(--cor-texto);
+    --texto-2: var(--cor-texto-2);
+    --texto-vinho: #E5B0AC;
+    --vidro-claro: rgba(32, 35, 41, 0.82);
+    --vidro-borda: var(--cor-borda);
+    --cor-superficie-vidro: rgba(32, 35, 41, 0.9);
+    --cor-borda-vidro: rgba(196, 202, 210, 0.16);
+    --elev-1: 0 1px 2px rgba(0, 0, 0, 0.24);
+    --elev-2: 0 8px 24px rgba(0, 0, 0, 0.38), 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 @supports (transition-timing-function: linear(0, 1)) {

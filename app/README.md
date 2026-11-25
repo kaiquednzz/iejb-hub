@@ -107,6 +107,10 @@ Dois tropeços que valem a lição:
    tentando de novo no 4G instável, mas desiste na hora quando o aparelho
    já sabe que está sem rede.
 
+## Aparência
+
+Em **Você → Aparência**, a pessoa escolhe Seguir sistema, Claro ou Escuro. A escolha é salva no armazenamento local deste aparelho (chave `iejb-aparencia`); não é enviada ao Supabase. Os tokens e a aplicação do tema ficam em `src/estilo/tokens.css` e `src/util/tema.js`. O HTML inicial define o tema antes de carregar a interface para reduzir a mudança de cor na abertura. A tela nativa inicial do PWA ainda usa a cor estática do manifesto (`#FDFAF5`), sem acompanhar essa escolha.
+
 ## Testado como
 
 Chrome headless com as respostas do Supabase simuladas (sessão falsa no

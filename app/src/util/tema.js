@@ -1,11 +1,45 @@
-// Cor do topo do celular (meta theme-color). Cada troca de tela volta para a
-// cor padrão (main.js); uma tela pode pedir outra, como a capa vermelha do
-// dia de culto no Início.
+// Preferência de aparência fica no aparelho: não é um dado de conta.
+const CHAVE = 'iejb-aparencia';
+const CORES_TOPO = { claro: '#FDFAF5', escuro: '#17191D' };
 const meta = () => document.querySelector('meta[name="theme-color"]');
-let padrao = null;
+const sistema = () => window.matchMedia?.('(prefers-color-scheme: dark)');
+
+export function preferenciaTema() {
+    try {
+        const modo = localStorage.getItem(CHAVE);
+        return ['sistema', 'claro', 'escuro'].includes(modo) ? modo : 'sistema';
+    } catch { return 'sistema'; }
+}
+
+function aplicar(modo = preferenciaTema()) {
+    const escuro = modo === 'escuro' || (modo === 'sistema' && sistema()?.matches);
+    document.documentElement.dataset.tema = escuro ? 'escuro' : 'claro';
+    const m = meta();
+    if (m && !corTopoSolicitada) m.content = escuro ? CORES_TOPO.escuro : CORES_TOPO.claro;
+    return escuro;
+}
+
+export function definirPreferenciaTema(modo) {
+    if (!['sistema', 'claro', 'escuro'].includes(modo)) return;
+    try { localStorage.setItem(CHAVE, modo); } catch { /* preferência vale nesta sessão */ }
+    aplicar(modo);
+}
+
+// Chamado na inicialização para ligar mudanças do sistema quando necessário.
+const media = sistema();
+const aoMudarSistema = () => {
+    if (preferenciaTema() === 'sistema') aplicar('sistema');
+};
+if (media?.addEventListener) media.addEventListener('change', aoMudarSistema);
+else media?.addListener?.(aoMudarSistema);
+
+let corTopoSolicitada = null;
 export function corDoTopo(cor) {
+    corTopoSolicitada = cor ?? null;
     const m = meta();
     if (!m) return;
-    padrao ??= m.content;
-    m.content = cor ?? padrao;
+    if (corTopoSolicitada) m.content = corTopoSolicitada;
+    else aplicar();
 }
+
+aplicar();
