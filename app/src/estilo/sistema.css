@@ -582,6 +582,7 @@ main .rotulo-secao::before { content: counter(secao, upper-roman) ".\00a0\00a0" 
 .agenda-mes-nome span { font-style: normal; color: var(--cor-texto-3); font-size: 20px; }
 .agenda-culto .bloco-data { background: var(--cor-marca); }
 .agenda-culto .bloco-data-dia, .agenda-culto .bloco-data-mes { color: #fff; }
+.agenda-culto-informativo { cursor: default; }
 .agenda-culto.nao-vai .bloco-data { background: var(--cor-superficie-rebaixada); }
 .agenda-culto.nao-vai .bloco-data-dia { color: var(--cor-texto-3); }
 .agenda-culto.nao-vai .bloco-data-mes { color: var(--cor-texto-3); }

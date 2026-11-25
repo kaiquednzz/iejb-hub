@@ -28,6 +28,7 @@ src/offline.js        cópia local da conta e da última escala (apagada ao sair
 src/supabase.js       o cliente único do Supabase
 src/sessao.js         lê a conta logada, nome curto, tradução de erros
 src/telas/            uma função por tela; cada uma devolve um elemento pronto
+src/telas/inicio.js   próximo culto para todos; detalhes pessoais quando a pessoa está escalada
 src/telas/equipe/     tela Equipe: pedidos de acesso, pessoas e grupos (uma seção por arquivo)
 src/telas/montar/     tela Montar escala (líder de louvor): mês, semanas, culto, mesa, WhatsApp
 src/util/foto.js      fotos de perfil: comprime no aparelho, sobe, mostra (avatar)

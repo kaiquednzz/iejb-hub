@@ -270,6 +270,11 @@ Motivo: a v1 deixou o app organizado, mas neutro ("só mais um app"). A v2 dá p
 ### 13.3 O ritmo da semana (Início)
 Semana normal → cartão vermelho. **Véspera** e **dia de culto** → capa com contagem (relógio de Brasília), ordem do louvor numerada com tons, rostos de quem toca junto, Ver a escala / Ouvir tudo / Mandar no WhatsApp. **Depois do culto** (2h30 após o início) → "Obrigado por tocar hoje" + o que foi tocado. `theme-color` vermelho no dia de culto (vale no Android; no iPhone instalado a barra de status segue o fundo da página).
 
+### 13.8 Início para toda a igreja (D73, 25/11/2026)
+O destaque do Início passa a mostrar o próximo culto ativo para todas as contas aprovadas, e não somente o próximo culto em que a pessoa serve. Quem está numa escala publicada no próximo culto continua vendo seus instrumentos; na véspera e no dia, mantém a capa personalizada com repertório e equipe. Sem participação na escala daquele culto, o cartão mostra data e horário e abre a Agenda. A Agenda lista os cultos ativos da igreja e marca a participação pessoal quando houver. Se não houver culto futuro cadastrado, o destaque não aparece. O restante da ordem permanece: pendências que pedem atenção, próximo culto, Mural e eventos do site. Os cultos futuros continuam dependendo da geração autorizada pelo fluxo Escala/Montar.
+
+O mural busca as 30 publicações recentes e, em uma consulta complementar, todos os posts com `fixado_ate` válido. Une por ID e ordena os fixados primeiro; assim, um aviso antigo não sai da lista por ficar fora do limite de recentes.
+
 ### 13.4 Acabamento
 Transição do cartão do compromisso para a Escala (View Transitions, `view-transition-name: compromisso`); "gota" que desliza entre as abas; traço que desliza na casa do Louvor; título compacto no cabeçalho ao rolar (`util/rolagem.js`); puxar para atualizar com a chama (só no app instalado).
 

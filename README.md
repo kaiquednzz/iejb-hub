@@ -16,10 +16,10 @@ Está no ar em [`app.iejb.com.br`](https://app.iejb.com.br) (acesso só para int
 
 | Área | O que tem |
 |---|---|
-| **Início** | O próximo compromisso da pessoa (com contagem regressiva e o repertório no dia em que ela toca), aviso de aniversário de amanhã, contagem do caixa esperando a conferência dela, pedidos de acesso (admin) e o mural. |
+| **Início** | O próximo culto para toda a igreja; quando a pessoa está escalada no Louvor, o destaque inclui a participação dela, a contagem regressiva e o repertório na véspera e no dia. Também mostra aniversários, pendências de acordo com o acesso e o mural. |
 | **Mural** | Avisos, fotos do culto e palavra, publicados pelo pastor e pela Comunicação, com fixar, guardar, editar e compartilhar no WhatsApp. Reações (Amém e coração) mostram quem reagiu. Cada membro compartilha **uma vez por semana** uma foto ou uma palavra (versículo ou mensagem curta); esses posts somem sozinhos em 90 dias. |
 | **Oração** | O membro escolhe para qual pastor ou pastora manda o pedido, pode esconder o nome e recebe "Orei por você" quando o pastor marcar. O pastor recebe o pedido como notificação. O pedido some em 30 dias. |
-| **Agenda** | As escalas da pessoa e os eventos da igreja, mês a mês. |
+| **Agenda** | Os cultos da igreja, os eventos publicados no site e a indicação de quando a pessoa está escalada, mês a mês. |
 | **Ministérios** | Louvor e os outros ministérios (Kids, Recepção, Intercessão...) com a lista de quem serve e lidera. O admin cria ministérios novos. |
 | **Pessoas** | O cadastro da igreja toda: título (pastor, presbítero, diácono, membro...), ministérios de cada um, permissões (Tesouraria, Comunicação, Vê o caixa) e convite pelo Gmail ou por um QR code grandão; quem entra pelo convite cai direto num pedido de acesso para o admin aprovar. |
 | **Louvor: Escala** | As semanas em blocos (domingo, terça, sábado de jovens). Tocar no dia abre quem toca, os instrumentos e o repertório. "Não vou poder ir" avisa os líderes na hora. Funciona sem internet com a última escala vista. |

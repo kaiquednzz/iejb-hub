@@ -60,24 +60,32 @@ export function blocoMural(conta, { aoCarregar } = {}) {
     return lugar;
 
     async function carregar() {
-        const [{ data, error }, espaco_] = await Promise.all([
-            supabase.from('mural_publicacao')
-                .select(`id, tipo, titulo, texto, referencia, fotos, fixado_ate, criado_em, criado_por, de_membro, guardar,
+        const hoje = hojeEmBrasilia();
+        const selecao = `id, tipo, titulo, texto, referencia, fotos, fixado_ate, criado_em, criado_por, de_membro, guardar,
                          culto:culto_id ( nome ),
-                         autor:criado_por ( nome, apelido, foto ), mural_reacao ( pessoa_id, tipo, pessoa:pessoa_id ( nome, apelido, foto ) )`)
+                         autor:criado_por ( nome, apelido, foto ), mural_reacao ( pessoa_id, tipo, pessoa:pessoa_id ( nome, apelido, foto ) )`;
+        const [recentes, fixados, espaco_] = await Promise.all([
+            supabase.from('mural_publicacao')
+                .select(selecao)
                 .order('criado_em', { ascending: false })
                 .limit(LIMITE),
+            // Busca todos os avisos ainda fixados à parte: um post antigo não
+            // pode sumir só por ter ficado fora das 30 publicações recentes.
+            supabase.from('mural_publicacao')
+                .select(selecao)
+                .gte('fixado_ate', hoje)
+                .order('criado_em', { ascending: false }),
             supabase.rpc('posso_compartilhar'),
         ]);
         espaco = espaco_.data?.[0] ?? null;
-        if (error) {
-            console.error(error);
+        if (recentes.error || fixados.error) {
+            console.error(recentes.error ?? fixados.error);
             return; // sem rede: o mural só não aparece (a escala continua)
         }
-        // Fixados (até hoje, inclusive) primeiro; o resto do mais novo pro mais velho
-        const hoje = hojeEmBrasilia();
         const fixado = (p) => p.fixado_ate && p.fixado_ate >= hoje;
-        publicacoes = [...data.filter(fixado), ...data.filter((p) => !fixado(p))];
+        const unicas = new Map([...recentes.data, ...fixados.data].map((p) => [p.id, p]));
+        publicacoes = [...unicas.values()].sort((a, b) => Number(fixado(b)) - Number(fixado(a))
+            || b.criado_em.localeCompare(a.criado_em));
         await assinarFotos(publicacoes.flatMap((p) => p.fotos.map(miniatura)));
         desenhar();
         aoCarregar?.();

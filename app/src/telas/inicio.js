@@ -5,10 +5,10 @@
 //     cartão vira uma capa com a contagem, a ordem do louvor com os tons e
 //     os rostos de quem toca junto (a cor do topo do celular fica vermelha);
 //   * depois do culto: um agradecimento e o que vocês tocaram.
-// Não há dado novo: é a mesma escala e o mesmo repertório da tela Escala.
+// Cultos são da igreja toda; a participação pessoal continua vindo da escala.
 //
 // Ordem da tela: saudação → "precisa da sua atenção" (só se houver: contagem
-// para conferir, pedidos de acesso) → compromisso (só de quem serve) →
+// para conferir, pedidos de acesso) → próximo culto →
 // Mural (D68) → Vem aí (eventos do site).
 // Ministérios e áreas ficam na aba Ministérios.
 import { iconeInstrumento, instrumentosComIcone } from '../util/instrumentos.js';
@@ -29,7 +29,6 @@ import { filaDoYoutube } from '../util/musica.js';
 import { chama, marcarEscalado } from '../util/chama.js';
 import { botaoWhatsRepertorio } from '../util/compartilhar.js';
 import { corDoTopo } from '../util/tema.js';
-import { serveNoLouvor } from '../sessao.js';
 
 const DURACAO_DO_CULTO_MIN = 150; // depois disso o culto conta como encerrado
 
@@ -45,12 +44,8 @@ function dataDeHoje() {
 
 export function telaInicio(conta) {
     const primeiroNome = conta.pessoa?.apelido?.trim() || (conta.pessoa?.nome || conta.nome_informado || '').split(' ')[0];
-    // Quem não serve em nenhum ministério (D68: o Hub é da igreja toda) não
-    // tem escala: o Início dele começa direto no mural
-    const serve = serveNoLouvor(conta); // só o Louvor tem escala (D71)
-    const destaque = serve
-        ? h('div', { class: 'inicio-destaque', 'aria-live': 'polite' }, h('div', { class: 'inicio-compromisso esqueleto' }))
-        : null;
+    const destaque = h('div', { class: 'inicio-destaque', 'aria-live': 'polite' },
+        h('div', { class: 'inicio-compromisso esqueleto' }));
     const avisosAdmin = h('div', { class: 'inicio-avisos' });
     const conferir = blocoConferir(conta); // contagem esperando esta pessoa conferir (D48)
 
@@ -69,7 +64,7 @@ export function telaInicio(conta) {
         ),
     );
 
-    if (destaque) carregarCompromisso(conta, destaque);
+    carregarCompromisso(conta, destaque);
     if (conta.e_administrador) carregarPedidos(avisosAdmin);
     carregarOracao(conta, avisosAdmin);
     mostrarBoasVindasSePrimeiraVez(conta);
@@ -115,47 +110,49 @@ const CONSULTA_DO_DIA = `
 async function carregarCompromisso(conta, destaque) {
     const meuId = conta.pessoa?.id;
     const hoje = hojeEmBrasilia();
-    let cultos = null;
-    const { data, error } = await supabase.from('culto')
-        .select('id, nome, rotulo, data, horario, escala!inner ( estado, escala_item!inner ( pessoa_id, instrumento_exibido, saiu_em ) )')
+    let cultos;
+    let consulta = supabase.from('culto')
+        .select('id, nome, rotulo, data, horario, estado, escala ( estado, escala_item ( pessoa_id, instrumento_exibido, saiu_em ) )')
         .eq('estado', 'ativo').gte('data', hoje)
-        .eq('escala.estado', 'publicada').eq('escala.escala_item.pessoa_id', meuId)
-        .order('data').order('horario').limit(3);
+        .order('data').order('horario').limit(40);
+    // O culto continua vindo mesmo sem escala da pessoa; os itens embutidos
+    // ficam limitados à própria conta, como na consulta anterior.
+    if (meuId) consulta = consulta.eq('escala.escala_item.pessoa_id', meuId);
+    const { data, error } = await consulta;
     const offline = Boolean(error);
     cultos = offline ? (escalaGuardada(conta.id)?.cultos ?? []) : data;
 
-    const meus = cultos.filter((c) => c.data >= hoje && c.escala?.some((e) => e.estado === 'publicada' &&
-        e.escala_item.some((i) => i.pessoa_id === meuId && !naoVai(i))));
-    // O culto de hoje que já acabou não é mais "o próximo": vira o "obrigado"
-    const encerradoHoje = meus.find((c) => c.data === hoje && minutosAte(c) < -DURACAO_DO_CULTO_MIN);
-    const proximo = meus.find((c) => c !== encerradoHoje);
-    marcarEscalado(proximo?.data ?? null);
+    const escalado = (c) => c.escala?.some((e) => e.estado === 'publicada' &&
+        e.escala_item.some((i) => i.pessoa_id === meuId && !naoVai(i)));
+    const encerradoHoje = cultos.find((c) => c.data === hoje && escalado(c) && minutosAte(c) < -DURACAO_DO_CULTO_MIN);
+    const proximo = cultos.find((c) => c.data >= hoje &&
+        !(c.data === hoje && minutosAte(c) < -DURACAO_DO_CULTO_MIN));
+    marcarEscalado(cultos.find((c) => c.data >= hoje && escalado(c) &&
+        !(c.data === hoje && minutosAte(c) < -DURACAO_DO_CULTO_MIN))?.data ?? null);
 
     if (encerradoHoje) {
         const completo = await cultoCompleto(conta, encerradoHoje, offline);
         destaque.replaceChildren(cartaoDepois(completo));
-        if (proximo) destaque.append(cartaoNormal(proximo, meuId));
+        if (proximo) destaque.append(cartaoNormal(proximo, meuId, Boolean(escalado(proximo))));
         return;
     }
     if (!proximo) {
-        destaque.replaceChildren(h('a', { class: 'inicio-compromisso vazio', href: '#/agenda' },
-            h('span', { class: 'compromisso-rotulo' }, 'Sua agenda'),
-            h('span', { class: 'compromisso-titulo' }, 'Nenhuma escala sua pela frente'),
-            h('span', { class: 'compromisso-acao' }, 'Ver a agenda', icone('seta', 'icone icone-p'))));
+        destaque.remove();
         return;
     }
     const dias = diasEntre(hoje, proximo.data);
-    if (dias <= 1) {
+    const participa = Boolean(escalado(proximo));
+    if (participa && dias <= 1) {
         const completo = await cultoCompleto(conta, proximo, offline);
         destaque.replaceChildren(cartaoDoDia(completo, meuId, dias === 0 ? 'dia' : 'vespera'));
         corDoTopo('#8F0D0B'); // o topo do celular acompanha a capa vermelha
         return;
     }
-    destaque.replaceChildren(cartaoNormal(proximo, meuId));
+    destaque.replaceChildren(cartaoNormal(proximo, meuId, participa));
 }
 
-// O culto com todo mundo da escala e o repertório (a consulta de cima só traz
-// a linha da própria pessoa). Sem internet, usa a cópia guardada da Escala.
+// O culto com toda a escala publicada e o repertório, usado só quando a pessoa
+// participa. Sem internet, usa a cópia guardada da Escala.
 async function cultoCompleto(conta, culto, offline) {
     if (!offline) {
         const { data, error } = await supabase.from('culto').select(CONSULTA_DO_DIA).eq('id', culto.id)
@@ -172,16 +169,16 @@ function meusInstrumentos(culto, meuId) {
     return lista;
 }
 
-function cartaoNormal(proximo, meuId) {
+function cartaoNormal(proximo, meuId, participa) {
     const falta = quantoFalta(proximo.data);
-    return h('a', { class: 'inicio-compromisso', href: '#/escala' },
+    return h('a', { class: 'inicio-compromisso', href: participa ? '#/escala' : '#/agenda' },
         h('span', { class: 'compromisso-rotulo' },
-            h('span', null, 'Próximo compromisso'),
+            h('span', null, 'Próximo culto'),
             falta && h('span', { class: 'compromisso-falta' }, falta)),
         h('span', { class: 'compromisso-titulo' }, proximo.nome, proximo.rotulo ? ` · ${proximo.rotulo}` : ''),
         h('span', { class: 'compromisso-quando' }, `${rotuloDoDia(proximo.data)} · ${formatarHorario(proximo.horario)}`),
-        h('span', { class: 'compromisso-chips' }, meusInstrumentos(proximo, meuId).map((x) => h('span', { class: 'compromisso-chip' }, iconeInstrumento(x), x))),
-        h('span', { class: 'compromisso-acao' }, 'Ver escala e repertório', icone('seta', 'icone icone-p')));
+        participa && h('span', { class: 'compromisso-chips' }, meusInstrumentos(proximo, meuId).map((x) => h('span', { class: 'compromisso-chip' }, iconeInstrumento(x), x))),
+        h('span', { class: 'compromisso-acao' }, participa ? 'Ver escala e repertório' : 'Ver agenda', icone('seta', 'icone icone-p')));
 }
 
 // A capa do dia de culto (e da véspera): o momento mais importante da semana

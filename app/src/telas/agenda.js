@@ -1,7 +1,5 @@
-// Agenda (redesign v2): tudo o que é da pessoa, de qualquer ministério, numa
-// linha do tempo só, agrupada por mês, como um boletim: os cultos em que ela
-// toca (escala publicada) e os eventos da igreja. Não traz dado novo: são as
-// mesmas consultas do Início e da Escala, juntas e em ordem.
+// Agenda (redesign v2): cultos da igreja, participação pessoal quando houver
+// escala publicada, e eventos do site, numa linha do tempo só por mês.
 import { h, icone } from '../util/dom.js';
 import { supabase } from '../supabase.js';
 import { hojeEmBrasilia, somarDias, formatarHorario, partesDaData, diasEntre } from '../util/datas.js';
@@ -32,7 +30,7 @@ export function telaAgenda(conta) {
     return tela;
 
     async function carregar() {
-        const [cultos, eventos] = await Promise.all([meusCultos(conta), proximosEventos().catch(() => [])]);
+        const [cultos, eventos] = await Promise.all([cultosDaIgreja(conta), proximosEventos().catch(() => [])]);
         lista.removeAttribute('aria-busy');
         const itens = [
             ...cultos.map((c) => ({ tipo: 'culto', data: c.data, hora: c.horario, c })),
@@ -70,35 +68,43 @@ export function telaAgenda(conta) {
     }
 }
 
-// Cultos com escala publicada em que a pessoa está, nas próximas semanas
-export async function meusCultos(conta) {
+// Cultos ativos da igreja nas próximas semanas. A escala embutida fica
+// filtrada para a pessoa atual, mas não remove da lista os cultos sem escala dela.
+export async function cultosDaIgreja(conta) {
     const meuId = conta.pessoa?.id;
-    if (!meuId) return [];
     const hoje = hojeEmBrasilia();
-    const { data, error } = await supabase.from('culto')
-        .select('id, nome, rotulo, data, horario, escala!inner ( estado, escala_item!inner ( pessoa_id, instrumento_exibido, saiu_em ) )')
+    let consulta = supabase.from('culto')
+        .select('id, nome, rotulo, data, horario, estado, escala ( estado, escala_item ( pessoa_id, instrumento_exibido, saiu_em ) )')
         .eq('estado', 'ativo').gte('data', hoje).lte('data', somarDias(hoje, SEMANAS * 7))
-        .eq('escala.estado', 'publicada').eq('escala.escala_item.pessoa_id', meuId)
         .order('data').order('horario');
+    if (meuId) consulta = consulta.eq('escala.escala_item.pessoa_id', meuId);
+    const { data, error } = await consulta;
     const cultos = error ? (escalaGuardada(conta.id)?.cultos ?? []).filter((c) => c.data >= hoje) : data;
-    const meus = cultos.filter((c) => c.escala?.some((e) => e.estado === 'publicada' && e.escala_item.some((it) => it.pessoa_id === meuId)));
-    marcarEscalado(meus.find((c) => c.escala.some((e) => e.escala_item.some((it) => it.pessoa_id === meuId && !naoVai(it))))?.data);
-    return meus;
+    const minhaEscala = (c) => c.escala?.some((e) => e.estado === 'publicada'
+        && e.escala_item.some((it) => it.pessoa_id === meuId && !naoVai(it)));
+    marcarEscalado(cultos.find(minhaEscala)?.data ?? null);
+    return cultos;
 }
 
 function linhaDoCulto(culto, conta, hoje) {
-    const eu = culto.escala.flatMap((e) => e.escala_item).find((i) => i.pessoa_id === conta.pessoa.id);
-    const vai = !naoVai(eu);
-    const funcoes = eu.instrumento_exibido.map((x) => (x === FUNCAO_MESA ? 'Mesa de som' : x)).join(', ');
+    const eu = (culto.escala ?? []).filter((e) => e.estado === 'publicada')
+        .flatMap((e) => e.escala_item ?? []).find((i) => i.pessoa_id === conta.pessoa?.id);
+    const vai = Boolean(eu) && !naoVai(eu);
+    const naoVaiPessoa = Boolean(eu) && naoVai(eu);
+    const funcoes = (eu?.instrumento_exibido ?? []).map((x) => (x === FUNCAO_MESA ? 'Mesa de som' : x)).join(', ');
     const p = partesDaData(culto.data);
     const dias = diasEntre(hoje, culto.data);
     const quando = dias === 0 ? 'Hoje' : dias === 1 ? 'Amanhã' : `${p.semana.charAt(0).toUpperCase()}${p.semana.slice(1)}`;
-    return h('a', { class: `item-lista agenda-culto${vai ? '' : ' nao-vai'}`, href: '#/escala' },
+    return h(eu ? 'a' : 'div', {
+        class: `item-lista agenda-culto${eu ? '' : ' agenda-culto-informativo'}${naoVaiPessoa ? ' nao-vai' : ''}`,
+        ...(eu ? { href: '#/escala' } : {}),
+    },
         blocoData(culto.data),
         h('span', { class: 'item-textos' },
             h('span', { class: 'item-nome' }, culto.nome, culto.rotulo ? ` · ${culto.rotulo}` : ''),
             h('span', { class: 'item-apoio' }, `${quando} · ${formatarHorario(culto.horario)}${funcoes ? ` · ${funcoes}` : ''}`),
-            h('span', { class: `agenda-marca${vai ? '' : ' agenda-marca-nao'}` }, vai ? 'Você toca' : 'Você avisou que não vai')),
+            h('span', { class: `agenda-marca${eu && !vai ? ' agenda-marca-nao' : ''}` },
+                !eu ? 'Culto da igreja' : vai ? 'Você serve' : 'Você avisou que não vai')),
         icone('seta', 'icone icone-p item-seta'));
 }
 
