@@ -79,7 +79,7 @@ function carteirinha(conta, pessoa, nome) {
     const desde = conta.criado_em ? `${MESES[Number(conta.criado_em.slice(5, 7)) - 1]} de ${conta.criado_em.slice(0, 4)}` : null;
     const cartao = h('section', { class: 'carteirinha', 'aria-label': `Carteirinha de ${nome}` },
         h('div', { class: 'carteirinha-topo' },
-            h('img', { src: '/logo-iejb-pequeno.png', alt: '', width: 13, height: 30 }),
+            h('img', { src: '/simbolo-fogo-iejb.png', alt: '', width: 15, height: 30 }),
             h('span', null, `IEJB · ${nomeDoTitulo(pessoa.titulo)}`)),
         h('div', { class: 'carteirinha-meio' },
             avatar(pessoa, 'pessoa-avatar carteirinha-foto'),

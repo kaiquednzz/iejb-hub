@@ -291,6 +291,10 @@ Achados e correções desta revisão:
 - Foram percorridas as rotas principais e de acesso em larguras móvel e desktop, com conta fictícia e respostas de consulta vazias. Isso permitiu revisar hierarquia, superfície, texto, seleção, navegação e vazios sem acessar nem alterar dados reais. Telas cujo conteúdo depende de registros existentes foram avaliadas no estado vazio; seus estados cheios e fluxos de gravação ainda dependem de conferência com dados de demonstração.
 
 Direção visual: priorizar hierarquia, leitura e familiaridade de feed como Instagram/Facebook, sem reproduzir seus elementos de marca. O vinho continua no tema claro e nos ativos institucionais; no escuro, não colore cartões, superfícies ou ações gerais. O destaque escuro usa cinzas neutros, sem introduzir azul como cor de marca.
+
+### 13.10 Símbolo compacto do Hub (D75, 25/11/2026)
+
+Nas marcas compactas que aparecem ao lado do nome ou de um rótulo — cabeçalho móvel, barra lateral, entrada, carregamento e carteirinha — usar somente o fogo. O PNG `public/simbolo-fogo-iejb.png` é recortado do ativo oficial e passa pelo mesmo filtro de cor do logo atual. A abertura animada e o ícone instalado do PWA mantêm o brasão completo, pois aparecem sem o nome escrito ao lado. O novo símbolo é incluído nos ativos estáticos do service worker.
 Preferência local em **Você**, com três opções: Seguir sistema, Claro e Escuro. Sem escolha salva, inicia em Claro, sem depender do sistema operacional. O escuro usa grafite e cinza claro em ações/seleção, sem vinho como cor geral nem azul como cor de marca. A tela de entrada e a abertura recebem a escolha antes da primeira pintura. Não altera dados, permissões nem configuração do Supabase.
 
 ### 13.4 Acabamento

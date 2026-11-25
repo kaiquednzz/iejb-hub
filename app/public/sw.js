@@ -17,7 +17,7 @@
 
 const CACHE_APP = 'iejb-hub-app';
 const CACHE_ASSETS = 'iejb-hub-assets';
-const ESTATICOS = ['/manifest.webmanifest', '/logo-iejb-pequeno.png', '/icone-192.png', '/favicon-96x96.png'];
+const ESTATICOS = ['/manifest.webmanifest', '/logo-iejb-pequeno.png', '/simbolo-fogo-iejb.png', '/icone-192.png', '/favicon-96x96.png'];
 
 self.addEventListener('install', (evento) => {
     evento.waitUntil((async () => {

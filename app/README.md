@@ -45,6 +45,10 @@ src/util/datas.js     datas sempre no fuso de Brasília
 src/estilo/           tokens (do site) → base → componentes → telas
 ```
 
+`public/simbolo-fogo-iejb.png` é a versão compacta do logo usada ao lado do
+nome “IEJB Hub” na interface. O brasão completo continua no ícone instalado e
+na animação de abertura.
+
 ## Fluxo das telas
 
 ```
