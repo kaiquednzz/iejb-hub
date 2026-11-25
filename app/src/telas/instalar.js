@@ -13,7 +13,7 @@ export function telaInstalar() {
     const tela = h('div', { class: 'tela tela-entrada tela-instalar' },
         h('main', { id: 'conteudo', class: 'entrada-palco' },
             h('div', { class: 'instalar-icone-app', 'aria-hidden': 'true' },
-                h('img', { src: '/icone-192.png', alt: '', width: 96, height: 96 })),
+                h('img', { src: '/icone-fogo-192.png', alt: '', width: 96, height: 96 })),
             h('section', { class: 'entrada-cartao', 'aria-labelledby': 'titulo-tela' },
                 h('h1', { id: 'titulo-tela', tabindex: -1 }, veioPorConvite() ? 'Que bom ter você aqui!' : 'Instale o IEJB Hub'),
                 h('p', { class: 'entrada-subtitulo' }, veioPorConvite()
@@ -115,7 +115,7 @@ export function telaAbrirNoApp() {
     const tela = h('div', { class: 'tela tela-entrada tela-instalar' },
         h('main', { id: 'conteudo', class: 'entrada-palco' },
             h('div', { class: 'instalar-icone-app', 'aria-hidden': 'true' },
-                h('img', { src: '/icone-192.png', alt: '', width: 96, height: 96 })),
+                h('img', { src: '/icone-fogo-192.png', alt: '', width: 96, height: 96 })),
             h('section', { class: 'entrada-cartao', 'aria-labelledby': 'titulo-tela' },
                 h('h1', { id: 'titulo-tela', tabindex: -1 }, 'Abra pelo app'),
                 h('p', { class: 'entrada-subtitulo' },

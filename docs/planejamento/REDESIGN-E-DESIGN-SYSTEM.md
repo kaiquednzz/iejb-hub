@@ -294,7 +294,7 @@ Direção visual: priorizar hierarquia, leitura e familiaridade de feed como Ins
 
 ### 13.10 Símbolo compacto do Hub (D75, 25/11/2026)
 
-Nas marcas compactas que aparecem ao lado do nome ou de um rótulo — cabeçalho móvel, barra lateral, entrada, carregamento e carteirinha — usar somente o fogo. O PNG `public/simbolo-fogo-iejb.png` é recortado do ativo oficial e passa pelo mesmo filtro de cor do logo atual. A abertura animada e o ícone instalado do PWA mantêm o brasão completo, pois aparecem sem o nome escrito ao lado. O novo símbolo é incluído nos ativos estáticos do service worker.
+Nas marcas compactas que aparecem ao lado do nome ou de um rótulo — cabeçalho móvel, barra lateral, entrada, carregamento e carteirinha — usar somente o fogo. O PNG `public/simbolo-fogo-iejb.png` é recortado do ativo oficial e passa pelo mesmo filtro de cor do logo atual. O PWA, o ícone do iPhone e o favicon também usam o fogo em arquivos com caminhos novos, para atualizar ícones já instalados. A abertura animada mantém o brasão completo. Os novos ícones entram nos ativos estáticos do service worker.
 Preferência local em **Você**, com três opções: Seguir sistema, Claro e Escuro. Sem escolha salva, inicia em Claro, sem depender do sistema operacional. O escuro usa grafite e cinza claro em ações/seleção, sem vinho como cor geral nem azul como cor de marca. A tela de entrada e a abertura recebem a escolha antes da primeira pintura. Não altera dados, permissões nem configuração do Supabase.
 
 ### 13.4 Acabamento

@@ -46,8 +46,9 @@ src/estilo/           tokens (do site) → base → componentes → telas
 ```
 
 `public/simbolo-fogo-iejb.png` é a versão compacta do logo usada ao lado do
-nome “IEJB Hub” na interface. O brasão completo continua no ícone instalado e
-na animação de abertura.
+nome “IEJB Hub” na interface. O PWA, o ícone do iPhone e o favicon usam
+`icone-fogo-192.png`, `icone-fogo-512.png` e `favicon-96x96.png`. O brasão
+completo continua na animação de abertura e em materiais institucionais.
 
 ## Fluxo das telas
 

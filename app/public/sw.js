@@ -17,7 +17,12 @@
 
 const CACHE_APP = 'iejb-hub-app';
 const CACHE_ASSETS = 'iejb-hub-assets';
-const ESTATICOS = ['/manifest.webmanifest', '/logo-iejb-pequeno.png', '/simbolo-fogo-iejb.png', '/icone-192.png', '/favicon-96x96.png'];
+// Inclui ícones do PWA versionados em caminhos distintos para forçar atualização instalada.
+const ESTATICOS = [
+    '/manifest.webmanifest', '/logo-iejb-pequeno.png', '/simbolo-fogo-iejb.png',
+    '/icone-192.png', '/icone-fogo-192.png', '/icone-fogo-512.png',
+    '/favicon.ico', '/favicon-96x96.png',
+];
 
 self.addEventListener('install', (evento) => {
     evento.waitUntil((async () => {
@@ -132,8 +137,8 @@ self.addEventListener('push', (evento) => {
     try { dados = evento.data?.json() ?? {}; } catch { dados = { corpo: evento.data?.text() }; }
     evento.waitUntil(self.registration.showNotification(dados.titulo || 'IEJB Hub', {
         body: dados.corpo || 'Tem novidade na escala.',
-        icon: '/icone-192.png',
-        badge: '/icone-192.png',
+        icon: '/icone-fogo-192.png',
+        badge: '/simbolo-fogo-iejb.png',
         tag: dados.tag,          // mesma escala: a notificação nova substitui a antiga
         renotify: !!dados.tag,   // ...mas ainda vibra/toca de novo
         data: { url: dados.url || '/' },
