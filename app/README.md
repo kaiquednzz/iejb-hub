@@ -109,7 +109,7 @@ Dois tropeços que valem a lição:
 
 ## Aparência
 
-Em **Você → Aparência**, a pessoa escolhe Seguir sistema, Claro ou Escuro. A escolha é salva no armazenamento local deste aparelho (chave `iejb-aparencia`); não é enviada ao Supabase. Os tokens e a aplicação do tema ficam em `src/estilo/tokens.css` e `src/util/tema.js`. O HTML inicial define o tema antes de carregar a interface para reduzir a mudança de cor na abertura. A tela nativa inicial do PWA ainda usa a cor estática do manifesto (`#FDFAF5`), sem acompanhar essa escolha.
+Em **Você → Aparência**, a pessoa escolhe Seguir sistema, Claro ou Escuro. Sem escolha salva, o padrão é Claro; o sistema é seguido apenas quando selecionado. A preferência fica no armazenamento local (chave `iejb-aparencia`) e não é enviada ao Supabase. No escuro, a paleta é neutra: cinza claro marca ações e foco, e os botões principais usam grafite médio, sem vinho como cor geral nem azul como cor de marca. Os tokens e a aplicação do tema ficam em `src/estilo/tokens.css` e `src/util/tema.js`. A tela nativa inicial do PWA ainda usa a cor estática do manifesto (`#FDFAF5`).
 
 ## Testado como
 

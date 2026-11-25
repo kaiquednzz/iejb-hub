@@ -11,15 +11,14 @@
     <script>
         // Define o tema antes da primeira pintura para evitar clarão ao abrir o app.
         try {
-            const escolha = localStorage.getItem('iejb-aparencia');
+            const escolha = localStorage.getItem('iejb-aparencia') ?? 'claro';
             const escuro = escolha === 'escuro'
-                || (escolha !== 'claro' && window.matchMedia?.('(prefers-color-scheme: dark)').matches);
+                || (escolha === 'sistema' && window.matchMedia?.('(prefers-color-scheme: dark)').matches);
             document.documentElement.dataset.tema = escuro ? 'escuro' : 'claro';
-            document.querySelector('meta[name="theme-color"]').content = escuro ? '#17191D' : '#FDFAF5';
+            document.querySelector('meta[name="theme-color"]').content = escuro ? '#18191A' : '#FDFAF5';
         } catch {
-            const escuroDoSistema = window.matchMedia?.('(prefers-color-scheme: dark)').matches;
-            document.documentElement.dataset.tema = escuroDoSistema ? 'escuro' : 'claro';
-            document.querySelector('meta[name="theme-color"]').content = escuroDoSistema ? '#17191D' : '#FDFAF5';
+            document.documentElement.dataset.tema = 'claro';
+            document.querySelector('meta[name="theme-color"]').content = '#FDFAF5';
         }
     </script>
     <meta name="mobile-web-app-capable" content="yes">
@@ -42,7 +41,7 @@
             background: #8F0D0B;
             transition: opacity .55s cubic-bezier(.32,.72,0,1);
         }
-        html[data-tema="escuro"] #abertura { background: #17191D; }
+        html[data-tema="escuro"] #abertura { background: #18191A; }
         #abertura.saindo { opacity: 0; pointer-events: none; }
         .ab-logo {
             position: relative;

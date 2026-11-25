@@ -107,7 +107,7 @@ Três camadas:
 
 ### 3.1.1 Tema escuro (D74, 25/11/2026)
 
-O seletor de aparência fica em **Você**: Seguir sistema, Claro ou Escuro. A escolha manual é local ao aparelho; nenhuma preferência estética é gravada no Supabase. O tema escuro usa grafite neutro nas superfícies, texto claro com hierarquia preservada e o vinho da IEJB como acento. Controles nativos recebem `color-scheme: dark`, e o foco visível continua destacado. A tela de entrada e a abertura HTML também leem a preferência antes da primeira pintura. A tela nativa inicial do PWA ainda usa a cor estática `#FDFAF5` definida no manifesto; ela não acompanha a escolha local nesta versão.
+O seletor de aparência fica em **Você**: Seguir sistema, Claro ou Escuro. Sem uma escolha salva, o padrão é Claro; seguir o sistema só acontece quando a pessoa seleciona essa opção. A preferência fica no aparelho. O tema escuro usa superfícies neutras (`#18191A`, `#242526`, `#303133`) e texto claro; cinza claro marca links, seleção e foco, enquanto botões principais usam grafite médio. O vinho deixa de ser a cor geral de interação no escuro, reduzindo a competição com o conteúdo. Controles nativos recebem `color-scheme: dark`, e o foco visível continua destacado. A tela de entrada e a abertura HTML também leem a preferência antes da primeira pintura. A tela nativa inicial do PWA ainda usa a cor estática `#FDFAF5` definida no manifesto; ela não acompanha a escolha local nesta versão.
 
 Os tokens semânticos são a fonte da paleta (`tokens.css`). Componentes antigos com cores fixas são revisados por área para evitar cartões claros soltos, status apagados ou texto de baixo contraste. QR codes e conteúdos cuja leitura exige branco/preto mantêm fundo branco.
 
@@ -280,7 +280,18 @@ O destaque do Início passa a mostrar o próximo culto ativo para todas as conta
 O mural busca as 30 publicações recentes e, em uma consulta complementar, todos os posts com `fixado_ate` válido. Une por ID e ordena os fixados primeiro; assim, um aviso antigo não sai da lista por ficar fora do limite de recentes.
 
 ### 13.9 Aparência escura (D74, 25/11/2026)
-Preferência local em **Você**, com três opções: Seguir sistema, Claro e Escuro. O tema escuro usa grafite em vez de preto puro e mantém vinho em pequenos pontos de identidade. A tela de entrada e a abertura recebem a escolha antes da primeira pintura. Não altera dados, permissões nem configuração do Supabase.
+
+Revisão visual da correção: a paleta escura também remapeia as cores primitivas legadas (creme, vermelho e rosa), que eram lidas diretamente por telas antigas. Isso evita cartões claros e blocos vinho no meio do tema escuro. Foram revisadas as famílias de tela de início/mural, agenda e escala, ministérios, equipe, repertórios, montagem, eventos, financeiro, oração, perfil, acesso e documentos, além dos componentes comuns de formulário, navegação e seleção. Estados hover usam superfície neutra; foco e seleção usam azul com contraste visível. QR codes, fotos, imagens de marca e folhas de impressão mantêm seus requisitos próprios.
+
+Achados e correções desta revisão:
+
+- A camada fixa atrás da navegação inferior ainda tinha fundo creme translúcido e ficava clara no tema escuro. Agora usa a superfície de vidro escura e a borda do tema.
+- O aviso para ativar notificações na Escala tinha fundo branco quase opaco e borda vinho. Agora usa cartão grafite, borda neutra e título azul legível.
+- Os tokens legados de creme/vermelho/rosa foram remapeados no escuro, alcançando componentes de telas antigas sem precisar criar exceções claras em cada arquivo.
+- Foram percorridas as rotas principais e de acesso em larguras móvel e desktop, com conta fictícia e respostas de consulta vazias. Isso permitiu revisar hierarquia, superfície, texto, seleção, navegação e vazios sem acessar nem alterar dados reais. Telas cujo conteúdo depende de registros existentes foram avaliadas no estado vazio; seus estados cheios e fluxos de gravação ainda dependem de conferência com dados de demonstração.
+
+Direção visual: priorizar hierarquia, leitura e familiaridade de feed como Instagram/Facebook, sem reproduzir seus elementos de marca. O vinho continua no tema claro e nos ativos institucionais; no escuro, não colore cartões, superfícies ou ações gerais. O destaque escuro usa cinzas neutros, sem introduzir azul como cor de marca.
+Preferência local em **Você**, com três opções: Seguir sistema, Claro e Escuro. Sem escolha salva, inicia em Claro, sem depender do sistema operacional. O escuro usa grafite e cinza claro em ações/seleção, sem vinho como cor geral nem azul como cor de marca. A tela de entrada e a abertura recebem a escolha antes da primeira pintura. Não altera dados, permissões nem configuração do Supabase.
 
 ### 13.4 Acabamento
 Transição do cartão do compromisso para a Escala (View Transitions, `view-transition-name: compromisso`); "gota" que desliza entre as abas; traço que desliza na casa do Louvor; título compacto no cabeçalho ao rolar (`util/rolagem.js`); puxar para atualizar com a chama (só no app instalado).

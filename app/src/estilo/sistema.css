@@ -1638,25 +1638,62 @@ html[data-tema="escuro"] .cartao-culto,
 html[data-tema="escuro"] .grupo-lista,
 html[data-tema="escuro"] .lista-linhas { box-shadow: var(--elev-1); }
 html[data-tema="escuro"] :is(.cabecalho, .montar-acoes, .barra-abas::before) { background: var(--cor-superficie-vidro); }
-html[data-tema="escuro"] .capa-ministerio { background: #292E35; color: var(--cor-texto); border: 1px solid var(--cor-borda); }
-html[data-tema="escuro"] .carteirinha { background: #24282E; border: 1px solid #4C545E; border-top: 3px solid var(--cor-marca); }
+html[data-tema="escuro"] .barra-fundo {
+    background: var(--cor-superficie-vidro);
+    border-color: var(--cor-borda);
+}
+html[data-tema="escuro"] .capa-ministerio { background: var(--cor-superficie-rebaixada); color: var(--cor-texto); border: 1px solid var(--cor-borda); }
+html[data-tema="escuro"] .carteirinha { background: var(--cor-superficie); border: 1px solid var(--cor-borda-forte); border-top: 3px solid var(--cor-marca); }
 html[data-tema="escuro"] .carteirinha-topo { color: var(--cor-marca); }
-html[data-tema="escuro"] .destaque:not(.inicio-compromisso) { background: #6E0908; }
-html[data-tema="escuro"] .fin-saldo { background: #292E35; border: 1px solid var(--cor-borda); }
+html[data-tema="escuro"] .destaque:not(.inicio-compromisso) { background: var(--cor-superficie-rebaixada); color: var(--cor-texto); border-color: var(--cor-borda); }
+html[data-tema="escuro"] .fin-saldo { background: var(--cor-superficie-rebaixada); border: 1px solid var(--cor-borda); }
+html[data-tema="escuro"] .cartao-avisos { background: var(--cor-superficie); border-color: var(--cor-borda); color: var(--cor-texto); }
+html[data-tema="escuro"] .cartao-avisos-textos strong { color: var(--cor-marca); }
 html[data-tema="escuro"] .cartao-culto.cancelado { opacity: 1; background: var(--cor-superficie-rebaixada); }
 html[data-tema="escuro"] :is(.selo-voce, .aba-contador, .segmento-contador) { color: var(--cor-sobre-marca); }
 html[data-tema="escuro"] .selo-admin { background: var(--cor-superficie-rebaixada); color: var(--cor-texto-2); }
 html[data-tema="escuro"] :is(.botao-perigo, .item-contador, .rotulo-culto, .convite-passos li::before) { color: var(--cor-sobre-marca); }
-html[data-tema="escuro"] .inicio-compromisso:not(.vazio):not(.esqueleto) { background: #6E0908; }
+html[data-tema="escuro"] .inicio-compromisso:not(.vazio):not(.esqueleto) { background: var(--cor-superficie); color: var(--cor-texto); border-color: var(--cor-marca); }
 html[data-tema="escuro"] .evento-bloco.agora .evento-bloco-data,
 html[data-tema="escuro"] .bloco-dia.sel,
 html[data-tema="escuro"] .agenda-culto:not(.nao-vai) .bloco-data,
-html[data-tema="escuro"] .inicio-dia { background: #6E0908; }
-html[data-tema="escuro"] .dia-botao-claro { color: #6E0908; }
+html[data-tema="escuro"] .inicio-dia { background: var(--cor-marca-sutil); color: var(--cor-texto); border-color: var(--cor-marca); }
+html[data-tema="escuro"] .dia-botao-claro { color: var(--cor-marca); }
 html[data-tema="escuro"] .sou-eu .pessoa-avatar { color: var(--cor-sobre-marca); }
 html[data-tema="escuro"] .aviso-form[data-tipo="info"] { background: var(--cor-atencao-sutil); color: var(--cor-atencao); }
 html[data-tema="escuro"] .fin-conta { background: rgba(255, 255, 255, 0.06); }
 html[data-tema="escuro"] .fin-qr { background: #fff; }
+
+/* Estados interativos escuros: superfícies neutras e foco azul visível. */
+html[data-tema="escuro"] :is(button, a, [role="button"], input, select, textarea):focus-visible {
+    outline-color: var(--cor-foco);
+}
+html[data-tema="escuro"] .botao-secundario:hover:not(:disabled),
+html[data-tema="escuro"] .ficha:hover,
+html[data-tema="escuro"] .aparencia-opcao:hover,
+html[data-tema="escuro"] .botao-agenda:hover,
+html[data-tema="escuro"] .linha-tocavel:hover,
+html[data-tema="escuro"] .lateral-item:hover {
+    background-color: var(--cor-superficie-rebaixada);
+    color: var(--cor-texto);
+}
+html[data-tema="escuro"] :is(.botao-principal, .botao-secundario, .botao-texto, .botao-perigo):hover:not(:disabled) {
+    filter: brightness(1.12);
+}
+html[data-tema="escuro"] .botao-principal { background: #555C65; color: #F2F3F5; }
+html[data-tema="escuro"] .botao-principal:hover:not(:disabled) { background: #68717A; filter: none; }
+html[data-tema="escuro"] :is(
+    .ficha[aria-pressed="true"], .ficha[aria-checked="true"],
+    .chip-grupo[aria-pressed="true"], .escolha-pessoa[aria-checked="true"]
+) {
+    background: var(--cor-marca-sutil);
+    border-color: var(--cor-borda-forte);
+    color: var(--cor-texto);
+}
+html[data-tema="escuro"] .evento-bloco.agora .evento-bloco-data :is(*),
+html[data-tema="escuro"] .bloco-dia.sel :is(*),
+html[data-tema="escuro"] .agenda-culto:not(.nao-vai) .bloco-data :is(*),
+html[data-tema="escuro"] .inicio-dia :is(*) { color: inherit; }
 
 .secao-aparencia { margin-top: var(--esp-8); }
 .secao-aparencia .rotulo-secao { margin-top: 0; }
