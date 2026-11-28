@@ -317,3 +317,59 @@ test('quem tem "vê o caixa" vê o Financeiro', async ({ page, simular }) => {
     await expect(page.getByRole('link', { name: /Financeiro/ })).toHaveCount(1);
 });
 
+
+// --- Cultos da igreja e eventos do site (D73) --------------------------------
+const culto = (id, nome, data, horario, escalado = false) => ({
+    id, nome, rotulo: null, data, horario, estado: 'ativo',
+    escala: escalado ? [{ estado: 'publicada', escala_item: [{ pessoa_id: 'p-eu', instrumento_exibido: ['Violão'], saiu_em: null,
+        pessoa: { nome: 'Ana Souza', apelido: null, foto: null } }] }] : [],
+    repertorio_item: [],
+});
+const evento = (titulo, data, horario, extra = {}) => ({
+    titulo, destaque: null, categoria: 'Culto especial', descricao: 'Venha!', data, data_fim: null, horario,
+    local_nome: null, local_cidade: null, link_inscricao: null, imagem: null, ...extra,
+});
+
+test('Agenda: evento no horário de um culto aparece uma vez só, com o nome do evento', async ({ page, simular }) => {
+    await simular.abrir('#/agenda', umaConta(), {
+        culto: [culto('c1', 'Culto da Família', '2026-11-29', '18:00:00'), culto('c2', 'Culto de Oração', '2026-12-01', '19:30:00')],
+        rpc: { eventos_do_site: [
+            evento('Cantata de Natal', '2026-11-29', '18:00:00'),
+            evento('Grudão', '2026-11-29', '18:00:00', { local_nome: 'Chácara', local_cidade: 'Pirapora' }), // fora da igreja: é outro encontro
+        ] },
+    });
+    const linhas = page.locator('.agenda-mes .item-lista');
+    await expect(linhas).toHaveCount(3);
+    await expect(page.getByText('Culto da Família')).toHaveCount(0);
+    await page.getByRole('button', { name: /Cantata de Natal/ }).click();
+    await expect(page.locator('.folha')).toContainText('Venha!');
+});
+
+test('Início: o próximo culto leva o nome do evento e o "Vem aí" não repete', async ({ page, simular }) => {
+    await simular.abrir('#/inicio', umaConta(), {
+        culto: [culto('c1', 'Culto da Família', '2026-11-29', '18:00:00')],
+        rpc: { eventos_do_site: [evento('Cantata de Natal', '2026-11-29', '18:00:00'), evento('Confraternização', '2026-11-28', '19:00:00', { local_nome: 'Sítio', local_cidade: 'Araçariguama' })] },
+    });
+    await expect(page.locator('.compromisso-titulo')).toHaveText('Cantata de Natal');
+    await expect(page.locator('.inicio-eventos')).toContainText('Confraternização');
+    await expect(page.locator('.inicio-eventos')).not.toContainText('Cantata de Natal');
+});
+
+test('Início: quem toca amanhã vê a capa mesmo com outro culto antes', async ({ page, simular }) => {
+    // Hoje é segunda 23/11 às 15h; a EBD de terça cedo vem antes do culto em que a pessoa toca
+    await simular.abrir('#/inicio', umaConta({ louvor: true }), {
+        culto: [culto('c0', 'EBD', '2026-11-24', '09:00:00'), culto('c1', 'Culto de Oração', '2026-11-24', '19:30:00', true)],
+    });
+    await expect(page.locator('.inicio-dia')).toContainText('Amanhã você toca');
+    await expect(page.locator('.dia-titulo')).toHaveText('Culto de Oração');
+});
+
+test('Aparência: escolher Escuro vale na hora e fica salvo', async ({ page, simular }) => {
+    await simular.abrir('#/voce', umaConta());
+    await page.getByRole('button', { name: 'Escuro' }).click();
+    await expect(page.locator('html')).toHaveAttribute('data-tema', 'escuro');
+    await expect(page.locator('meta[name="theme-color"]')).toHaveAttribute('content', '#0C0A0A');
+    await page.reload();
+    await expect(page.locator('html')).toHaveAttribute('data-tema', 'escuro');
+    await expect(page.getByRole('button', { name: 'Escuro' })).toHaveAttribute('aria-pressed', 'true');
+});

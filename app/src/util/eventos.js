@@ -46,6 +46,14 @@ export function enderecoNoSite(e) {
     return `${SITE}/#evento-${e.data}-${slug}`;
 }
 
+// Evento do site marcado no mesmo dia e hora de um culto, na IEJB (ex.: a
+// Cantata no domingo às 18h). É o mesmo encontro: o app mostra um só, com o
+// nome do evento. Mesma ideia do eventoNoHorario do site.
+export function eventoDoCulto(culto, eventos) {
+    return eventos?.find((e) => e.data === culto.data && !e.local_nome
+        && e.horario?.slice(0, 5) === culto.horario?.slice(0, 5)) ?? null;
+}
+
 // Os publicados que ainda não acabaram, pela mesma função que o site usa
 export async function proximosEventos() {
     const { data, error } = await supabase.rpc('eventos_do_site');

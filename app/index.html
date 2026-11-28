@@ -15,7 +15,7 @@
             const escuro = escolha === 'escuro'
                 || (escolha === 'sistema' && window.matchMedia?.('(prefers-color-scheme: dark)').matches);
             document.documentElement.dataset.tema = escuro ? 'escuro' : 'claro';
-            document.querySelector('meta[name="theme-color"]').content = escuro ? '#18191A' : '#FDFAF5';
+            document.querySelector('meta[name="theme-color"]').content = escuro ? '#0C0A0A' : '#FDFAF5';
         } catch {
             document.documentElement.dataset.tema = 'claro';
             document.querySelector('meta[name="theme-color"]').content = '#FDFAF5';
@@ -41,7 +41,7 @@
             background: #8F0D0B;
             transition: opacity .55s cubic-bezier(.32,.72,0,1);
         }
-        html[data-tema="escuro"] #abertura { background: #18191A; }
+        html[data-tema="escuro"] #abertura { background: #0C0A0A; }
         #abertura.saindo { opacity: 0; pointer-events: none; }
         .ab-logo {
             position: relative;

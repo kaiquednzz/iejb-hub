@@ -107,7 +107,7 @@ Três camadas:
 
 ### 3.1.1 Tema escuro (D74, 25/11/2026)
 
-O seletor de aparência fica em **Você**: Seguir sistema, Claro ou Escuro. Sem uma escolha salva, o padrão é Claro; seguir o sistema só acontece quando a pessoa seleciona essa opção. A preferência fica no aparelho. O tema escuro usa superfícies neutras (`#18191A`, `#242526`, `#303133`) e texto claro; cinza claro marca links, seleção e foco, enquanto botões principais usam grafite médio. O vinho deixa de ser a cor geral de interação no escuro, reduzindo a competição com o conteúdo. Controles nativos recebem `color-scheme: dark`, e o foco visível continua destacado. A tela de entrada e a abertura HTML também leem a preferência antes da primeira pintura. A tela nativa inicial do PWA ainda usa a cor estática `#FDFAF5` definida no manifesto; ela não acompanha a escolha local nesta versão.
+O seletor de aparência fica em **Você**: Seguir sistema, Claro ou Escuro. Sem uma escolha salva, o padrão é Claro; seguir o sistema só acontece quando a pessoa seleciona essa opção. A preferência fica no aparelho. **Paleta revista na D76 (27/11/2026):** preto quente (`#0C0A0A` fundo, `#181515` cartão, `#221E1D` rebaixada), texto creme `#F4EEE8` / `#B9AFA7` / `#968C85`, e o vermelho da IEJB mantido em três papéis: `--cor-marca` `#F0574C` para texto e ícone, `--cor-marca-fundo` `#D63A30` para botão e selo com texto branco, `--cor-marca-capa` `#8A1511` para as capas grandes. Superfícies sobem de tom em vez de usar sombra. Linhas e vidros usam os canais `--tinta-rgb`, `--marca-rgb` e `--fundo-rgb` (`rgb(var(--tinta-rgb) / .1)`), que trocam sozinhos com o tema. Cor fixa nova em CSS de tela é proibida: use um token. Controles nativos recebem `color-scheme: dark`, e o foco visível continua destacado. A tela de entrada e a abertura HTML também leem a preferência antes da primeira pintura. A tela nativa inicial do PWA ainda usa a cor estática `#FDFAF5` definida no manifesto; ela não acompanha a escolha local nesta versão.
 
 Os tokens semânticos são a fonte da paleta (`tokens.css`). Componentes antigos com cores fixas são revisados por área para evitar cartões claros soltos, status apagados ou texto de baixo contraste. QR codes e conteúdos cuja leitura exige branco/preto mantêm fundo branco.
 
@@ -290,7 +290,7 @@ Achados e correções desta revisão:
 - Os tokens legados de creme/vermelho/rosa foram remapeados no escuro, alcançando componentes de telas antigas sem precisar criar exceções claras em cada arquivo.
 - Foram percorridas as rotas principais e de acesso em larguras móvel e desktop, com conta fictícia e respostas de consulta vazias. Isso permitiu revisar hierarquia, superfície, texto, seleção, navegação e vazios sem acessar nem alterar dados reais. Telas cujo conteúdo depende de registros existentes foram avaliadas no estado vazio; seus estados cheios e fluxos de gravação ainda dependem de conferência com dados de demonstração.
 
-Direção visual: priorizar hierarquia, leitura e familiaridade de feed como Instagram/Facebook, sem reproduzir seus elementos de marca. O vinho continua no tema claro e nos ativos institucionais; no escuro, não colore cartões, superfícies ou ações gerais. O destaque escuro usa cinzas neutros, sem introduzir azul como cor de marca.
+Direção visual: priorizar hierarquia, leitura e familiaridade de feed como Instagram/Facebook, sem reproduzir seus elementos de marca. ~~O vinho não colore o escuro~~ (revisto na D76: o escuro mantém o vermelho da IEJB, ver 3.1.1).
 
 ### 13.10 Símbolo compacto do Hub (D75, 25/11/2026)
 

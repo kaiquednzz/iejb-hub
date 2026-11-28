@@ -52,6 +52,15 @@
     --cor-marca-sutil: var(--vermelho-100);
     --cor-marca-sutil-2: var(--vermelho-50);
     --cor-sobre-marca: #FFFFFF;
+    /* Fundo cheio de marca (botão principal, selos). No claro é o próprio
+       vermelho; no escuro é um vermelho mais fechado que segura o texto branco */
+    --cor-marca-fundo: var(--cor-marca);
+    /* Canais RGB para linhas e tintas translúcidas: rgb(var(--tinta-rgb) / .1) */
+    --tinta-rgb: 58 10 9;
+    --marca-rgb: 143 13 11;
+    --fundo-rgb: 253 250 245;  /* vidro das barras: rgb(var(--fundo-rgb) / .9) */
+    /* Capas grandes (dia de culto, carteirinha, ministério): o vermelho fundo da IEJB */
+    --cor-marca-capa: var(--vermelho-700);
     /* Status: a cor forte é para texto/ícone, a sutil para o fundo */
     --cor-sucesso: var(--verde-700);
     --cor-sucesso-sutil: var(--verde-100);
@@ -150,72 +159,64 @@
     --raio-capsula: var(--raio-pilula);
 }
 
-/* Aparência escura: neutros inspirados em redes sociais; destaque sem nova cor de marca. */
+/* Aparência escura (D73): preto quente, como o Instagram à noite, com o
+   vermelho da IEJB mantido. Contrastes medidos sobre --cor-superficie:
+   texto 15,8:1, texto-2 8,4:1, texto-3 5,5:1, marca (texto) 5,4:1;
+   branco sobre --cor-marca-fundo 4,7:1. Não é uma inversão do claro: as
+   superfícies sobem de tom (fundo < cartão < rebaixada) em vez de sombra. */
 html[data-tema="escuro"] {
     color-scheme: dark;
-    --cor-fundo: #18191A;
-    --cor-superficie: #242526;
-    --cor-superficie-rebaixada: #303133;
-    --cor-borda: #3E4042;
-    --cor-borda-forte: #606366;
-    --cor-borda-campo: #74777A;
-    --cor-texto: #E4E6EB;
-    --cor-texto-2: #B0B3B8;
-    --cor-texto-3: #A0A3A7;
-    --cor-titulo: #E4E6EB;
-    --cor-marca: #C6CBD2;
-    --cor-marca-hover: #E4E6EB;
-    --cor-marca-viva: #E4E6EB;
-    --cor-marca-sutil: #383B40;
-    --cor-marca-sutil-2: #303338;
-    --cor-sobre-marca: #18191A;
-    --cor-sucesso: #75D99A;
-    --cor-sucesso-sutil: #20392D;
-    --cor-atencao: #F2C66D;
-    --cor-atencao-sutil: #403820;
-    --cor-perigo: #FF8A80;
-    --cor-perigo-sutil: #442725;
-    --cor-info: #B6C0CC;
-    --cor-info-sutil: #30353B;
-    --cor-foco: #E4E6EB;
+    /* Primitivas (os apelidos antigos apontam para elas) */
+    --vermelho-900: #2A1210;
+    --vermelho-800: #FF7268;
+    --vermelho-700: #F0574C;
+    --vermelho-500: #FF7268;
+    --vermelho-100: #3A1815;
+    --vermelho-50:  #2A1311;
+    --creme-50:  #0C0A0A;
+    --creme-100: #221E1D;
+    --creme-200: #2C2726;
+    --creme-300: #3A3432;
+    --creme-500: #6B6360;
+    --tinta-900: #F4EEE8;
+    --tinta-700: #FAF5EF;
+    --tinta-600: #B9AFA7;
+    --tinta-400: #968C85;
+    --verde-700: #5FD08B;
+    --verde-100: #12291C;
+    --ambar-700: #F2C66D;
+    --ambar-100: #33280F;
+    --azul-700: #8DB8E8;
+    --azul-100: #14233A;
+
+    --cor-fundo: #0C0A0A;
+    --cor-superficie: #181515;
+    --cor-superficie-rebaixada: #221E1D;
+    --cor-marca-fundo: #D63A30;
+    --cor-sobre-marca: #FFFFFF;
+    --cor-perigo: #FF7A70;
+    --cor-perigo-sutil: #3A1714;
+    --cor-foco: #FF8A80;
     --foco: var(--cor-foco);
-    --tinta-900: #F2F3F5;
-    --tinta-700: #E4E6EB;
-    --tinta-600: #B0B3B8;
-    --tinta-400: #A0A3A7;
-    --creme-50: #18191A;
-    --creme-100: #303133;
-    --creme-200: #3E4042;
-    --creme-300: #606366;
-    --creme-500: #74777A;
-    --vermelho-900: #242526;
-    --vermelho-800: #303133;
-    --vermelho-700: #C6CBD2;
-    --vermelho-500: #E4E6EB;
-    --vermelho-100: #383B40;
-    --vermelho-50: #303338;
-    --rosa: #C6CBD2;
-    --verde-700: #75D99A;
-    --verde-100: #20392D;
-    --ambar-700: #F0C27A;
-    --ambar-100: #403421;
-    --azul-700: #B6C0CC;
-    --azul-100: #30353B;
-    --principal: var(--cor-marca);
-    --principal-brighter: var(--cor-marca-viva);
-    --principal-escuro: #18191A;
-    --secondary: #303133;
-    --background: var(--cor-fundo);
-    --fundo-rosado: #303133;
-    --texto: var(--cor-texto);
-    --texto-2: var(--cor-texto-2);
-    --texto-vinho: #C6CBD2;
-    --vidro-claro: rgba(32, 35, 41, 0.82);
-    --vidro-borda: var(--cor-borda);
-    --cor-superficie-vidro: rgba(32, 35, 41, 0.9);
-    --cor-borda-vidro: rgba(196, 202, 210, 0.16);
-    --elev-1: 0 1px 2px rgba(0, 0, 0, 0.24);
-    --elev-2: 0 8px 24px rgba(0, 0, 0, 0.38), 0 1px 3px rgba(0, 0, 0, 0.2);
+    --tinta-rgb: 255 240 232;
+    --marca-rgb: 240 87 76;
+    --fundo-rgb: 12 10 10;
+    --cor-marca-capa: #8A1511;
+
+    --cor-superficie-vidro: rgba(12, 10, 10, 0.82);
+    --cor-borda-vidro: rgba(255, 240, 232, 0.08);
+    --secondary: #2A2321;
+    --fundo-rosado: #241A19;
+    --rosa: #FF9A90;
+    --vidro-claro: rgba(24, 21, 21, 0.72);
+    --vidro-escuro: rgba(255, 255, 255, 0.06);
+    --vidro-borda-escura: rgba(255, 255, 255, 0.1);
+    --brilho-escuro: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    /* Sombra quase não aparece no preto: flutuantes ganham um contorno */
+    --elev-1: 0 0 0 1px rgba(255, 240, 232, 0.06);
+    --elev-2: 0 0 0 1px rgba(255, 240, 232, 0.08), 0 12px 32px rgba(0, 0, 0, 0.6);
+    /* O logo PNG é branco: no escuro ganha o vermelho vivo */
+    --logo-vermelho: brightness(0) invert(52%) sepia(62%) saturate(2400%) hue-rotate(-10deg) brightness(98%) contrast(96%);
 }
 
 @supports (transition-timing-function: linear(0, 1)) {

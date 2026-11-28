@@ -118,7 +118,7 @@
     min-height: calc(56px + env(safe-area-inset-top));
     margin: 0;
     padding: env(safe-area-inset-top) max(var(--esp-4), (100% - 720px) / 2) 0;
-    background: rgba(253, 250, 245, 0.88);
+    background: rgb(var(--fundo-rgb) / 0.88);
     -webkit-backdrop-filter: var(--desfoque);
     backdrop-filter: var(--desfoque);
     border-bottom: 1px solid var(--cor-borda);
@@ -156,7 +156,7 @@ a.cabecalho-marca { text-decoration: none; min-height: 44px; border-radius: var(
     border: none;
     border-top: 1px solid var(--cor-borda);
     border-radius: 0;
-    background: rgba(253, 250, 245, 0.9);
+    background: rgb(var(--fundo-rgb) / 0.9);
     box-shadow: none;
     animation: none;
 }
@@ -269,7 +269,7 @@ a.cabecalho-marca { text-decoration: none; min-height: 44px; border-radius: var(
     gap: 0;
     padding: var(--esp-5);
     border-radius: var(--raio-3);
-    background: var(--cor-marca);
+    background: var(--cor-marca-capa);
     color: var(--cor-sobre-marca);
     box-shadow: var(--elev-1);
     text-decoration: none;
@@ -354,8 +354,8 @@ a.cabecalho-marca { text-decoration: none; min-height: 44px; border-radius: var(
 .bloco-dia.sel .bloco-dia-num { color: var(--cor-marca); }
 .bloco-dia-rostos .pessoa-avatar { border-color: var(--cor-superficie-rebaixada); }
 .bloco-dia.sel .bloco-dia-rostos .pessoa-avatar { border-color: var(--cor-superficie); }
-.bloco-dia.sel .bloco-dia-eu { background: var(--cor-marca); }
-@container (min-width: 120px) { .bloco-dia.sel .bloco-dia-eu { background: var(--cor-marca); } }
+.bloco-dia.sel .bloco-dia-eu { background: var(--cor-marca-fundo); }
+@container (min-width: 120px) { .bloco-dia.sel .bloco-dia-eu { background: var(--cor-marca-fundo); } }
 
 /* --- Estado vazio das telas antigas: mesmo padrão do .estado -------------- */
 .estado-vazio {
@@ -446,7 +446,7 @@ main .rotulo-secao::before { content: counter(secao, upper-roman) ".\00a0\00a0" 
     inset: 0;
     z-index: -2;
     border-top: 1px solid var(--cor-borda);
-    background: rgba(253, 250, 245, 0.9);
+    background: rgb(var(--fundo-rgb) / 0.9);
     -webkit-backdrop-filter: var(--desfoque);
     backdrop-filter: var(--desfoque);
     view-transition-name: barra-fundo;
@@ -521,7 +521,7 @@ main .rotulo-secao::before { content: counter(secao, upper-roman) ".\00a0\00a0" 
     bottom: -1px;
     height: 3px;
     border-radius: 3px 3px 0 0;
-    background: var(--cor-marca);
+    background: var(--cor-marca-fundo);
     view-transition-name: subnav-traco;
 }
 ::view-transition-group(subnav-traco) { animation-duration: 0.45s; animation-timing-function: var(--ease-ios); }
@@ -533,7 +533,7 @@ main .rotulo-secao::before { content: counter(secao, upper-roman) ".\00a0\00a0" 
     gap: 2px;
     padding: var(--esp-6) var(--esp-5) var(--esp-5);
     border-radius: var(--raio-3);
-    background: var(--cor-marca);
+    background: var(--cor-marca-capa);
     color: #fff;
     text-decoration: none;
     overflow: hidden;
@@ -580,8 +580,8 @@ main .rotulo-secao::before { content: counter(secao, upper-roman) ".\00a0\00a0" 
     color: var(--cor-titulo);
 }
 .agenda-mes-nome span { font-style: normal; color: var(--cor-texto-3); font-size: 20px; }
-.agenda-culto .bloco-data { background: var(--cor-marca); }
-.agenda-culto .bloco-data-dia, .agenda-culto .bloco-data-mes { color: #fff; }
+a.agenda-culto .bloco-data { background: var(--cor-marca-fundo); } /* só onde a pessoa serve */
+a.agenda-culto .bloco-data-dia, a.agenda-culto .bloco-data-mes { color: #fff; }
 .agenda-culto-informativo { cursor: default; }
 .agenda-culto.nao-vai .bloco-data { background: var(--cor-superficie-rebaixada); }
 .agenda-culto.nao-vai .bloco-data-dia { color: var(--cor-texto-3); }
@@ -650,7 +650,7 @@ main .rotulo-secao::before { content: counter(secao, upper-roman) ".\00a0\00a0" 
     font: 600 16px/1.2 var(--fonte-texto);
     text-decoration: none;
 }
-.dia-botao-claro { background: #fff; color: var(--cor-marca); }
+.dia-botao-claro { background: var(--cor-superficie); color: var(--cor-marca); }
 .dia-botao:active { transform: scale(0.97); }
 
 /* Depois do culto: agradecimento */
@@ -768,7 +768,7 @@ main .rotulo-secao::before { content: counter(secao, upper-roman) ".\00a0\00a0" 
     transition: transform 0.7s var(--ease-ios);
 }
 .mes-progresso-montado { background: #E3B5B0; transform: scaleX(var(--montado, 0)); }
-.mes-progresso-publicado { background: var(--cor-marca); transform: scaleX(var(--publicado, 0)); }
+.mes-progresso-publicado { background: var(--cor-marca-fundo); transform: scaleX(var(--publicado, 0)); }
 .mes-progresso.completo .mes-progresso-publicado { background: var(--cor-sucesso); }
 .mes-progresso-texto { font: 600 13px/1.3 var(--fonte-texto); color: var(--cor-texto-2); font-variant-numeric: tabular-nums; }
 .mes-progresso.completo .mes-progresso-texto { color: var(--cor-sucesso); }
@@ -783,7 +783,7 @@ main .rotulo-secao::before { content: counter(secao, upper-roman) ".\00a0\00a0" 
     width: 60px;
     height: 60px;
     border-radius: var(--raio-2);
-    background: var(--cor-marca);
+    background: var(--cor-marca-fundo);
     color: #fff;
 }
 .historico-topo .mini-data span { font: 600 11px/1 var(--fonte-texto); letter-spacing: 0.06em; text-transform: uppercase; color: rgba(255, 255, 255, 0.85); }
@@ -975,7 +975,7 @@ main .rotulo-secao::before { content: counter(secao, upper-roman) ".\00a0\00a0" 
     margin: 0 0 var(--esp-2);
     padding: var(--esp-5);
     border-radius: var(--raio-3);
-    background: var(--cor-marca);
+    background: var(--cor-marca-fundo);
     overflow: hidden;
     align-content: end;
 }
@@ -988,7 +988,7 @@ main .rotulo-secao::before { content: counter(secao, upper-roman) ".\00a0\00a0" 
     bottom: var(--esp-3);
     padding: 8px 12px;
     border-radius: var(--raio-2);
-    background: var(--cor-marca);
+    background: var(--cor-marca-fundo);
 }
 .evento-capa-dia { font: 700 44px/1 var(--fonte-titulo); font-variant-numeric: lining-nums; }
 .evento-capa.com-imagem .evento-capa-dia { font-size: 30px; }
@@ -1005,7 +1005,7 @@ main .rotulo-secao::before { content: counter(secao, upper-roman) ".\00a0\00a0" 
     max-width: 440px;
     padding: var(--esp-5);
     border-radius: var(--raio-3);
-    background: var(--cor-marca);
+    background: var(--cor-marca-capa);
     color: #fff;
     overflow: hidden;
     isolation: isolate;
@@ -1141,7 +1141,7 @@ main .rotulo-secao::before { content: counter(secao, upper-roman) ".\00a0\00a0" 
     place-items: center;
     margin: -1px -1px 0;
     border-radius: 9px 9px 0 0;
-    background: var(--cor-marca);
+    background: var(--cor-marca-fundo);
     color: #fff !important;
     font: 700 10px/1 var(--fonte-texto) !important;
     letter-spacing: 0.1em;
@@ -1168,8 +1168,8 @@ main .rotulo-secao::before { content: counter(secao, upper-roman) ".\00a0\00a0" 
 .folhinha-argolas::before { left: 13px; }
 .folhinha-argolas::after { right: 13px; }
 /* Culto em que você toca (Agenda): folha toda vermelha */
-.agenda-culto .bloco-data.folhinha { background: var(--cor-marca-sutil); border-color: #E7C6C2; }
-.agenda-culto .folhinha-dia { color: var(--cor-marca) !important; }
+a.agenda-culto .bloco-data.folhinha { background: var(--cor-marca-sutil); border-color: rgb(var(--marca-rgb) / 0.25); }
+a.agenda-culto .folhinha-dia { color: var(--cor-marca) !important; }
 .agenda-culto.nao-vai .folhinha-mes { background: var(--cor-texto-3); }
 .agenda-culto.nao-vai .folhinha-dia { color: var(--cor-texto-3) !important; }
 .agenda-culto .bloco-data-mes { color: #fff; }
@@ -1384,7 +1384,7 @@ blockquote.mural-palavra { position: relative; margin: 0; padding: 30px 0 0 var(
     content: '' / '';
     position: absolute; top: 9px; right: 9px;
     width: 9px; height: 9px; border-radius: 50%;
-    background: var(--cor-marca); box-shadow: 0 0 0 2px var(--cor-fundo);
+    background: var(--cor-marca-fundo); box-shadow: 0 0 0 2px var(--cor-fundo);
 }
 
 /* --- Aniversários (D69) ----------------------------------------------------- */
@@ -1428,16 +1428,16 @@ blockquote.mural-palavra { position: relative; margin: 0; padding: 30px 0 0 var(
 .convite-logo { width: 56px; height: 56px; border-radius: 14px; }
 .convite-chapeu { margin: 0; font: var(--texto-rotulo); letter-spacing: var(--rotulo-espaco); text-transform: uppercase; color: var(--cor-marca); }
 .convite-titulo { margin: 0; font: italic 700 clamp(32px, 7vw, 52px)/1.05 var(--fonte-titulo); color: var(--cor-titulo); }
-.convite-qr { width: min(78vw, 52dvh, 440px); padding: var(--esp-2); border: 1px solid var(--cor-borda); border-radius: var(--raio-3); background: #fff; animation: reacaoPula 0.6s 0.1s var(--mola) backwards; }
+.convite-qr { width: min(78vw, 52dvh, 440px); padding: var(--esp-2); border: 1px solid var(--cor-borda); border-radius: var(--raio-3); background: var(--cor-superficie); animation: reacaoPula 0.6s 0.1s var(--mola) backwards; }
 .convite-qr .qr { display: block; width: 100%; height: auto; }
 .convite-passos { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; counter-reset: passo; font: var(--texto-corpo); text-align: left; }
 .convite-passos li { display: flex; align-items: flex-start; gap: var(--esp-2); counter-increment: passo; }
-.convite-passos li::before { content: counter(passo); display: inline-grid; place-items: center; flex: none; width: 22px; height: 22px; border-radius: 50%; background: var(--cor-marca); color: #fff; font: 700 12px/1 var(--fonte-texto); }
+.convite-passos li::before { content: counter(passo); display: inline-grid; place-items: center; flex: none; width: 22px; height: 22px; border-radius: 50%; background: var(--cor-marca-fundo); color: #fff; font: 700 12px/1 var(--fonte-texto); }
 .convite-link { margin: 0; font: var(--texto-apoio); color: var(--cor-texto-2); }
 .convite-acoes { padding: var(--esp-4) var(--esp-4) calc(env(safe-area-inset-bottom) + var(--esp-4)); }
 @media print {
     html.imprimindo-convite body > :not(.convite) { display: none !important; }
-    html.imprimindo-convite .convite { position: static; height: auto; animation: none; background: #fff; }
+    html.imprimindo-convite .convite { position: static; height: auto; animation: none; background: var(--cor-superficie); }
     html.imprimindo-convite .convite-fechar, html.imprimindo-convite .convite-acoes { display: none; }
     html.imprimindo-convite .convite-qr { width: 12cm; animation: none; }
     html.imprimindo-convite .convite-titulo { font-size: 44pt; }
@@ -1496,7 +1496,7 @@ blockquote.mural-palavra { position: relative; margin: 0; padding: 30px 0 0 var(
 .tour-rodape { display: flex; align-items: center; gap: var(--esp-2); margin-top: var(--esp-2); }
 .tour-pontos { display: flex; gap: 6px; margin-right: auto; }
 .tour-pontos span { width: 7px; height: 7px; border-radius: 4px; background: var(--cor-borda-forte); transition: width 0.4s var(--mola), background 0.3s ease; }
-.tour-pontos span.atual { width: 20px; background: var(--cor-marca); }
+.tour-pontos span.atual { width: 20px; background: var(--cor-marca-fundo); }
 .tour-pular { min-height: 44px; }
 .tour-proximo { min-height: 44px; padding-inline: var(--esp-5); }
 
@@ -1583,117 +1583,25 @@ blockquote.mural-palavra { position: relative; margin: 0; padding: 30px 0 0 var(
 /* A faixa de aniversário não cola na saudação */
 .inicio-ola-area + .aniversarios, .inicio-avisos + .aniversarios { margin-top: var(--esp-2); }
 
-/* --- Aparência escura ------------------------------------------------------ */
-html[data-tema="escuro"] body,
-html[data-tema="escuro"] .tela-app,
-html[data-tema="escuro"] .carregando-inicial { background-color: var(--cor-fundo); }
-html[data-tema="escuro"] .entrada-cartao { background: var(--cor-superficie); color: var(--cor-texto); }
-html[data-tema="escuro"] .entrada-cartao h1 { color: var(--cor-titulo); }
-html[data-tema="escuro"] .entrada-cartao :is(input, textarea, select) { background: var(--cor-superficie-rebaixada); color: var(--cor-texto); }
-
-/* Superfícies que ainda tinham branco fixo antes da introdução dos tokens. */
-html[data-tema="escuro"] :is(
-    .cartao-culto, .semana-escala, .lista-linhas, .cartao-pedido, .cartao-grupo,
-    .fichas-outro-campo:focus, .opcao, .credenciais, .evento-linha, .evento-imagem, .previa-cartao,
-    .fin-contagem, .fin-resumo, .fin-linhas, .fin-opcao, .fin-valor, .fin-entrada,
-    .fin-detalhe, .cartao-conferir, .fin-an-topo, .fin-an-bloco, .historico-culto,
-    .historico-musica, .evento-bloco, .cartao-semana, .chip-grupo, .fichas-chip,
-    .previa-whatsapp, .opcao-mesa, .cartao-mesa, .lista-cultos .estado
-) { background-color: var(--cor-superficie); color: var(--cor-texto); }
-html[data-tema="escuro"] :is(.historico-busca, .busca-musica, .inicio-compromisso.vazio) {
-    background-color: var(--cor-superficie);
-    color: var(--cor-texto);
+/* --- Aparência escura (D73) ----------------------------------------------
+   Quase tudo vem dos tokens (tokens.css). Aqui ficam só as exceções: o que
+   no claro é branco de propósito ou depende de foto. */
+html[data-tema="escuro"] .fin-qr { background: #fff; } /* QR precisa de fundo claro para ler */
+/* No escuro o que está escolhido sobe de tom (no claro, fica branco sobre creme) */
+/* Dentro da capa vermelha (dia de culto) os botões e rostos continuam claros,
+   como no tema claro: devolve os tokens do claro só ali dentro */
+html[data-tema="escuro"] .inicio-dia {
+    --cor-superficie: #FFFFFF;
+    --cor-superficie-rebaixada: #F6F0E8;
+    --fundo-rosado: #F6EEEC;
+    --secondary: #EBDEDD;
+    --cor-marca: #8F0D0B;
+    --texto-vinho: #3A0A09;
+    --cor-titulo: #3A0A09;
 }
-html[data-tema="escuro"] .inicio-compromisso.vazio { border-color: var(--cor-borda); }
-html[data-tema="escuro"] .segmentos::before { background: var(--cor-superficie); }
-html[data-tema="escuro"] :is(.botao-streaming, .linha-editor, .opcao-culto, .resultado-musica, .resultado-novo, .ficha, .seletor, .escolha-pessoa) {
-    background-color: var(--cor-superficie);
-    color: var(--cor-texto);
-    border-color: var(--cor-borda);
-}
-html[data-tema="escuro"] :is(.ficha[aria-pressed="true"], .ficha[aria-checked="true"], .chip-grupo[aria-pressed="true"]) {
-    background: var(--cor-marca);
-    border-color: var(--cor-marca);
-    color: var(--cor-sobre-marca);
-}
-html[data-tema="escuro"] .escolha-pessoa[aria-checked="true"] {
-    background: var(--cor-marca);
-    border-color: var(--cor-marca);
-    color: var(--cor-sobre-marca);
-}
-html[data-tema="escuro"] .opcao:has(input:checked) { background: var(--cor-marca-sutil); border-color: var(--cor-marca); }
-html[data-tema="escuro"] .resultado-icone { color: var(--cor-sobre-marca); }
-
-html[data-tema="escuro"] :is(
-    .grupo-lista, .cartao-culto, .semana-escala, .lista-linhas, .cartao-pedido,
-    .cartao-grupo, .fin-contagem, .fin-resumo, .fin-linhas, .fin-opcao,
-    .fin-detalhe, .cartao-conferir, .fin-an-topo, .fin-an-bloco, .historico-culto,
-    .evento-linha, .evento-imagem, .previa-cartao, .evento-bloco, .cartao-semana,
-    .previa-whatsapp, .opcao, .opcao-mesa, .chip-grupo,
-    .campo-texto, .fin-entrada, .fin-valor, .historico-busca, .busca-musica
-) { border-color: var(--cor-borda); }
-
-html[data-tema="escuro"] .entrada-cartao,
-html[data-tema="escuro"] .cartao-culto,
-html[data-tema="escuro"] .grupo-lista,
-html[data-tema="escuro"] .lista-linhas { box-shadow: var(--elev-1); }
-html[data-tema="escuro"] :is(.cabecalho, .montar-acoes, .barra-abas::before) { background: var(--cor-superficie-vidro); }
-html[data-tema="escuro"] .barra-fundo {
-    background: var(--cor-superficie-vidro);
-    border-color: var(--cor-borda);
-}
-html[data-tema="escuro"] .capa-ministerio { background: var(--cor-superficie-rebaixada); color: var(--cor-texto); border: 1px solid var(--cor-borda); }
-html[data-tema="escuro"] .carteirinha { background: var(--cor-superficie); border: 1px solid var(--cor-borda-forte); border-top: 3px solid var(--cor-marca); }
-html[data-tema="escuro"] .carteirinha-topo { color: var(--cor-marca); }
-html[data-tema="escuro"] .destaque:not(.inicio-compromisso) { background: var(--cor-superficie-rebaixada); color: var(--cor-texto); border-color: var(--cor-borda); }
-html[data-tema="escuro"] .fin-saldo { background: var(--cor-superficie-rebaixada); border: 1px solid var(--cor-borda); }
-html[data-tema="escuro"] .cartao-avisos { background: var(--cor-superficie); border-color: var(--cor-borda); color: var(--cor-texto); }
-html[data-tema="escuro"] .cartao-avisos-textos strong { color: var(--cor-marca); }
-html[data-tema="escuro"] .cartao-culto.cancelado { opacity: 1; background: var(--cor-superficie-rebaixada); }
-html[data-tema="escuro"] :is(.selo-voce, .aba-contador, .segmento-contador) { color: var(--cor-sobre-marca); }
-html[data-tema="escuro"] .selo-admin { background: var(--cor-superficie-rebaixada); color: var(--cor-texto-2); }
-html[data-tema="escuro"] :is(.botao-perigo, .item-contador, .rotulo-culto, .convite-passos li::before) { color: var(--cor-sobre-marca); }
-html[data-tema="escuro"] .inicio-compromisso:not(.vazio):not(.esqueleto) { background: var(--cor-superficie); color: var(--cor-texto); border-color: var(--cor-marca); }
-html[data-tema="escuro"] .evento-bloco.agora .evento-bloco-data,
-html[data-tema="escuro"] .bloco-dia.sel,
-html[data-tema="escuro"] .agenda-culto:not(.nao-vai) .bloco-data,
-html[data-tema="escuro"] .inicio-dia { background: var(--cor-marca-sutil); color: var(--cor-texto); border-color: var(--cor-marca); }
-html[data-tema="escuro"] .dia-botao-claro { color: var(--cor-marca); }
-html[data-tema="escuro"] .sou-eu .pessoa-avatar { color: var(--cor-sobre-marca); }
-html[data-tema="escuro"] .aviso-form[data-tipo="info"] { background: var(--cor-atencao-sutil); color: var(--cor-atencao); }
-html[data-tema="escuro"] .fin-conta { background: rgba(255, 255, 255, 0.06); }
-html[data-tema="escuro"] .fin-qr { background: #fff; }
-
-/* Estados interativos escuros: superfícies neutras e foco azul visível. */
-html[data-tema="escuro"] :is(button, a, [role="button"], input, select, textarea):focus-visible {
-    outline-color: var(--cor-foco);
-}
-html[data-tema="escuro"] .botao-secundario:hover:not(:disabled),
-html[data-tema="escuro"] .ficha:hover,
-html[data-tema="escuro"] .aparencia-opcao:hover,
-html[data-tema="escuro"] .botao-agenda:hover,
-html[data-tema="escuro"] .linha-tocavel:hover,
-html[data-tema="escuro"] .lateral-item:hover {
-    background-color: var(--cor-superficie-rebaixada);
-    color: var(--cor-texto);
-}
-html[data-tema="escuro"] :is(.botao-principal, .botao-secundario, .botao-texto, .botao-perigo):hover:not(:disabled) {
-    filter: brightness(1.12);
-}
-html[data-tema="escuro"] .botao-principal { background: #555C65; color: #F2F3F5; }
-html[data-tema="escuro"] .botao-principal:hover:not(:disabled) { background: #68717A; filter: none; }
-html[data-tema="escuro"] :is(
-    .ficha[aria-pressed="true"], .ficha[aria-checked="true"],
-    .chip-grupo[aria-pressed="true"], .escolha-pessoa[aria-checked="true"]
-) {
-    background: var(--cor-marca-sutil);
-    border-color: var(--cor-borda-forte);
-    color: var(--cor-texto);
-}
-html[data-tema="escuro"] .evento-bloco.agora .evento-bloco-data :is(*),
-html[data-tema="escuro"] .bloco-dia.sel :is(*),
-html[data-tema="escuro"] .agenda-culto:not(.nao-vai) .bloco-data :is(*),
-html[data-tema="escuro"] .inicio-dia :is(*) { color: inherit; }
+html[data-tema="escuro"] .botao-secundario:hover:not(:disabled) { background: #4A1D19; }
+html[data-tema="escuro"] .aniversario-faixa.hoje { border-color: #5A4520; }
+html[data-tema="escuro"] .segmentos::before { background: #342D2B; box-shadow: none; }
 
 .secao-aparencia { margin-top: var(--esp-8); }
 .secao-aparencia .rotulo-secao { margin-top: 0; }
@@ -1719,3 +1627,5 @@ html[data-tema="escuro"] .inicio-dia :is(*) { color: inherit; }
 @media (forced-colors: active) {
     .aparencia-opcao[aria-pressed="true"] { outline: 2px solid Highlight; outline-offset: 2px; }
 }
+/* "Culto da igreja" na Agenda: informativo, não confunde com "Você serve" */
+.agenda-marca.agenda-marca-igreja { background: var(--cor-superficie-rebaixada); color: var(--cor-texto-2); }

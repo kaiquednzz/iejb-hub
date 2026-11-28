@@ -22,7 +22,7 @@
     padding: 12px 12px 12px 10px;
     border: 1px solid var(--vidro-borda);
     border-radius: var(--raio-l);
-    background: rgba(255, 255, 255, 0.86);
+    background: color-mix(in srgb, var(--cor-superficie) 86%, transparent);
     box-shadow: var(--sombra-1), var(--brilho);
     font: inherit;
     color: inherit;
@@ -55,8 +55,8 @@
     place-items: center;
     min-height: 120px;
     border-radius: var(--raio-s);
-    border: 1.5px dashed rgba(58, 10, 9, 0.16);
-    background: rgba(255, 255, 255, 0.6);
+    border: 1.5px dashed rgb(var(--tinta-rgb) / 0.16);
+    background: color-mix(in srgb, var(--cor-superficie) 60%, transparent);
     overflow: hidden;
 }
 .evento-imagem img { width: 100%; max-height: 220px; object-fit: cover; display: block; }
@@ -71,7 +71,7 @@
     gap: 12px;
     padding: 12px;
     border-radius: var(--raio-l);
-    background: #fff;
+    background: var(--cor-superficie);
     border: 1px solid var(--vidro-borda);
     box-shadow: var(--sombra-2);
 }
@@ -81,7 +81,7 @@
     justify-items: center;
     padding: 8px 4px;
     border-radius: var(--raio-s);
-    background: var(--principal);
+    background: var(--cor-marca-fundo);
     color: #fff;
     text-align: center;
     font-size: 11px;
@@ -100,7 +100,7 @@
     margin-top: 4px;
     padding: 5px 12px;
     border-radius: var(--raio-capsula);
-    background: var(--principal);
+    background: var(--cor-marca-fundo);
     color: #fff;
     font-size: 12px;
     font-weight: 600;

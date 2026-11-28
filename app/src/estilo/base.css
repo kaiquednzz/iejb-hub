@@ -63,7 +63,7 @@ h1[tabindex="-1"]:focus { outline: none; }
     z-index: 100;
     padding: 10px 16px;
     border-radius: var(--raio-capsula);
-    background: var(--principal);
+    background: var(--cor-marca-fundo);
     color: #fff;
     font-weight: 600;
     text-decoration: none;

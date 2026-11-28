@@ -43,7 +43,7 @@
     width: 100%;
     padding: 28px 22px 22px;
     border-radius: var(--raio-l);
-    background: rgba(253, 250, 245, 0.96);
+    background: rgb(var(--fundo-rgb) / 0.96);
     color: var(--texto);
     box-shadow: var(--sombra-3), var(--brilho);
     animation: subir 0.8s 0.06s var(--ease-out) both;
@@ -132,7 +132,7 @@
     border-radius: var(--raio-l);
     color: #fff;
     text-decoration: none;
-    background: var(--principal);
+    background: var(--cor-marca-fundo);
     box-shadow: 0 14px 34px rgba(143, 13, 11, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.2);
     overflow: hidden;
     animation: surgir 0.7s 0.1s var(--mola) both;
@@ -151,7 +151,7 @@
 .cartao-culto {
     padding: 18px;
     border-radius: var(--raio-l);
-    background: rgba(255, 255, 255, 0.82);
+    background: color-mix(in srgb, var(--cor-superficie) 82%, transparent);
     border: 1px solid var(--vidro-borda);
     box-shadow: var(--sombra-1), var(--brilho);
     /* Entrada em cascata: cada cartão atrasa um pouco mais (--i vem do JS) */
@@ -196,7 +196,7 @@
     font-weight: 700;
     color: var(--texto-vinho);
 }
-.comigo .cartao-data { background: var(--principal); }
+.comigo .cartao-data { background: var(--cor-marca-fundo); }
 .comigo .cartao-data :is(.cartao-data-semana, .cartao-data-mes, .cartao-data-dia) { color: #fff; }
 
 .cartao-titulos { display: flex; flex-direction: column; align-items: flex-start; gap: 3px; min-width: 0; }
@@ -214,7 +214,7 @@
     margin-top: 14px;
     padding: 12px 14px;
     border-radius: var(--raio-s);
-    border: 1.5px dashed rgba(58, 10, 9, 0.14);
+    border: 1.5px dashed rgb(var(--tinta-rgb) / 0.14);
     color: var(--texto-2);
     font-size: 15px;
 }
@@ -248,14 +248,14 @@
     font-size: 13px;
     font-weight: 700;
 }
-.sou-eu .pessoa-avatar { background: var(--principal); color: #fff; }
+.sou-eu .pessoa-avatar { background: var(--cor-marca-fundo); color: #fff; }
 .pessoa-nome { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .pessoa-instrumento { font-size: 14px; color: var(--texto-2); text-align: right; }
 
 /* Repertório: abre e fecha com a altura animada (util/detalhes.js) */
 .repertorio {
     margin-top: 12px;
-    border-top: 1px solid rgba(58, 10, 9, 0.08);
+    border-top: 1px solid rgb(var(--tinta-rgb) / 0.08);
 }
 .repertorio summary {
     display: flex;
@@ -331,7 +331,7 @@
     padding: 36px 22px;
     text-align: center;
     border-radius: var(--raio-l);
-    background: rgba(255, 255, 255, 0.6);
+    background: color-mix(in srgb, var(--cor-superficie) 60%, transparent);
     border: 1px solid var(--vidro-borda);
     box-shadow: var(--sombra-1), var(--brilho);
     animation: subir 0.6s var(--ease-out) both;
@@ -428,7 +428,7 @@
     display: grid;
     place-items: center;
     border-radius: 13px;
-    background: #fff;
+    background: var(--cor-superficie);
     color: var(--principal);
     box-shadow: var(--sombra-1);
 }
@@ -445,7 +445,7 @@
     display: grid;
     place-items: center;
     border-radius: 50%;
-    background: var(--principal);
+    background: var(--cor-marca-fundo);
     color: #fff;
     font-size: 11px;
     font-weight: 700;
@@ -524,9 +524,9 @@
     gap: 12px;
     min-height: 52px;
     padding: 12px 20px;
-    border: 1px solid rgba(58, 10, 9, 0.14);
+    border: 1px solid rgb(var(--tinta-rgb) / 0.14);
     border-radius: var(--raio-capsula);
-    background: #fff;
+    background: var(--cor-superficie);
     color: #1f1f1f;
     font-size: 17px;
     font-weight: 600;
@@ -538,10 +538,10 @@
 .botao-google.carregando::after { border-color: rgba(0, 0, 0, 0.12); border-top-color: #4285f4; }
 .google-g { width: 20px; height: 20px; flex: none; }
 .divisoria { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--texto-2); }
-.divisoria::before, .divisoria::after { content: '' / ''; flex: 1; height: 1px; background: rgba(58, 10, 9, 0.12); }
+.divisoria::before, .divisoria::after { content: '' / ''; flex: 1; height: 1px; background: rgb(var(--tinta-rgb) / 0.12); }
 
 /* "Não vou poder ir" (D35) */
-.lista-pessoas li.nao-vai .pessoa-nome { text-decoration: line-through; text-decoration-color: rgba(58, 10, 9, 0.35); color: var(--texto-2); }
+.lista-pessoas li.nao-vai .pessoa-nome { text-decoration: line-through; text-decoration-color: rgb(var(--tinta-rgb) / 0.35); color: var(--texto-2); }
 .lista-pessoas li.nao-vai .pessoa-avatar { opacity: 0.45; filter: grayscale(1); }
 .pessoa-nao-vai { font-weight: 600; color: var(--principal); }
 .presenca {
@@ -570,9 +570,9 @@
 
 /* Culto cancelado: em vez de apagar o cartão inteiro com opacidade (o texto
    ficava abaixo do contraste mínimo), só as cores ficam neutras */
-.cartao-culto.cancelado { opacity: 1; background: rgba(255, 255, 255, 0.55); }
+.cartao-culto.cancelado { opacity: 1; background: color-mix(in srgb, var(--cor-superficie) 55%, transparent); }
 .cartao-culto.cancelado h3, .cartao-culto.cancelado .cartao-quando { color: var(--texto-2); }
-.cartao-culto.cancelado .cartao-data { background: rgba(58, 10, 9, 0.05); }
+.cartao-culto.cancelado .cartao-data { background: rgb(var(--tinta-rgb) / 0.05); }
 .cartao-culto.cancelado .cartao-data :is(.cartao-data-semana, .cartao-data-mes, .cartao-data-dia) { color: var(--texto-2); }
 
 /* Número da música: rosa claro quase não aparecia */
@@ -583,7 +583,7 @@
 .semana-escala {
     padding: 14px;
     border-radius: calc(var(--raio-l) + 2px);
-    background: rgba(255, 255, 255, 0.9);
+    background: color-mix(in srgb, var(--cor-superficie) 90%, transparent);
     border: 1px solid var(--vidro-borda);
     box-shadow: var(--sombra-1), var(--brilho);
     animation: subir 0.65s calc(0.1s + var(--i, 0) * 0.07s) var(--ease-out) backwards;
@@ -605,7 +605,7 @@
 .semana-escala-grupo {
     padding: 4px 12px;
     border-radius: var(--raio-capsula);
-    background: var(--principal);
+    background: var(--cor-marca-fundo);
     color: #fff;
     font-size: 13px;
     font-weight: 700;
@@ -634,7 +634,7 @@
     transition: flex-grow 0.6s var(--mola), background-color 0.35s, color 0.35s, transform 0.45s var(--mola);
 }
 .bloco-dia:active { transform: scale(0.95); transition-duration: 0.6s, 0.35s, 0.35s, 0.12s; }
-.bloco-dia.sel { flex-grow: 2.2; background: var(--principal); color: #fff; }
+.bloco-dia.sel { flex-grow: 2.2; background: var(--cor-marca-fundo); color: #fff; }
 .bloco-dia-semana { font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; opacity: 0.75; }
 .bloco-dia-num { font-family: var(--fonte-titulo); font-size: 30px; font-weight: 700; line-height: 1; }
 .bloco-dia-hora { font-size: 13px; font-weight: 600; opacity: 0.85; white-space: nowrap; }
@@ -743,7 +743,7 @@
     transition: transform 0.45s var(--mola), background-color 0.25s ease;
 }
 .botao-agenda:active { transform: scale(0.9); transition-duration: 0.12s; }
-@media (hover: hover) { .botao-agenda:hover { background: rgba(143, 13, 11, 0.14); } }
+@media (hover: hover) { .botao-agenda:hover { background: rgb(var(--marca-rgb) / 0.14); } }
 .botao-agenda.novidade::after {
     content: '' / '';
     position: absolute;

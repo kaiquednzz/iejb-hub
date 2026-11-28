@@ -1,6 +1,6 @@
 // Preferência de aparência fica no aparelho: não é um dado de conta.
 const CHAVE = 'iejb-aparencia';
-const CORES_TOPO = { claro: '#FDFAF5', escuro: '#18191A' };
+const CORES_TOPO = { claro: '#FDFAF5', escuro: '#0C0A0A' };
 const meta = () => document.querySelector('meta[name="theme-color"]');
 const sistema = () => window.matchMedia?.('(prefers-color-scheme: dark)');
 

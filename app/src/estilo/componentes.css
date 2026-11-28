@@ -27,7 +27,7 @@
 }
 
 /* Principal: a ação da tela (uma por tela). Vermelho cheio, sem sombra. */
-.botao-principal { background: var(--cor-marca); color: var(--cor-sobre-marca); }
+.botao-principal { background: var(--cor-marca-fundo); color: var(--cor-sobre-marca); }
 .botao-principal:active:not(:disabled) { background: var(--cor-marca-hover); }
 @media (hover: hover) {
     .botao-principal:hover:not(:disabled) { background: var(--cor-marca-hover); }
@@ -74,7 +74,7 @@
     cursor: pointer;
     transition: transform 0.45s var(--mola), background-color 0.2s;
 }
-.botao-texto:active:not(:disabled) { transform: scale(0.95); transition-duration: 0.12s; background: rgba(143, 13, 11, 0.08); }
+.botao-texto:active:not(:disabled) { transform: scale(0.95); transition-duration: 0.12s; background: rgb(var(--marca-rgb) / 0.08); }
 
 .botao-pequeno { min-height: 38px; padding: 8px 14px; font-size: 15px; }
 
@@ -108,7 +108,7 @@
     border-top-color: #fff;
     animation: girar 0.7s linear infinite;
 }
-.botao-secundario.carregando::after { border-color: rgba(143, 13, 11, 0.2); border-top-color: var(--principal); }
+.botao-secundario.carregando::after { border-color: rgb(var(--marca-rgb) / 0.2); border-top-color: var(--principal); }
 @keyframes girar { to { rotate: 1turn; } }
 
 .link-discreto {
@@ -209,7 +209,7 @@
     color: var(--cor-marca);
 }
 .selo .icone { width: 14px; height: 14px; }
-.selo-voce { background: var(--principal); color: #fff; }
+.selo-voce { background: var(--cor-marca-fundo); color: #fff; }
 .selo-rascunho { background: var(--cor-atencao-sutil); color: var(--cor-atencao); }
 .selo-cancelado { background: var(--cor-superficie-rebaixada); color: var(--cor-texto-2); }
 
@@ -236,14 +236,14 @@
     inset: 0;
     z-index: -1;
     border-radius: var(--raio-capsula);
-    background: rgba(253, 250, 245, 0.72);
+    background: rgb(var(--fundo-rgb) / 0.72);
     -webkit-backdrop-filter: var(--desfoque);
     backdrop-filter: var(--desfoque);
     border: 1px solid var(--vidro-borda);
     box-shadow: var(--sombra-2), var(--brilho);
 }
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-    .cabecalho::before { background: rgba(253, 250, 245, 0.97); }
+    .cabecalho::before { background: rgb(var(--fundo-rgb) / 0.97); }
 }
 
 .cabecalho-marca { display: flex; align-items: center; gap: 10px; }

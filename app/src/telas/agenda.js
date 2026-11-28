@@ -4,8 +4,8 @@ import { h, icone } from '../util/dom.js';
 import { supabase } from '../supabase.js';
 import { hojeEmBrasilia, somarDias, formatarHorario, partesDaData, diasEntre } from '../util/datas.js';
 import { cabecalhoApp } from './moldura.js';
-import { blocoData, linhaDoEvento } from './inicio-eventos.js';
-import { proximosEventos } from '../util/eventos.js';
+import { blocoData, linhaDoEvento, detalhesDoEvento } from './inicio-eventos.js';
+import { proximosEventos, eventoDoCulto } from '../util/eventos.js';
 import { naoVai, FUNCAO_MESA } from '../util/escala.js';
 import { escalaGuardada } from '../offline.js';
 import { botaoAgenda } from '../util/agenda.js';
@@ -32,9 +32,12 @@ export function telaAgenda(conta) {
     async function carregar() {
         const [cultos, eventos] = await Promise.all([cultosDaIgreja(conta), proximosEventos().catch(() => [])]);
         lista.removeAttribute('aria-busy');
+        // Evento no horário de um culto vira uma linha só (o culto, com o nome do evento)
+        const casados = new Map(cultos.map((c) => [c, eventoDoCulto(c, eventos)]));
+        const usados = new Set(casados.values());
         const itens = [
-            ...cultos.map((c) => ({ tipo: 'culto', data: c.data, hora: c.horario, c })),
-            ...eventos.map((e) => ({ tipo: 'evento', data: e.data, hora: e.horario, e })),
+            ...cultos.map((c) => ({ tipo: 'culto', data: c.data, hora: c.horario, c, e: casados.get(c) })),
+            ...eventos.filter((e) => !usados.has(e)).map((e) => ({ tipo: 'evento', data: e.data, hora: e.horario, e })),
         ].sort((a, b) => (a.data + a.hora).localeCompare(b.data + b.hora));
 
         if (!itens.length) {
@@ -60,7 +63,7 @@ export function telaAgenda(conta) {
             return h('section', { class: 'agenda-mes', 'aria-label': `${MESES[mes - 1]}${esteAno ? '' : ` de ${ano}`}` },
                 h('h2', { class: 'agenda-mes-nome' }, MESES[mes - 1], esteAno ? null : h('span', null, ` ${ano}`)),
                 h('ul', { class: 'grupo-lista' }, doMes.map((item) => {
-                    const li = h('li', { style: { '--i': i++ } }, item.tipo === 'culto' ? linhaDoCulto(item.c, conta, hoje) : linhaDoEvento(item.e));
+                    const li = h('li', { style: { '--i': i++ } }, item.tipo === 'culto' ? linhaDoCulto(item.c, conta, hoje, item.e) : linhaDoEvento(item.e));
                     if (item.tipo === 'evento') li.firstChild.classList.add('agenda-evento');
                     return li;
                 })));
@@ -86,26 +89,32 @@ export async function cultosDaIgreja(conta) {
     return cultos;
 }
 
-function linhaDoCulto(culto, conta, hoje) {
+function linhaDoCulto(culto, conta, hoje, evento = null) {
     const eu = (culto.escala ?? []).filter((e) => e.estado === 'publicada')
         .flatMap((e) => e.escala_item ?? []).find((i) => i.pessoa_id === conta.pessoa?.id);
     const vai = Boolean(eu) && !naoVai(eu);
-    const naoVaiPessoa = Boolean(eu) && naoVai(eu);
     const funcoes = (eu?.instrumento_exibido ?? []).map((x) => (x === FUNCAO_MESA ? 'Mesa de som' : x)).join(', ');
     const p = partesDaData(culto.data);
     const dias = diasEntre(hoje, culto.data);
     const quando = dias === 0 ? 'Hoje' : dias === 1 ? 'Amanhã' : `${p.semana.charAt(0).toUpperCase()}${p.semana.slice(1)}`;
-    return h(eu ? 'a' : 'div', {
-        class: `item-lista agenda-culto${eu ? '' : ' agenda-culto-informativo'}${naoVaiPessoa ? ' nao-vai' : ''}`,
-        ...(eu ? { href: '#/escala' } : {}),
+    const nome = evento ? evento.titulo : [culto.nome, culto.rotulo].filter(Boolean).join(' · ');
+    // Quem serve vai para a escala; um culto com evento abre os detalhes do
+    // evento; o culto comum, sem nada a abrir, é só uma linha de leitura
+    const tag = eu ? 'a' : evento ? 'button' : 'div';
+    const el = h(tag, {
+        class: `item-lista agenda-culto${tag === 'div' ? ' agenda-culto-informativo' : ''}${eu && !vai ? ' nao-vai' : ''}`,
+        ...(eu ? { href: '#/escala' } : evento ? { type: 'button' } : {}),
     },
         blocoData(culto.data),
         h('span', { class: 'item-textos' },
-            h('span', { class: 'item-nome' }, culto.nome, culto.rotulo ? ` · ${culto.rotulo}` : ''),
+            evento?.categoria ? h('span', { class: 'evento-chapeu' }, evento.categoria) : null,
+            h('span', { class: 'item-nome' }, nome),
             h('span', { class: 'item-apoio' }, `${quando} · ${formatarHorario(culto.horario)}${funcoes ? ` · ${funcoes}` : ''}`),
-            h('span', { class: `agenda-marca${eu && !vai ? ' agenda-marca-nao' : ''}` },
-                !eu ? 'Culto da igreja' : vai ? 'Você serve' : 'Você avisou que não vai')),
-        icone('seta', 'icone icone-p item-seta'));
+            eu ? h('span', { class: `agenda-marca${vai ? '' : ' agenda-marca-nao'}` }, vai ? 'Você serve' : 'Você avisou que não vai')
+                : evento ? null : h('span', { class: 'agenda-marca agenda-marca-igreja' }, 'Culto da igreja')),
+        tag === 'div' ? null : icone('seta', 'icone icone-p item-seta'));
+    if (tag === 'button') el.addEventListener('click', () => detalhesDoEvento(evento));
+    return el;
 }
 
 function esqueleto() {

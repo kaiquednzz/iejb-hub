@@ -29,6 +29,7 @@ import { filaDoYoutube } from '../util/musica.js';
 import { chama, marcarEscalado } from '../util/chama.js';
 import { botaoWhatsRepertorio } from '../util/compartilhar.js';
 import { corDoTopo } from '../util/tema.js';
+import { proximosEventos, eventoDoCulto } from '../util/eventos.js';
 
 const DURACAO_DO_CULTO_MIN = 150; // depois disso o culto conta como encerrado
 
@@ -44,6 +45,9 @@ function dataDeHoje() {
 
 export function telaInicio(conta) {
     const primeiroNome = conta.pessoa?.apelido?.trim() || (conta.pessoa?.nome || conta.nome_informado || '').split(' ')[0];
+    // O cartão do culto avisa qual evento ele já mostra, para o "Vem aí" não repetir
+    let avisarEventoDoCartao;
+    const eventoDoCartao = new Promise((r) => { avisarEventoDoCartao = r; });
     const destaque = h('div', { class: 'inicio-destaque', 'aria-live': 'polite' },
         h('div', { class: 'inicio-compromisso esqueleto' }));
     const avisosAdmin = h('div', { class: 'inicio-avisos' });
@@ -60,11 +64,11 @@ export function telaInicio(conta) {
             blocoAniversarios(),
             destaque,
             blocoMural(conta),
-            blocoEventos(),
+            blocoEventos({ semEste: eventoDoCartao }),
         ),
     );
 
-    carregarCompromisso(conta, destaque);
+    carregarCompromisso(conta, destaque).then(avisarEventoDoCartao, () => avisarEventoDoCartao(null));
     if (conta.e_administrador) carregarPedidos(avisosAdmin);
     carregarOracao(conta, avisosAdmin);
     mostrarBoasVindasSePrimeiraVez(conta);
@@ -122,33 +126,39 @@ async function carregarCompromisso(conta, destaque) {
     const offline = Boolean(error);
     cultos = offline ? (escalaGuardada(conta.id)?.cultos ?? []) : data;
 
-    const escalado = (c) => c.escala?.some((e) => e.estado === 'publicada' &&
-        e.escala_item.some((i) => i.pessoa_id === meuId && !naoVai(i)));
-    const encerradoHoje = cultos.find((c) => c.data === hoje && escalado(c) && minutosAte(c) < -DURACAO_DO_CULTO_MIN);
-    const proximo = cultos.find((c) => c.data >= hoje &&
-        !(c.data === hoje && minutosAte(c) < -DURACAO_DO_CULTO_MIN));
-    marcarEscalado(cultos.find((c) => c.data >= hoje && escalado(c) &&
-        !(c.data === hoje && minutosAte(c) < -DURACAO_DO_CULTO_MIN))?.data ?? null);
+    const escalado = (c) => Boolean(c.escala?.some((e) => e.estado === 'publicada' &&
+        e.escala_item.some((i) => i.pessoa_id === meuId && !naoVai(i))));
+    const jaAcabou = (c) => c.data === hoje && minutosAte(c) < -DURACAO_DO_CULTO_MIN;
+    const encerradoHoje = cultos.find((c) => c.data === hoje && escalado(c) && jaAcabou(c));
+    const proximo = cultos.find((c) => c.data >= hoje && !jaAcabou(c));
+    // O próximo culto em que a pessoa serve pode não ser o próximo da igreja
+    // (a EBD das 9h vem antes do culto das 18h): a capa de hoje/amanhã é dele
+    const meu = cultos.find((c) => c.data >= hoje && escalado(c) && !jaAcabou(c));
+    marcarEscalado(meu?.data ?? null);
+    // Evento do site no mesmo horário (Cantata, Ceia especial): o cartão
+    // mostra o nome do evento, como a Agenda (sem rede, fica o nome do culto)
+    const eventos = offline ? [] : await proximosEventos().catch(() => []);
+    const comEvento = (c) => (c ? { ...c, evento: eventoDoCulto(c, eventos) } : c);
 
     if (encerradoHoje) {
         const completo = await cultoCompleto(conta, encerradoHoje, offline);
-        destaque.replaceChildren(cartaoDepois(completo));
-        if (proximo) destaque.append(cartaoNormal(proximo, meuId, Boolean(escalado(proximo))));
-        return;
+        destaque.replaceChildren(cartaoDepois(comEvento(completo)));
+        if (proximo) destaque.append(cartaoNormal(comEvento(proximo), meuId, escalado(proximo)));
+        return proximo ? eventoDoCulto(proximo, eventos) : null;
+    }
+    if (meu && diasEntre(hoje, meu.data) <= 1) {
+        const dias = diasEntre(hoje, meu.data);
+        const completo = await cultoCompleto(conta, meu, offline);
+        destaque.replaceChildren(cartaoDoDia(comEvento(completo), meuId, dias === 0 ? 'dia' : 'vespera'));
+        corDoTopo('#8F0D0B'); // o topo do celular acompanha a capa vermelha
+        return eventoDoCulto(meu, eventos);
     }
     if (!proximo) {
         destaque.remove();
-        return;
+        return null;
     }
-    const dias = diasEntre(hoje, proximo.data);
-    const participa = Boolean(escalado(proximo));
-    if (participa && dias <= 1) {
-        const completo = await cultoCompleto(conta, proximo, offline);
-        destaque.replaceChildren(cartaoDoDia(completo, meuId, dias === 0 ? 'dia' : 'vespera'));
-        corDoTopo('#8F0D0B'); // o topo do celular acompanha a capa vermelha
-        return;
-    }
-    destaque.replaceChildren(cartaoNormal(proximo, meuId, participa));
+    destaque.replaceChildren(cartaoNormal(comEvento(proximo), meuId, escalado(proximo)));
+    return eventoDoCulto(proximo, eventos);
 }
 
 // O culto com toda a escala publicada e o repertório, usado só quando a pessoa
@@ -169,13 +179,16 @@ function meusInstrumentos(culto, meuId) {
     return lista;
 }
 
+// Nome que aparece: o do evento, se houver um no mesmo horário
+const nomeDoCulto = (c) => (c.evento ? c.evento.titulo : [c.nome, c.rotulo].filter(Boolean).join(' · '));
+
 function cartaoNormal(proximo, meuId, participa) {
     const falta = quantoFalta(proximo.data);
     return h('a', { class: 'inicio-compromisso', href: participa ? '#/escala' : '#/agenda' },
         h('span', { class: 'compromisso-rotulo' },
             h('span', null, 'Próximo culto'),
             falta && h('span', { class: 'compromisso-falta' }, falta)),
-        h('span', { class: 'compromisso-titulo' }, proximo.nome, proximo.rotulo ? ` · ${proximo.rotulo}` : ''),
+        h('span', { class: 'compromisso-titulo' }, nomeDoCulto(proximo)),
         h('span', { class: 'compromisso-quando' }, `${rotuloDoDia(proximo.data)} · ${formatarHorario(proximo.horario)}`),
         participa && h('span', { class: 'compromisso-chips' }, meusInstrumentos(proximo, meuId).map((x) => h('span', { class: 'compromisso-chip' }, iconeInstrumento(x), x))),
         h('span', { class: 'compromisso-acao' }, participa ? 'Ver escala e repertório' : 'Ver agenda', icone('seta', 'icone icone-p')));
@@ -212,9 +225,9 @@ function cartaoDoDia(culto, meuId, modo) {
 
     const instrumentos = meusInstrumentos(culto, meuId);
     const MAX_ROSTOS = 6;
-    return h('article', { class: `inicio-compromisso inicio-dia${modo === 'vespera' ? ' vespera' : ''}`, 'aria-label': `${modo === 'dia' ? 'Hoje' : 'Amanhã'} você toca: ${culto.nome}` },
+    return h('article', { class: `inicio-compromisso inicio-dia${modo === 'vespera' ? ' vespera' : ''}`, 'aria-label': `${modo === 'dia' ? 'Hoje' : 'Amanhã'} você toca: ${nomeDoCulto(culto)}` },
         h('p', { class: 'dia-rotulo' }, chama('chama-dia'), modo === 'dia' ? 'Hoje você toca' : 'Amanhã você toca'),
-        h('h2', { class: 'dia-titulo' }, culto.nome, culto.rotulo ? h('span', null, ` · ${culto.rotulo}`) : null),
+        h('h2', { class: 'dia-titulo' }, culto.evento ? culto.evento.titulo : culto.nome, !culto.evento && culto.rotulo ? h('span', null, ` · ${culto.rotulo}`) : null),
         instrumentos.length ? h('p', { class: 'dia-voce' }, h('span', null, 'Você'), instrumentos.map((x) => h('span', { class: 'compromisso-chip' }, iconeInstrumento(x), x))) : null,
         estado,
         contagem,
@@ -250,7 +263,7 @@ function cartaoDepois(culto) {
     return h('article', { class: 'inicio-depois' },
         h('p', { class: 'depois-rotulo' }, chama('chama-depois'), 'Culto encerrado'),
         h('h2', { class: 'depois-titulo' }, 'Obrigado por tocar hoje.'),
-        h('p', { class: 'depois-texto' }, `${culto.nome} · ${formatarHorario(culto.horario)}`),
+        h('p', { class: 'depois-texto' }, `${nomeDoCulto(culto)} · ${formatarHorario(culto.horario)}`),
         itens.length ? h('ol', { class: 'depois-musicas' }, itens.map((i) => h('li', null, i.musica.titulo, i.tom ? h('span', null, ` · ${i.tom}`) : null))) : null);
 }
 

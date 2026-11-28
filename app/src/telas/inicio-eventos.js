@@ -10,7 +10,7 @@ import { proximosEventos, urlDaImagem, enderecoNoSite } from '../util/eventos.js
 const MAXIMO = 8;
 const VISIVEIS = 3; // o resto aparece em "Ver todos", sem sair da tela
 
-export function blocoEventos() {
+export function blocoEventos({ semEste } = {}) {
     const lugar = h('section', { class: 'inicio-eventos', 'aria-labelledby': 'titulo-eventos', hidden: true });
     carregar();
     return lugar;
@@ -18,7 +18,9 @@ export function blocoEventos() {
     async function carregar() {
         let eventos;
         try {
-            eventos = (await proximosEventos()).slice(0, MAXIMO);
+            const [todos, doCartao] = await Promise.all([proximosEventos(), semEste ?? null]);
+            // O evento que já é o cartão do próximo culto não aparece de novo aqui
+            eventos = todos.filter((e) => !doCartao || e.titulo !== doCartao.titulo || e.data !== doCartao.data).slice(0, MAXIMO);
         } catch (erro) {
             console.error(erro);
             return; // sem rede: a seção só não aparece
