@@ -19,7 +19,7 @@ export function fecharAbertura() {
     const falta = (semMovimento ? DURACAO_SEM_MOVIMENTO_MS : DURACAO_MS) - performance.now();
     setTimeout(() => {
         abertura.classList.add('saindo');
-        abertura.addEventListener('transitionend', () => abertura.remove(), { once: true });
-        setTimeout(() => abertura.remove(), 800); // se o transitionend não vier
+        abertura.addEventListener('transitionend', (e) => { if (e.propertyName === 'opacity') abertura.remove(); });
+        setTimeout(() => abertura.remove(), 1100); // se o transitionend não vier
     }, Math.max(0, falta));
 }

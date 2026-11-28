@@ -1629,3 +1629,16 @@ html[data-tema="escuro"] .segmentos::before { background: #342D2B; box-shadow: n
 }
 /* "Culto da igreja" na Agenda: informativo, não confunde com "Você serve" */
 .agenda-marca.agenda-marca-igreja { background: var(--cor-superficie-rebaixada); color: var(--cor-texto-2); }
+
+/* --- Toque (D78) --------------------------------------------------------------
+   No app nativo o dedo "afunda" o que tocou e solta com mola. No site o toque
+   não responde até a página trocar. Aqui: o ícone da aba encolhe ao apertar
+   e volta quicando; linhas de lista acendem na hora e apagam devagar. */
+.barra-abas .aba .icone { transition: scale 0.5s var(--mola); }
+.barra-abas .aba:active .icone { scale: 0.8; transition-duration: 0.1s; }
+.barra-abas .aba .aba-nome { transition: opacity 0.2s ease; }
+.barra-abas .aba:active .aba-nome { opacity: 0.6; }
+.lateral-nav a { transition: transform 0.45s var(--mola), background-color var(--dur-media) ease; }
+.lateral-nav a:active { transform: scale(0.97); transition-duration: 0.1s; }
+.item-lista .item-icone { transition: scale 0.45s var(--mola); }
+.item-lista:active .item-icone { scale: 0.88; transition-duration: 0.1s; }

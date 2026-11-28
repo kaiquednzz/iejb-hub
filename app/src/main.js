@@ -171,8 +171,23 @@ async function decidirTela() {
     mostrar(tela);
 }
 
-// Troca a tela com a View Transitions API quando existe (Chrome, Safari 18+):
-// o navegador faz o cruzamento suave entre a tela velha e a nova.
+// Que tipo de troca é (D78), para a animação ter o sentido de app nativo:
+//   aba     → abas de baixo, ou abas irmãs (Escala/Montar/...): troca no lugar
+//   avanca  → entrou num nível mais fundo (Ministérios → Louvor): empurra da direita
+//   volta   → o contrário: a tela de antes volta da esquerda
+const ABAS = ['#/inicio', '#/agenda', '#/ministerios', '#/voce'];
+const IRMAS = ['#/escala', '#/montar', '#/repertorios', '#/equipe'];
+const nivel = (rota) => (ABAS.includes(rota) || rota === '' ? 0 : 1);
+let rotaAnterior = location.hash;
+function tipoDeTroca(de, para) {
+    if (ABAS.includes(para) && ABAS.includes(de)) return 'aba';
+    if (IRMAS.includes(para) && IRMAS.includes(de)) return 'aba';
+    return nivel(para) > nivel(de) ? 'avanca' : nivel(para) < nivel(de) ? 'volta' : 'aba';
+}
+
+// Troca a tela com a View Transitions API quando existe (Chrome, Safari 18+).
+// A tela velha sai rápido e desfocando; só então a nova entra (nada de duas
+// telas sobrepostas, que é o que entrega "site"). Ver base.css.
 function mostrar(tela) {
     const trocar = () => {
         corDoTopo(null); // cada tela começa com a cor padrão do topo
@@ -183,6 +198,9 @@ function mostrar(tela) {
         window.scrollTo(0, 0);
     };
     const semMovimento = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const para = location.hash;
+    document.documentElement.dataset.troca = tipoDeTroca(rotaAnterior, para);
+    rotaAnterior = para;
     if (document.startViewTransition && !semMovimento && raiz.firstElementChild?.matches('.tela')) {
         document.startViewTransition(trocar);
     } else {

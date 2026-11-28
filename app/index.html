@@ -41,6 +41,16 @@
             background: #8F0D0B;
             transition: opacity .55s cubic-bezier(.32,.72,0,1);
         }
+        /* Saída (D78): um círculo se abre a partir da logo e revela o app,
+           como uma lente. --furo é o raio do buraco na máscara. Sem
+           @property (navegador velho) o buraco não anima e fica o esmaecer. */
+        @property --furo { syntax: '<length>'; inherits: false; initial-value: 0px; }
+        #abertura {
+            -webkit-mask: radial-gradient(circle at 50% 50%, transparent var(--furo), #000 calc(var(--furo) + 1px));
+            mask: radial-gradient(circle at 50% 50%, transparent var(--furo), #000 calc(var(--furo) + 1px));
+            transition: --furo .8s cubic-bezier(.7,0,.25,1), opacity .3s .55s ease;
+        }
+        #abertura.saindo { --furo: 120vmax; }
         html[data-tema="escuro"] #abertura { background: #0C0A0A; }
         #abertura.saindo { opacity: 0; pointer-events: none; }
         .ab-logo {

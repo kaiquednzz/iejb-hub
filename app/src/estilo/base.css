@@ -92,11 +92,26 @@ h1[tabindex="-1"]:focus { outline: none; }
     text-align: center;
 }
 
-/* Troca de tela: cruzamento suave com um leve deslize (View Transitions API) */
-::view-transition-old(root) { animation: 0.22s var(--ease-ios) both sair-tela; }
-::view-transition-new(root) { animation: 0.42s var(--ease-out) both entrar-tela; }
-@keyframes sair-tela { to { opacity: 0; scale: 0.985; } }
-@keyframes entrar-tela { from { opacity: 0; translate: 0 14px; } }
+/* Troca de tela (D78). Sem as duas telas sobrepostas: a velha sai rápido,
+   desfocando, e a nova entra logo depois, saindo do desfoque. Cabeçalho e
+   barra de baixo têm nome próprio e ficam parados (sistema.css).
+   data-troca (main.js) escolhe o movimento:
+     aba    → no lugar: a nova sobe de leve e foca
+     avanca → a nova vem da direita, a velha recua um pouco para a esquerda
+     volta  → o contrário */
+::view-transition-old(root) { animation: 0.16s var(--ease-ios) both sair-tela; }
+::view-transition-new(root) { animation: 0.46s 0.13s var(--ease-out) both entrar-tela; }
+@keyframes sair-tela { to { opacity: 0; scale: 0.99; filter: blur(6px); } }
+@keyframes entrar-tela { from { opacity: 0; translate: 0 10px; filter: blur(8px); } }
+
+html[data-troca="avanca"]::view-transition-old(root) { animation: 0.3s var(--ease-ios) both empurrar-sai; }
+html[data-troca="avanca"]::view-transition-new(root) { animation: 0.5s var(--ease-ios) both empurrar-entra; }
+html[data-troca="volta"]::view-transition-old(root) { animation: 0.3s var(--ease-ios) both voltar-sai; }
+html[data-troca="volta"]::view-transition-new(root) { animation: 0.5s var(--ease-ios) both voltar-entra; }
+@keyframes empurrar-sai  { to   { opacity: 0; translate: -18% 0; filter: blur(3px); } }
+@keyframes empurrar-entra { from { opacity: 0; translate: 32% 0; } }
+@keyframes voltar-sai    { to   { opacity: 0; translate: 32% 0; } }
+@keyframes voltar-entra  { from { opacity: 0; translate: -18% 0; filter: blur(3px); } }
 
 @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
