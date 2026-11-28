@@ -373,3 +373,21 @@ test('Aparência: escolher Escuro vale na hora e fica salvo', async ({ page, sim
     await expect(page.locator('html')).toHaveAttribute('data-tema', 'escuro');
     await expect(page.getByRole('button', { name: 'Escuro' })).toHaveAttribute('aria-pressed', 'true');
 });
+
+// --- Datas especiais (D79) ---------------------------------------------------
+test('Natal: o Início ganha o cartão da época e a saudação', async ({ page, simular }) => {
+    await simular.abrir('?epoca=natal#/inicio', umaConta());
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Feliz Natal, Ana');
+    await expect(page.locator('.epoca')).toContainText('Lucas 2:11');
+    await expect(page.locator('.epoca-chuva')).toHaveCount(1); // dia de festa: chuva na 1ª abertura
+});
+
+test('fora de época não aparece nada; desligar os enfeites esconde', async ({ page, simular }) => {
+    await simular.abrir('#/inicio', umaConta());
+    await expect(page.locator('.epoca')).toHaveCount(0); // 23/11 não é data especial
+    await page.goto('/?epoca=pascoa#/voce');
+    await page.getByRole('switch', { name: /Enfeites das datas especiais/ }).uncheck({ force: true });
+    await page.goto('/?epoca=pascoa#/inicio');
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText(/Boa tarde, Ana/);
+    await expect(page.locator('.epoca')).toHaveCount(0);
+});

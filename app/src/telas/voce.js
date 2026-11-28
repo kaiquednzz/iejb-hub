@@ -8,6 +8,8 @@ import { textoAniversario, folhaAniversario } from './aniversarios.js';
 import { abrirTour } from './tour.js';
 import { nomeDoTitulo } from '../util/titulos.js';
 import { definirPreferenciaTema, preferenciaTema } from '../util/tema.js';
+import { interruptor } from './equipe/pecas.js';
+import { enfeitesLigados, ligarEnfeites } from '../util/epocas.js';
 
 // Linha de lista: ícone, nome, texto de apoio e seta. Toda a linha é o link.
 export function linhaLista({ href, nome, texto, nomeIcone }) {
@@ -63,7 +65,11 @@ function secaoAparencia() {
     return h('section', { class: 'secao-aparencia', 'aria-labelledby': 'titulo-aparencia' },
         h('h2', { id: 'titulo-aparencia', class: 'rotulo-secao' }, 'Aparência'),
         h('div', { class: 'grupo-lista aparencia-cartao' },
-            h('div', { class: 'aparencia-controles' }, grupo, descricao)));
+            h('div', { class: 'aparencia-controles' }, grupo, descricao)),
+        // Datas especiais (D79): Natal, Páscoa, Pentecostes... no Início
+        h('div', { class: 'grupo-lista aparencia-cartao aparencia-enfeites' },
+            interruptor({ rotulo: 'Enfeites das datas especiais', descricao: 'Natal, Páscoa, Pentecostes e outras, no Início',
+                ligado: enfeitesLigados(), aoMudar: (v) => { ligarEnfeites(v); return true; } })));
 }
 
 // Carteirinha digital (redesign v2, fase 3): o cartão da pessoa no Hub, com

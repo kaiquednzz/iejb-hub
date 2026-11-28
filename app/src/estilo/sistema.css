@@ -1642,3 +1642,92 @@ html[data-tema="escuro"] .segmentos::before { background: #342D2B; box-shadow: n
 .lateral-nav a:active { transform: scale(0.97); transition-duration: 0.1s; }
 .item-lista .item-icone { transition: scale 0.45s var(--mola); }
 .item-lista:active .item-icone { scale: 0.88; transition-duration: 0.1s; }
+
+/* --- Datas especiais (D79) ----------------------------------------------------
+   Um cartão no Início com o desenho da época e um versículo. Os desenhos se
+   montam uma vez ao aparecer (nada fica em loop, só a estrela e as chamas
+   respiram, com transform/opacity). Sóbrio na Sexta-feira Santa. */
+.epoca {
+    display: grid;
+    grid-template-columns: 112px minmax(0, 1fr);
+    align-items: center;
+    gap: var(--esp-3);
+    margin-top: var(--esp-3);
+    padding: var(--esp-3) var(--esp-4) var(--esp-3) var(--esp-2);
+    border: 1px solid var(--cor-borda);
+    border-radius: var(--raio-3);
+    background: var(--cor-superficie);
+    animation: subir 0.6s 0.1s var(--ease-out) backwards;
+}
+.epoca-desenho { width: 112px; height: 84px; overflow: visible; }
+.epoca-titulo { font: var(--texto-rotulo); letter-spacing: var(--rotulo-espaco); text-transform: uppercase; color: var(--cor-marca); }
+.epoca-frase { margin-top: 4px; font: italic 600 17px/1.3 var(--fonte-titulo); color: var(--cor-titulo); }
+.epoca-ref { margin-top: 4px; font: var(--texto-apoio); color: var(--cor-texto-3); }
+.epoca-tom-sobrio .epoca-titulo { color: var(--cor-texto-2); }
+.epoca-tom-sobrio { animation-duration: 1.2s; }
+
+/* Peças que se montam (uma vez) */
+.epoca-desenho :is(.ep-estrela, .ep-aureola, .ep-sol, .ep-pedra, .ep-flor, .ep-fogo, .ep-coracao, .ep-vela, .ep-pomba, .ep-ovelha, .ep-cajado, .ep-gravata, .ep-rosa, .ep-confete, .ep-chama) {
+    transform-box: fill-box;
+    transform-origin: center;
+}
+.ep-estrela { animation: epPop 0.7s 0.3s var(--mola) backwards, epBrilha 2.6s 1s ease-in-out infinite; }
+.ep-luz { animation: epAparece 1.2s 0.6s ease backwards; }
+.ep-pisca { animation: epPisca 2.4s calc(var(--i, 0) * 0.35s) ease-in-out infinite; }
+.ep-aureola { animation: epPop 0.6s 0.7s var(--mola) backwards; }
+.ep-sol { animation: epNasce 1.4s 0.2s var(--ease-out) backwards; transform-origin: 50% 100%; }
+.ep-pedra { animation: epRola 1.1s 0.5s var(--ease-ios) backwards; }
+.ep-flor { animation: epBrota 0.7s calc(0.6s + var(--i, 0) * 0.15s) var(--mola) backwards; transform-origin: 50% 100%; }
+.ep-fogo { animation: epExplode 1s calc(0.2s + var(--i, 0) * 0.35s) var(--ease-out) backwards; }
+.ep-coracao { animation: epPop 0.7s calc(0.2s + var(--i, 0) * 0.15s) var(--mola) backwards, epBate 1.6s calc(1.2s + var(--i, 0) * 0.2s) ease-in-out 2; }
+.ep-sobe { animation: epSobe 2.6s calc(0.6s + var(--i, 0) * 0.4s) ease-out infinite; }
+.ep-vela { animation: epBrota 0.6s calc(0.2s + var(--i, 0) * 0.12s) var(--mola) backwards; transform-origin: 50% 100%; }
+.ep-chama { transform-origin: 0 0; animation: epChama 1.8s ease-in-out infinite alternate; }
+.ep-pomba { animation: epPousa 1.3s 0.2s var(--ease-out) backwards; }
+.ep-ovelha { animation: epPop 0.7s 0.4s var(--mola) backwards; }
+.ep-cajado { animation: epAparece 0.8s ease backwards; }
+.ep-gravata { animation: epBalanca 1.2s 0.4s var(--mola) backwards; transform-origin: 50% 0; }
+.ep-rosa { animation: epGira 1.2s 0.2s var(--ease-out) backwards; }
+.ep-confete { animation: epAparece 0.8s 0.6s ease backwards; }
+
+@keyframes epPop { from { opacity: 0; scale: 0.2; } }
+@keyframes epAparece { from { opacity: 0; } }
+@keyframes epBrilha { 50% { scale: 1.12; rotate: 8deg; } }
+@keyframes epPisca { 50% { opacity: 0.2; } }
+@keyframes epNasce { from { translate: 0 24px; opacity: 0; } }
+@keyframes epRola { from { translate: -26px 0; rotate: -200deg; } }
+@keyframes epBrota { from { scale: 0 0; opacity: 0; } }
+@keyframes epExplode { from { scale: 0.1; opacity: 0; } 60% { opacity: 1; } }
+@keyframes epBate { 15%, 45% { scale: 1.12; } 30% { scale: 1; } }
+@keyframes epSobe { from { translate: 0 10px; opacity: 0; } 30% { opacity: 1; } to { translate: 0 -14px; opacity: 0; } }
+@keyframes epChama { to { scale: 1.06 0.94; } }
+@keyframes epPousa { from { translate: -18px -16px; opacity: 0; rotate: -8deg; } }
+@keyframes epBalanca { from { rotate: 18deg; } }
+@keyframes epGira { from { rotate: -72deg; opacity: 0; scale: 0.6; } }
+
+/* Chuva de enfeites: só nos dias de festa, uma vez por dia */
+.epoca-chuva { position: fixed; inset: 0; z-index: 1500; pointer-events: none; overflow: hidden; }
+.epoca-peca {
+    position: absolute; top: -20px; left: var(--x);
+    width: 9px; height: 9px; border-radius: 2px;
+    background: var(--cor);
+    animation: epCai var(--dur) var(--atraso) cubic-bezier(0.3, 0.2, 0.4, 1) forwards;
+    opacity: 0;
+}
+.peca-fita { width: 5px; height: 14px; }
+.peca-estrela, .peca-chaminha { width: 12px; height: 12px; border-radius: 0;
+    clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%); }
+.peca-chaminha { clip-path: path('M6 0C9 4 12 6 12 9A6 6 0 0 1 0 9C0 6 3 4 6 0Z'); }
+.peca-petala { width: 10px; height: 14px; border-radius: 50% 50% 50% 0; }
+@keyframes epCai {
+    0% { opacity: 0; transform: translate(0, 0) rotate(0); }
+    10% { opacity: 1; }
+    85% { opacity: 1; }
+    100% { opacity: 0; transform: translate(var(--deriva), 105vh) rotate(var(--giro)); }
+}
+.aparencia-enfeites { margin-top: var(--esp-3); padding: 0; }
+.aparencia-enfeites .interruptor { padding: var(--esp-3) var(--esp-4); }
+@media (prefers-reduced-motion: reduce) {
+    .epoca-desenho * { animation: none !important; }
+}
+.epoca-sexta-santa { color: var(--cor-texto-2); }

@@ -30,6 +30,7 @@ import { chama, marcarEscalado } from '../util/chama.js';
 import { botaoWhatsRepertorio } from '../util/compartilhar.js';
 import { corDoTopo } from '../util/tema.js';
 import { proximosEventos, eventoDoCulto } from '../util/eventos.js';
+import { blocoEpoca, saudacaoDaEpoca } from './epoca.js';
 
 const DURACAO_DO_CULTO_MIN = 150; // depois disso o culto conta como encerrado
 
@@ -58,7 +59,8 @@ export function telaInicio(conta) {
         h('main', { id: 'conteudo', class: 'app-conteudo' },
             h('div', { class: 'inicio-ola-area' },
                 h('p', { class: 'inicio-data' }, dataDeHoje()),
-                h('h1', { tabindex: -1, class: 'titulo-tela inicio-ola' }, `${saudacao()}${primeiroNome ? `, ${primeiroNome}` : ''}`)),
+                h('h1', { tabindex: -1, class: 'titulo-tela inicio-ola' }, `${saudacaoDaEpoca() ?? saudacao()}${primeiroNome ? `, ${primeiroNome}` : ''}`)),
+            blocoEpoca(), // datas especiais (D79): Natal, Páscoa, Pentecostes...
             conferir,
             avisosAdmin,
             blocoAniversarios(),
